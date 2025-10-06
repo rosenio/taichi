@@ -2,14 +2,14 @@
 
 #include <memory>
 
-#include "taichi/program/kernel.h"
-#include "taichi/program/compile_config.h"
 #include "taichi/codegen/compiled_kernel_data.h"
+#include "taichi/program/compile_config.h"
+#include "taichi/program/kernel.h"
 
 namespace taichi::lang {
 
 class KernelCompiler {
- public:
+public:
   using IRNodePtr = std::unique_ptr<IRNode>;
   using CKDPtr = std::unique_ptr<CompiledKernelData>;
 
@@ -20,10 +20,9 @@ class KernelCompiler {
   // CHI IR -> CompiledKernelData
   virtual CKDPtr compile(const CompileConfig &compile_config,
                          const DeviceCapabilityConfig &device_caps,
-                         const Kernel &kernel_def,
-                         IRNode &chi_ir) const = 0;
+                         const Kernel &kernel_def, IRNode &chi_ir) const = 0;
 
   virtual ~KernelCompiler() = default;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

@@ -7,8 +7,7 @@
 namespace taichi {
 
 // Round up |a| to the closest multiple of |b|, works only for integers.
-template <typename T,
-          typename U,
+template <typename T, typename U,
           typename = std::enable_if_t<std::is_convertible_v<U, T>>>
 T iroundup(T a, U b) {
   static_assert(std::is_integral_v<T>, "LHS must be integral type");
@@ -16,8 +15,7 @@ T iroundup(T a, U b) {
   return ((a + b - 1) / b) * b;
 }
 
-template <typename T>
-uint32_t log2int(T value) {
+template <typename T> uint32_t log2int(T value) {
   static_assert(std::is_integral_v<T>, "Must be integral type");
 
   uint32_t ret = 0;
@@ -29,4 +27,4 @@ uint32_t log2int(T value) {
   return ret;
 }
 
-}  // namespace taichi
+} // namespace taichi

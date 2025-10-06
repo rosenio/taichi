@@ -1,17 +1,17 @@
 #pragma once
 
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/Instructions.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/LegacyPassManager.h"
-#include "llvm/IR/Function.h"
-#include "llvm/Pass.h"
 #include "llvm/IR/Module.h"
+#include "llvm/Pass.h"
+#include "llvm/Support/SourceMgr.h"
 #include "llvm/Transforms/IPO.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
-#include "llvm/IR/Instructions.h"
-#include "llvm/IR/IRBuilder.h"
-#include "llvm/Support/SourceMgr.h"
-#include "llvm/Transforms/Utils/ValueMapper.h"
 #include "llvm/Transforms/Utils/Cloning.h"
+#include "llvm/Transforms/Utils/ValueMapper.h"
 
 #if defined(TI_WITH_AMDGPU)
 #include "taichi/rhi/amdgpu/amdgpu_context.h"
@@ -80,8 +80,7 @@ struct AddStructForFuncPass : public ModulePass {
 #if defined(TI_WITH_AMDGPU)
 struct AMDGPUConvertAllocaInstAddressSpacePass : public FunctionPass {
   static inline char ID{0};
-  AMDGPUConvertAllocaInstAddressSpacePass() : FunctionPass(ID) {
-  }
+  AMDGPUConvertAllocaInstAddressSpacePass() : FunctionPass(ID) {}
   bool runOnFunction(llvm::Function &f) override {
     f.addFnAttr("target-cpu",
                 "gfx" + AMDGPUContext::get_instance().get_mcpu().substr(3, 4));
@@ -186,8 +185,7 @@ struct AMDGPUAddStructForFuncPass : public ModulePass {
 
 struct AMDGPUConvertFunctionBodyAllocsAddressSpacePass : public FunctionPass {
   static inline char ID{0};
-  AMDGPUConvertFunctionBodyAllocsAddressSpacePass() : FunctionPass(ID) {
-  }
+  AMDGPUConvertFunctionBodyAllocsAddressSpacePass() : FunctionPass(ID) {}
   bool runOnFunction(llvm::Function &f) override {
     for (auto &bb : f) {
       if (bb.getName() != "allocs")
@@ -219,8 +217,7 @@ struct AMDGPUConvertFunctionBodyAllocsAddressSpacePass : public FunctionPass {
 
 struct AMDGPUConvertFuncParamAddressSpacePass : public ModulePass {
   static inline char ID{0};
-  AMDGPUConvertFuncParamAddressSpacePass() : ModulePass(ID) {
-  }
+  AMDGPUConvertFuncParamAddressSpacePass() : ModulePass(ID) {}
   bool runOnModule(llvm::Module &M) override {
     for (auto &f : M) {
       bool is_kernel = false;
@@ -301,5 +298,5 @@ struct AMDGPUConvertFuncParamAddressSpacePass : public ModulePass {
 
 #endif
 
-}  // namespace lang
-}  // namespace taichi
+} // namespace lang
+} // namespace taichi

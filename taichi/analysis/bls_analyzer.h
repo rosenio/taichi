@@ -1,8 +1,8 @@
 #pragma once
 
-#include "taichi/ir/visitors.h"
-#include "taichi/ir/statements.h"
 #include "taichi/ir/scratch_pad.h"
+#include "taichi/ir/statements.h"
+#include "taichi/ir/visitors.h"
 
 namespace taichi::lang {
 
@@ -10,7 +10,7 @@ namespace taichi::lang {
 class BLSAnalyzer : public BasicStmtVisitor {
   using BasicStmtVisitor::visit;
 
- public:
+public:
   // The lowest and highest index in each dimension.
   struct IndexRange {
     int low{0};
@@ -20,8 +20,7 @@ class BLSAnalyzer : public BasicStmtVisitor {
 
   BLSAnalyzer(OffloadedStmt *for_stmt, ScratchPads *pads);
 
-  void visit(GlobalPtrStmt *stmt) override {
-  }
+  void visit(GlobalPtrStmt *stmt) override {}
 
   // Do not eliminate global data access
   void visit(GlobalLoadStmt *stmt) override;
@@ -38,7 +37,7 @@ class BLSAnalyzer : public BasicStmtVisitor {
    */
   bool run();
 
- private:
+private:
   // Generate the index bounds in a SNode (block). E.g., a dense(ti.ij, (2, 4))
   // SNode has index bounds [[0, 1], [0, 3]].
   static void generate_block_indices(SNode *snode, BlockIndices *indices);
@@ -55,4 +54,4 @@ class BLSAnalyzer : public BasicStmtVisitor {
   bool analysis_ok_{true};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

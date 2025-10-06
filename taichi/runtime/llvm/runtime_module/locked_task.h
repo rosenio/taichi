@@ -1,8 +1,7 @@
 #pragma once
 
-template <typename T, typename G>
-class lock_guard {
- public:
+template <typename T, typename G> class lock_guard {
+public:
   lock_guard(Ptr lock, const T &func, const G &test) {
 #if ARCH_x64 || ARCH_arm64
     mutex_lock_i32(lock);
@@ -63,7 +62,7 @@ class lock_guard {
       // safe.
       body();
     }
-#endif  // CUDA
+#endif // CUDA
   }
 };
 
@@ -72,7 +71,6 @@ void locked_task(void *lock, const T &func, const G &test) {
   lock_guard<T, G> _((Ptr)lock, func, test);
 }
 
-template <typename T>
-void locked_task(void *lock, const T &func) {
+template <typename T> void locked_task(void *lock, const T &func) {
   locked_task(lock, func, []() { return true; });
 }

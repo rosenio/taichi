@@ -20,5 +20,5 @@ struct ZipArchive {
   static bool try_from_bytes(const void *data, size_t size, ZipArchive &ar);
 };
 
-}  // namespace zip
-}  // namespace taichi
+} // namespace zip
+} // namespace taichi

@@ -7,15 +7,13 @@
 namespace taichi::lang {
 
 class TestProgram {
- public:
+public:
   void setup(Arch arch = Arch::x64);
 
-  Program *prog() {
-    return prog_.get();
-  }
+  Program *prog() { return prog_.get(); }
 
- private:
+private:
   std::unique_ptr<Program> prog_{nullptr};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

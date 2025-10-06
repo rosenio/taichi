@@ -1,17 +1,17 @@
 #pragma once
 #include "taichi/util/lang_util.h"
 
-#include <vector>
 #include <chrono>
+#include <vector>
 
-#include "taichi/rhi/device.h"
-#include "taichi/codegen/spirv/snode_struct_compiler.h"
 #include "taichi/codegen/spirv/kernel_utils.h"
+#include "taichi/codegen/spirv/snode_struct_compiler.h"
 #include "taichi/program/compile_config.h"
-#include "taichi/struct/snode_tree.h"
-#include "taichi/program/snode_expr_utils.h"
-#include "taichi/program/program_impl.h"
 #include "taichi/program/kernel_launcher.h"
+#include "taichi/program/program_impl.h"
+#include "taichi/program/snode_expr_utils.h"
+#include "taichi/rhi/device.h"
+#include "taichi/struct/snode_tree.h"
 
 namespace taichi::lang {
 namespace gfx {
@@ -33,7 +33,7 @@ using InputBuffersMap =
 class SNodeTreeManager;
 
 class CompiledTaichiKernel {
- public:
+public:
   struct Params {
     const TaichiKernelAttributes *ti_kernel_attribs{nullptr};
     std::vector<std::vector<uint32_t>> spirv_bins;
@@ -62,7 +62,7 @@ class CompiledTaichiKernel {
     return input_buffers_[bind];
   }
 
- private:
+private:
   TaichiKernelAttributes ti_kernel_attribs_;
   std::vector<TaskAttributes> tasks_attribs_;
 
@@ -76,7 +76,7 @@ class CompiledTaichiKernel {
 };
 
 class TI_DLL_EXPORT GfxRuntime {
- public:
+public:
   struct Params {
     Device *device{nullptr};
     KernelProfilerBase *profiler{nullptr};
@@ -99,8 +99,7 @@ class TI_DLL_EXPORT GfxRuntime {
   void launch_kernel(KernelHandle handle, LaunchContextBuilder &host_ctx);
 
   void buffer_copy(DevicePtr dst, DevicePtr src, size_t size);
-  void copy_image(DeviceAllocation dst,
-                  DeviceAllocation src,
+  void copy_image(DeviceAllocation dst, DeviceAllocation src,
                   const ImageCopyParams &params);
 
   DeviceAllocation create_image(const ImageParams &params);
@@ -136,7 +135,7 @@ class TI_DLL_EXPORT GfxRuntime {
   get_struct_type_with_data_layout_impl(const lang::StructType *old_ty,
                                         const std::string &layout);
 
- private:
+private:
   friend class taichi::lang::gfx::SNodeTreeManager;
 
   void ensure_current_cmdlist();
@@ -172,12 +171,10 @@ class TI_DLL_EXPORT GfxRuntime {
   std::unordered_set<DeviceAllocationId> argpacks_in_use_;
 };
 
-GfxRuntime::RegisterParams run_codegen(
-    Kernel *kernel,
-    Arch arch,
-    const DeviceCapabilityConfig &caps,
-    const std::vector<CompiledSNodeStructs> &compiled_structs,
-    const CompileConfig &compile_config);
+GfxRuntime::RegisterParams
+run_codegen(Kernel *kernel, Arch arch, const DeviceCapabilityConfig &caps,
+            const std::vector<CompiledSNodeStructs> &compiled_structs,
+            const CompileConfig &compile_config);
 
-}  // namespace gfx
-}  // namespace taichi::lang
+} // namespace gfx
+} // namespace taichi::lang

@@ -3,8 +3,8 @@
 #include <vector>
 
 #include "taichi/program/field_info.h"
-#include "taichi/ui/common/renderable_info.h"
 #include "taichi/ui/common/camera.h"
+#include "taichi/ui/common/renderable_info.h"
 #include "taichi/ui/utils/utils.h"
 
 namespace taichi::ui {
@@ -44,7 +44,7 @@ struct SceneLinesInfo {
 };
 
 class SceneBase {
- public:
+public:
   virtual void set_camera(const Camera &camera) = 0;
   virtual void lines(const SceneLinesInfo &info) = 0;
   virtual void mesh(const MeshInfo &info) = 0;
@@ -89,4 +89,4 @@ class SceneBase {
   int next_object_id_ = 0;
 };
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

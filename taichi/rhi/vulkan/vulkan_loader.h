@@ -1,22 +1,22 @@
 #pragma once
 
-#include <thread>
 #include <mutex>
+#include <thread>
 
-#include "taichi/rhi/vulkan/vulkan_common.h"
 #include "taichi/common/dynamic_loader.h"
+#include "taichi/rhi/vulkan/vulkan_common.h"
 
 namespace taichi::lang {
 namespace vulkan {
 
 class TI_DLL_EXPORT VulkanLoader {
- public:
+public:
   static VulkanLoader &instance() {
     static VulkanLoader instance;
     return instance;
   }
 
- public:
+public:
   VulkanLoader(VulkanLoader const &) = delete;
   void operator=(VulkanLoader const &) = delete;
 
@@ -26,12 +26,10 @@ class TI_DLL_EXPORT VulkanLoader {
   void load_device(VkDevice device_);
   bool init(PFN_vkGetInstanceProcAddr get_proc_addr = nullptr);
   PFN_vkVoidFunction load_function(const char *name);
-  VkInstance get_instance() {
-    return vulkan_instance_;
-  }
+  VkInstance get_instance() { return vulkan_instance_; }
   std::string visible_device_id;
 
- private:
+private:
   std::once_flag init_flag_;
   bool initialized_{false};
 
@@ -49,5 +47,5 @@ TI_DLL_EXPORT bool is_vulkan_api_available();
 
 TI_DLL_EXPORT void set_vulkan_visible_device(std::string id);
 
-}  // namespace vulkan
-}  // namespace taichi::lang
+} // namespace vulkan
+} // namespace taichi::lang

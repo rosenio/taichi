@@ -11,7 +11,7 @@ namespace taichi::lang {
 namespace LLVM {
 
 class CompiledKernelData : public lang::CompiledKernelData {
- public:
+public:
   struct InternalData {
     std::vector<std::pair<std::vector<int>, Callable::Parameter>> args;
     std::vector<Callable::Ret> rets;
@@ -23,25 +23,15 @@ class CompiledKernelData : public lang::CompiledKernelData {
     const StructType *args_type = nullptr;
     size_t args_size{0};
 
-    TI_IO_DEF(args,
-              rets,
-              compiled_data,
-              ret_type,
-              ret_size,
-              args_type,
+    TI_IO_DEF(args, rets, compiled_data, ret_type, ret_size, args_type,
               args_size);
 
     InternalData() = default;
 
     InternalData(const InternalData &o)
-        : args(o.args),
-          rets(o.rets),
-          compiled_data(o.compiled_data.clone()),
-          ret_type(o.ret_type),
-          ret_size(o.ret_size),
-          args_type(o.args_type),
-          args_size(o.args_size) {
-    }
+        : args(o.args), rets(o.rets), compiled_data(o.compiled_data.clone()),
+          ret_type(o.ret_type), ret_size(o.ret_size), args_type(o.args_type),
+          args_size(o.args_size) {}
 
     InternalData(InternalData &&o) = default;
   };
@@ -54,20 +44,18 @@ class CompiledKernelData : public lang::CompiledKernelData {
 
   Err check() const override;
 
-  const InternalData &get_internal_data() const {
-    return data_;
-  }
+  const InternalData &get_internal_data() const { return data_; }
 
- protected:
+protected:
   Err load_impl(const CompiledKernelDataFile &file) override;
   Err dump_impl(CompiledKernelDataFile &file) const override;
 
- private:
+private:
   llvm::LLVMContext llvm_ctx_;
   Arch arch_;
   InternalData data_;
 };
 
-}  // namespace LLVM
+} // namespace LLVM
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

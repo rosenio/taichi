@@ -6,9 +6,9 @@
 
 #ifdef TI_WITH_LLVM
 
-#include "taichi/ir/ir.h"
 #include "taichi/codegen/llvm/llvm_codegen_utils.h"
 #include "taichi/codegen/llvm/llvm_compiled_data.h"
+#include "taichi/ir/ir.h"
 #include "taichi/program/program.h"
 
 namespace taichi::lang {
@@ -16,7 +16,7 @@ namespace taichi::lang {
 class TaskCodeGenLLVM;
 
 class FunctionCreationGuard {
- public:
+public:
   TaskCodeGenLLVM *mb;
   llvm::Function *old_func;
   llvm::Function *body;
@@ -31,7 +31,7 @@ class FunctionCreationGuard {
 };
 
 class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
- public:
+public:
   const CompileConfig &compile_config;
   const Kernel *kernel;
   IRNode *ir;
@@ -72,23 +72,18 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
   using IRVisitor::visit;
   using LLVMModuleBuilder::call;
 
-  explicit TaskCodeGenLLVM(int id,
-                           const CompileConfig &config,
-                           TaichiLLVMContext &tlctx,
-                           const Kernel *kernel,
+  explicit TaskCodeGenLLVM(int id, const CompileConfig &config,
+                           TaichiLLVMContext &tlctx, const Kernel *kernel,
                            IRNode *ir,
                            std::unique_ptr<llvm::Module> &&module = nullptr);
 
-  Arch current_arch() const {
-    return compile_config.arch;
-  }
+  Arch current_arch() const { return compile_config.arch; }
 
   void initialize_context();
 
   llvm::Value *get_arg(int i);
 
-  llvm::Value *get_argpack_arg(const std::vector<int> &index,
-                               int arg_depth,
+  llvm::Value *get_argpack_arg(const std::vector<int> &index, int arg_depth,
                                bool create_load);
 
   llvm::Value *get_struct_arg(const std::vector<int> &index, bool create_load);
@@ -119,8 +114,7 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
 
   llvm::Value *get_runtime();
 
-  void emit_struct_meta_base(const std::string &name,
-                             llvm::Value *node_meta,
+  void emit_struct_meta_base(const std::string &name, llvm::Value *node_meta,
                              SNode *snode);
 
   void create_elementwise_binary(
@@ -128,8 +122,7 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
       std::function<llvm::Value *(llvm::Value *lhs, llvm::Value *rhs)> f);
 
   void create_elementwise_cast(
-      UnaryOpStmt *stmt,
-      llvm::Type *to_ty,
+      UnaryOpStmt *stmt, llvm::Type *to_ty,
       std::function<llvm::Value *(llvm::Value *, llvm::Type *)> f,
       bool on_self = false);
 
@@ -150,34 +143,29 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
    */
   virtual LLVMCompiledTask run_compilation();
   // For debugging only
-  virtual llvm::Value *create_print(std::string tag,
-                                    DataType dt,
+  virtual llvm::Value *create_print(std::string tag, DataType dt,
                                     llvm::Value *value);
 
   llvm::Value *create_print(std::string tag, llvm::Value *value);
 
-  void set_struct_to_buffer(const StructType *struct_type,
-                            llvm::Value *buffer,
+  void set_struct_to_buffer(const StructType *struct_type, llvm::Value *buffer,
                             const std::vector<Stmt *> &elements);
 
-  llvm::Value *cast_pointer(llvm::Value *val,
-                            std::string dest_ty_name,
+  llvm::Value *cast_pointer(llvm::Value *val, std::string dest_ty_name,
                             int addr_space = 0);
 
   void emit_list_gen(OffloadedStmt *listgen);
 
   void emit_gc(OffloadedStmt *stmt);
 
-  llvm::Value *call(SNode *snode,
-                    llvm::Value *node_ptr,
+  llvm::Value *call(SNode *snode, llvm::Value *node_ptr,
                     const std::string &method,
                     const std::vector<llvm::Value *> &arguments);
 
   llvm::Function *get_struct_function(const std::string &name, int tree_id);
 
   template <typename... Args>
-  llvm::Value *call_struct_func(int tree_id,
-                                const std::string &func_name,
+  llvm::Value *call_struct_func(int tree_id, const std::string &func_name,
                                 Args &&...args);
 
   void create_increment(llvm::Value *ptr, llvm::Value *value);
@@ -231,13 +219,10 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
 
   llvm::Value *atomic_add_quant_fixed(llvm::Value *ptr,
                                       llvm::Type *physical_type,
-                                      QuantFixedType *qfxt,
-                                      llvm::Value *value);
+                                      QuantFixedType *qfxt, llvm::Value *value);
 
-  llvm::Value *atomic_add_quant_int(llvm::Value *ptr,
-                                    llvm::Type *physical_type,
-                                    QuantIntType *qit,
-                                    llvm::Value *value,
+  llvm::Value *atomic_add_quant_int(llvm::Value *ptr, llvm::Type *physical_type,
+                                    QuantIntType *qit, llvm::Value *value,
                                     bool value_is_signed);
 
   llvm::Value *to_quant_fixed(llvm::Value *real, QuantFixedType *qfxt);
@@ -249,8 +234,7 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
   virtual llvm::Value *integral_type_atomic(AtomicOpStmt *stmt);
 
   virtual llvm::Value *atomic_op_using_cas(
-      llvm::Value *output_address,
-      llvm::Value *val,
+      llvm::Value *output_address, llvm::Value *val,
       std::function<llvm::Value *(llvm::Value *, llvm::Value *)> op,
       const DataType &type);
 
@@ -262,23 +246,14 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
 
   void visit(MatrixPtrStmt *stmt) override;
 
-  void store_quant_int(llvm::Value *ptr,
-                       llvm::Type *physical_type,
-                       QuantIntType *qit,
-                       llvm::Value *value,
-                       bool atomic);
+  void store_quant_int(llvm::Value *ptr, llvm::Type *physical_type,
+                       QuantIntType *qit, llvm::Value *value, bool atomic);
 
-  void store_quant_fixed(llvm::Value *ptr,
-                         llvm::Type *physical_type,
-                         QuantFixedType *qfxt,
-                         llvm::Value *value,
-                         bool atomic);
+  void store_quant_fixed(llvm::Value *ptr, llvm::Type *physical_type,
+                         QuantFixedType *qfxt, llvm::Value *value, bool atomic);
 
-  void store_masked(llvm::Value *ptr,
-                    llvm::Type *ty,
-                    uint64 mask,
-                    llvm::Value *value,
-                    bool atomic);
+  void store_masked(llvm::Value *ptr, llvm::Type *ty, uint64 mask,
+                    llvm::Value *value, bool atomic);
 
   void visit(GlobalStoreStmt *stmt) override;
 
@@ -291,12 +266,10 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
   void store_quant_floats_with_shared_exponents(BitStructStoreStmt *stmt);
 
   llvm::Value *extract_quant_float(llvm::Value *physical_value,
-                                   BitStructType *bit_struct,
-                                   int digits_id);
+                                   BitStructType *bit_struct, int digits_id);
 
   llvm::Value *extract_quant_int(llvm::Value *physical_value,
-                                 llvm::Value *bit_offset,
-                                 QuantIntType *qit);
+                                 llvm::Value *bit_offset, QuantIntType *qit);
 
   llvm::Value *reconstruct_quant_fixed(llvm::Value *digits,
                                        QuantFixedType *qfxt);
@@ -333,7 +306,7 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
   void visit(ExternalTensorBasePtrStmt *stmt) override;
 
   virtual bool kernel_argument_by_val() const {
-    return false;  // on CPU devices just pass in a pointer
+    return false; // on CPU devices just pass in a pointer
   }
 
   std::string init_offloaded_task_function(OffloadedStmt *stmt,
@@ -341,12 +314,12 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
 
   void finalize_offloaded_task_function();
 
-  FunctionCreationGuard get_function_creation_guard(
-      std::vector<llvm::Type *> argument_types,
-      const std::string &func_name = "function_body");
+  FunctionCreationGuard
+  get_function_creation_guard(std::vector<llvm::Type *> argument_types,
+                              const std::string &func_name = "function_body");
 
-  std::tuple<llvm::Value *, llvm::Value *> get_range_for_bounds(
-      OffloadedStmt *stmt);
+  std::tuple<llvm::Value *, llvm::Value *>
+  get_range_for_bounds(OffloadedStmt *stmt);
 
   virtual void create_offload_range_for(OffloadedStmt *stmt) = 0;
 
@@ -410,9 +383,9 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
 
   llvm::Value *extract_digits_from_f32(llvm::Value *f, bool full);
 
-  llvm::Value *extract_digits_from_f32_with_shared_exponent(
-      llvm::Value *f,
-      llvm::Value *shared_exp);
+  llvm::Value *
+  extract_digits_from_f32_with_shared_exponent(llvm::Value *f,
+                                               llvm::Value *shared_exp);
 
   llvm::Value *get_exponent_offset(llvm::Value *exponent, QuantFloatType *qflt);
 
@@ -425,17 +398,15 @@ class TaskCodeGenLLVM : public IRVisitor, public LLVMModuleBuilder {
 
   ~TaskCodeGenLLVM() override = default;
 
- private:
-  void set_struct_to_buffer(llvm::Value *buffer,
-                            llvm::Type *buffer_type,
+private:
+  void set_struct_to_buffer(llvm::Value *buffer, llvm::Type *buffer_type,
                             const std::vector<Stmt *> &elements,
-                            const Type *current_type,
-                            int &current_element,
+                            const Type *current_type, int &current_element,
                             std::vector<llvm::Value *> &current_index);
 
   virtual std::tuple<llvm::Value *, llvm::Value *> get_spmd_info() = 0;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
-#endif  // #ifdef TI_WITH_LLVM
+#endif // #ifdef TI_WITH_LLVM

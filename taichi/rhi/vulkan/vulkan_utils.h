@@ -2,10 +2,10 @@
 
 #ifdef _WIN64
 #define VK_USE_PLATFORM_WIN32_KHR 1
+#include <VersionHelpers.h>
 #include <aclapi.h>
 #include <dxgi1_2.h>
 #include <windows.h>
-#include <VersionHelpers.h>
 #endif
 
 #include "taichi/rhi/vulkan/vulkan_common.h"
@@ -19,14 +19,12 @@ namespace taichi::lang {
 namespace vulkan {
 
 class VulkanEnvSettings {
- public:
+public:
   // This version number is used to create a vkInstance, it should be
   // the highest API version that is designed to use.
   // Reference:
   // https://www.khronos.org/registry/vulkan/specs/1.3-extensions/man/html/VkApplicationInfo.html
-  static constexpr uint32_t k_api_version() {
-    return VK_API_VERSION_1_3;
-  }
+  static constexpr uint32_t k_api_version() { return VK_API_VERSION_1_3; }
 };
 
 #ifdef _WIN64
@@ -35,11 +33,11 @@ class VulkanEnvSettings {
 // the implementation is taken from
 // https://github.com/NVIDIA/cuda-samples/tree/master/Samples/vulkanImageCUDA
 class WindowsSecurityAttributes {
- protected:
+protected:
   SECURITY_ATTRIBUTES security_attributes;
   PSECURITY_DESCRIPTOR security_descriptor;
 
- public:
+public:
   WindowsSecurityAttributes();
   SECURITY_ATTRIBUTES *operator&();
   ~WindowsSecurityAttributes();
@@ -97,7 +95,7 @@ inline WindowsSecurityAttributes::~WindowsSecurityAttributes() {
   free(security_descriptor);
 }
 
-#endif  //_WIN64
+#endif //_WIN64
 
-}  // namespace vulkan
-}  // namespace taichi::lang
+} // namespace vulkan
+} // namespace taichi::lang

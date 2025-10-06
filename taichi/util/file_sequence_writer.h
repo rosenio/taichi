@@ -7,12 +7,12 @@
 
 namespace taichi::lang {
 class IRNode;
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace taichi {
 
 class FileSequenceWriter {
- public:
+public:
   FileSequenceWriter(std::string filename_template, std::string file_type);
 
 #ifdef TI_WITH_LLVM
@@ -24,7 +24,7 @@ class FileSequenceWriter {
 
   std::string write(const std::string &str);
 
- private:
+private:
   int counter_;
   std::string filename_template_;
   std::string file_type_;
@@ -32,4 +32,4 @@ class FileSequenceWriter {
   std::pair<std::ofstream, std::string> create_new_file();
 };
 
-}  // namespace taichi
+} // namespace taichi

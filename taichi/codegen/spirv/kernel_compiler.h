@@ -2,15 +2,15 @@
 
 #include <memory>
 
-#include "taichi/codegen/kernel_compiler.h"
 #include "taichi/codegen/compiled_kernel_data.h"
+#include "taichi/codegen/kernel_compiler.h"
 #include "taichi/codegen/spirv/snode_struct_compiler.h"
 
 namespace taichi::lang {
 namespace spirv {
 
 class KernelCompiler : public lang::KernelCompiler {
- public:
+public:
   struct Config {
     // NOTE: Ideally, compiled_struct_data should be used as an argument to
     // KernelCompiler::compile, but this necessitates the use of a unified
@@ -25,12 +25,11 @@ class KernelCompiler : public lang::KernelCompiler {
 
   CKDPtr compile(const CompileConfig &compile_config,
                  const DeviceCapabilityConfig &device_caps,
-                 const Kernel &kernel_def,
-                 IRNode &chi_ir) const override;
+                 const Kernel &kernel_def, IRNode &chi_ir) const override;
 
- private:
+private:
   Config config_;
 };
 
-}  // namespace spirv
-}  // namespace taichi::lang
+} // namespace spirv
+} // namespace taichi::lang

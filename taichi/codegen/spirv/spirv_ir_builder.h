@@ -2,35 +2,32 @@
 
 #include <array>
 
-#include <spirv/unified1/spirv.hpp>
-#include "taichi/util/lang_util.h"
-#include "taichi/ir/type.h"
-#include "taichi/util/testing.h"
 #include "taichi/codegen/spirv/snode_struct_compiler.h"
-#include "taichi/rhi/device.h"
 #include "taichi/ir/statements.h"
+#include "taichi/ir/type.h"
+#include "taichi/rhi/device.h"
+#include "taichi/util/lang_util.h"
+#include "taichi/util/testing.h"
+#include <spirv/unified1/spirv.hpp>
 
 namespace taichi::lang {
 namespace spirv {
 
-template <bool stop, std::size_t I, typename F>
-struct for_each_dispatcher {
+template <bool stop, std::size_t I, typename F> struct for_each_dispatcher {
   template <typename T, typename... Args>
-  static void run(const F &f, T &&value, Args &&...args) {  // NOLINT(*)
+  static void run(const F &f, T &&value, Args &&...args) { // NOLINT(*)
     f(I, std::forward<T>(value));
     for_each_dispatcher<sizeof...(Args) == 0, (I + 1), F>::run(
         f, std::forward<Args>(args)...);
   }
 };
 
-template <std::size_t I, typename F>
-struct for_each_dispatcher<true, I, F> {
-  static void run(const F &f) {
-  }  // NOLINT(*)
+template <std::size_t I, typename F> struct for_each_dispatcher<true, I, F> {
+  static void run(const F &f) {} // NOLINT(*)
 };
 
 template <typename F, typename... Args>
-inline void for_each(const F &f, Args &&...args) {  // NOLINT(*)
+inline void for_each(const F &f, Args &&...args) { // NOLINT(*)
   for_each_dispatcher<sizeof...(Args) == 0, 0, F>::run(
       f, std::forward<Args>(args)...);
 }
@@ -38,7 +35,7 @@ inline void for_each(const F &f, Args &&...args) {  // NOLINT(*)
 enum class TypeKind {
   kPrimitive,
   kSNodeStruct,
-  kSNodeArray,  // array components of a kSNodeStruct
+  kSNodeArray, // array components of a kSNodeStruct
   kStruct,
   kPtr,
   kFunc,
@@ -53,7 +50,7 @@ struct SType {
   // corresponding Taichi type/Compiled SNode info
   DataType dt;
 
-  SNodeDescriptor snode_desc;  // TODO: dt/snode_desc only need one at a time
+  SNodeDescriptor snode_desc; // TODO: dt/snode_desc only need one at a time
   std::vector<uint32_t> snode_child_type_id;
 
   TypeKind flag{TypeKind::kPrimitive};
@@ -87,9 +84,7 @@ struct Value {
   // Additional flags about the value
   ValueKind flag{ValueKind::kNormal};
 
-  bool operator==(const Value &rhs) const {
-    return id == rhs.id;
-  }
+  bool operator==(const Value &rhs) const { return id == rhs.id; }
 };
 
 struct ValueHasher {
@@ -107,17 +102,15 @@ struct Label {
 // A SPIRV instruction,
 //     can be used as handle to modify its content later
 class Instr {
- public:
-  uint32_t word_count() const {
-    return word_count_;
-  }
+public:
+  uint32_t word_count() const { return word_count_; }
 
   uint32_t &operator[](uint32_t idx) {
     TI_ASSERT(idx < word_count_);
     return (*data_)[begin_ + idx];
   }
 
- private:
+private:
   friend class InstrBuilder;
 
   std::vector<uint32_t> *data_{nullptr};
@@ -138,7 +131,7 @@ struct PhiValue : public Value {
 
 // Helper class to build SPIRV instruction
 class InstrBuilder {
- public:
+public:
   InstrBuilder &begin(spv::Op op) {
     TI_ASSERT(data_.size() == 0U);
     op_ = op;
@@ -146,10 +139,10 @@ class InstrBuilder {
     return *this;
   }
 
-#define ADD(var, id)                \
-  InstrBuilder &add(const var &v) { \
-    data_.push_back(id);            \
-    return *this;                   \
+#define ADD(var, id)                                                           \
+  InstrBuilder &add(const var &v) {                                            \
+    data_.push_back(id);                                                       \
+    return *this;                                                              \
   }
 
   ADD(Value, v.id);
@@ -182,8 +175,7 @@ class InstrBuilder {
     return *this;
   }
 
-  template <typename... Args>
-  InstrBuilder &add_seq(Args &&...args) {
+  template <typename... Args> InstrBuilder &add_seq(Args &&...args) {
     AddSeqHelper helper;
     helper.builder = this;
     for_each(helper, std::forward<Args>(args)...);
@@ -201,7 +193,7 @@ class InstrBuilder {
     return ret;
   }
 
- private:
+private:
   // current op code
   spv::Op op_;
   // The internal data to store code
@@ -211,8 +203,7 @@ class InstrBuilder {
     // The reference to builder
     InstrBuilder *builder;
     // invoke function
-    template <typename T>
-    void operator()(size_t, const T &v) const {
+    template <typename T> void operator()(size_t, const T &v) const {
       builder->add(v);
     }
   };
@@ -220,37 +211,31 @@ class InstrBuilder {
 
 // Builder to build up a single SPIR-V module
 class IRBuilder {
- public:
+public:
   IRBuilder(Arch arch, const DeviceCapabilityConfig *caps)
-      : arch_(arch), caps_(caps) {
-  }
+      : arch_(arch), caps_(caps) {}
 
-  template <typename... Args>
-  void debug_name(spv::Op op, Args &&...args) {
+  template <typename... Args> void debug_name(spv::Op op, Args &&...args) {
     ib_.begin(op).add_seq(std::forward<Args>(args)...).commit(&names_);
   }
 
   Value debug_string(std::string str);
 
-  template <typename... Args>
-  void execution_mode(Value func, Args &&...args) {
+  template <typename... Args> void execution_mode(Value func, Args &&...args) {
     ib_.begin(spv::OpExecutionMode)
         .add_seq(func, std::forward<Args>(args)...)
         .commit(&exec_mode_);
   }
 
-  template <typename... Args>
-  void decorate(spv::Op op, Args &&...args) {
+  template <typename... Args> void decorate(spv::Op op, Args &&...args) {
     ib_.begin(op).add_seq(std::forward<Args>(args)...).commit(&decorate_);
   }
 
-  template <typename... Args>
-  void declare_global(spv::Op op, Args &&...args) {
+  template <typename... Args> void declare_global(spv::Op op, Args &&...args) {
     ib_.begin(op).add_seq(std::forward<Args>(args)...).commit(&global_);
   }
 
-  template <typename... Args>
-  Instr make_inst(spv::Op op, Args &&...args) {
+  template <typename... Args> Instr make_inst(spv::Op op, Args &&...args) {
     return ib_.begin(op)
         .add_seq(std::forward<Args>(args)...)
         .commit(&function_);
@@ -282,9 +267,7 @@ class IRBuilder {
     curr_label_ = label;
   }
 
-  Label current_label() const {
-    return curr_label_;
-  }
+  Label current_label() const { return curr_label_; }
 
   // Make a new SSA value
   template <typename... Args>
@@ -298,8 +281,7 @@ class IRBuilder {
   }
 
   // Make an AccessChain
-  Value make_access_chain(const SType &out_type,
-                          Value base,
+  Value make_access_chain(const SType &out_type, Value base,
                           const std::vector<int> &indices);
 
   // Make a phi value
@@ -308,14 +290,11 @@ class IRBuilder {
   // Create Constant Primitive Value
   // cache: if a variable is named, it should not be cached, or the name may
   // have conflict.
-  Value int_immediate_number(const SType &dtype,
-                             int64_t value,
+  Value int_immediate_number(const SType &dtype, int64_t value,
                              bool cache = true);
-  Value uint_immediate_number(const SType &dtype,
-                              uint64_t value,
+  Value uint_immediate_number(const SType &dtype, uint64_t value,
                               bool cache = true);
-  Value float_immediate_number(const SType &dtype,
-                               double value,
+  Value float_immediate_number(const SType &dtype, double value,
                                bool cache = true);
 
   // Match zero type
@@ -367,36 +346,26 @@ class IRBuilder {
 
   // Declare buffer argument of function
   Value buffer_struct_argument(const SType &struct_type,
-                               uint32_t descriptor_set,
-                               uint32_t binding,
+                               uint32_t descriptor_set, uint32_t binding,
                                const std::string &name);
   Value uniform_struct_argument(const SType &struct_type,
-                                uint32_t descriptor_set,
-                                uint32_t binding,
+                                uint32_t descriptor_set, uint32_t binding,
                                 const std::string &name);
-  Value buffer_argument(const SType &value_type,
-                        uint32_t descriptor_set,
-                        uint32_t binding,
-                        const std::string &name);
+  Value buffer_argument(const SType &value_type, uint32_t descriptor_set,
+                        uint32_t binding, const std::string &name);
   Value struct_array_access(const SType &res_type, Value buffer, Value index);
 
-  Value texture_argument(int num_channels,
-                         int num_dimensions,
-                         uint32_t descriptor_set,
-                         uint32_t binding);
+  Value texture_argument(int num_channels, int num_dimensions,
+                         uint32_t descriptor_set, uint32_t binding);
 
-  Value storage_image_argument(int num_channels,
-                               int num_dimensions,
-                               uint32_t descriptor_set,
-                               uint32_t binding,
+  Value storage_image_argument(int num_channels, int num_dimensions,
+                               uint32_t descriptor_set, uint32_t binding,
                                BufferFormat format);
 
-  Value sample_texture(Value texture_var,
-                       const std::vector<Value> &args,
+  Value sample_texture(Value texture_var, const std::vector<Value> &args,
                        Value lod);
 
-  Value fetch_texel(Value texture_var,
-                    const std::vector<Value> &args,
+  Value fetch_texel(Value texture_var, const std::vector<Value> &args,
                     Value lod);
 
   Value image_load(Value image_var, const std::vector<Value> &args);
@@ -405,15 +374,12 @@ class IRBuilder {
 
   // Declare a new function
   // NOTE: only support void kernel function, i.e. main
-  Value new_function() {
-    return new_value(t_void_func_, ValueKind::kFunction);
-  }
+  Value new_function() { return new_value(t_void_func_, ValueKind::kFunction); }
 
   std::vector<Value> global_values;
 
   // Declare the entry point for a kernel function
-  void commit_kernel_function(const Value &func,
-                              const std::string &name,
+  void commit_kernel_function(const Value &func, const std::string &name,
                               std::vector<Value> args,
                               std::array<int, 3> local_size) {
     ib_.begin(spv::OpEntryPoint)
@@ -526,69 +492,40 @@ class IRBuilder {
   }
 
   // Support easy access to trivial data types
-  SType i64_type() const {
-    return t_int64_;
-  }
-  SType u64_type() const {
-    return t_uint64_;
-  }
-  SType f64_type() const {
-    return t_fp64_;
-  }
+  SType i64_type() const { return t_int64_; }
+  SType u64_type() const { return t_uint64_; }
+  SType f64_type() const { return t_fp64_; }
 
-  SType i32_type() const {
-    return t_int32_;
-  }
-  SType u32_type() const {
-    return t_uint32_;
-  }
-  SType f32_type() const {
-    return t_fp32_;
-  }
+  SType i32_type() const { return t_int32_; }
+  SType u32_type() const { return t_uint32_; }
+  SType f32_type() const { return t_fp32_; }
 
-  SType i16_type() const {
-    return t_int16_;
-  }
-  SType u16_type() const {
-    return t_uint16_;
-  }
-  SType f16_type() const {
-    return t_fp16_;
-  }
+  SType i16_type() const { return t_int16_; }
+  SType u16_type() const { return t_uint16_; }
+  SType f16_type() const { return t_fp16_; }
 
-  SType i8_type() const {
-    return t_int8_;
-  }
-  SType u8_type() const {
-    return t_uint8_;
-  }
+  SType i8_type() const { return t_int8_; }
+  SType u8_type() const { return t_uint8_; }
 
-  SType bool_type() const {
-    return t_bool_;
-  }
+  SType bool_type() const { return t_bool_; }
 
   // quick cache for const zero/one i32
   Value const_i32_zero_;
   Value const_i32_one_;
 
   // Use force-inline float atomic helper function
-  Value float_atomic(AtomicOpType op_type,
-                     Value addr_ptr,
-                     Value data,
+  Value float_atomic(AtomicOpType op_type, Value addr_ptr, Value data,
                      const DataType &dt);
-  Value integer_atomic(AtomicOpType op_type,
-                       Value addr_ptr,
-                       Value data,
+  Value integer_atomic(AtomicOpType op_type, Value addr_ptr, Value data,
                        const DataType &dt);
-  Value atomic_operation(Value addr_ptr,
-                         Value data,
+  Value atomic_operation(Value addr_ptr, Value data,
                          std::function<Value(Value, Value)> op,
                          const DataType &dt);
   Value rand_u32(Value global_tmp_);
   Value rand_f32(Value global_tmp_);
   Value rand_i32(Value global_tmp_);
 
- private:
+private:
   Value get_const(const SType &dtype, const uint64_t *pvalue, bool cache);
   SType declare_primitive_type(DataType dt);
 
@@ -643,7 +580,7 @@ class IRBuilder {
   Value rand_x_;
   Value rand_y_;
   Value rand_z_;
-  Value rand_w_;  // per-thread local variable
+  Value rand_w_; // per-thread local variable
 
   // map from value to its pointer type
   std::map<std::pair<uint32_t, spv::StorageClass>, SType> pointer_type_tbl_;
@@ -685,5 +622,5 @@ class IRBuilder {
   // Main Function segment
   std::vector<uint32_t> function_;
 };
-}  // namespace spirv
-}  // namespace taichi::lang
+} // namespace spirv
+} // namespace taichi::lang

@@ -9,7 +9,7 @@ namespace taichi::lang {
 class Function;
 
 class IRBuilder {
- public:
+public:
   struct InsertPoint {
     Block *block{nullptr};
     int position{0};
@@ -24,8 +24,7 @@ class IRBuilder {
   std::unique_ptr<Block> extract_ir();
 
   // General inserter. Returns stmt.get().
-  template <typename XStmt>
-  XStmt *insert(std::unique_ptr<XStmt> &&stmt) {
+  template <typename XStmt> XStmt *insert(std::unique_ptr<XStmt> &&stmt) {
     return insert(std::move(stmt), &insert_point_);
   }
 
@@ -61,7 +60,7 @@ class IRBuilder {
 
   // RAII handles insertion points automatically.
   class LoopGuard {
-   public:
+  public:
     // Set the insertion point to the beginning of the loop body.
     template <typename XStmt>
     explicit LoopGuard(IRBuilder &builder, XStmt *loop)
@@ -73,20 +72,20 @@ class IRBuilder {
     // Set the insertion point to the point after the loop.
     ~LoopGuard();
 
-   private:
+  private:
     IRBuilder &builder_;
     Stmt *loop_;
     int location_;
   };
   class IfGuard {
-   public:
+  public:
     // Set the insertion point to the beginning of the true/false branch.
     explicit IfGuard(IRBuilder &builder, IfStmt *if_stmt, bool true_branch);
 
     // Set the insertion point to the point after the if statement.
     ~IfGuard();
 
-   private:
+  private:
     IRBuilder &builder_;
     IfStmt *if_stmt_;
     int location_;
@@ -102,21 +101,16 @@ class IRBuilder {
   }
 
   // Control flows.
-  RangeForStmt *create_range_for(Stmt *begin,
-                                 Stmt *end,
+  RangeForStmt *create_range_for(Stmt *begin, Stmt *end,
                                  bool is_bit_vectorized = false,
-                                 int num_cpu_threads = 0,
-                                 int block_dim = 0,
+                                 int num_cpu_threads = 0, int block_dim = 0,
                                  bool strictly_serialized = false);
-  StructForStmt *create_struct_for(SNode *snode,
-                                   bool is_bit_vectorized = false,
-                                   int num_cpu_threads = 0,
-                                   int block_dim = 0);
+  StructForStmt *create_struct_for(SNode *snode, bool is_bit_vectorized = false,
+                                   int num_cpu_threads = 0, int block_dim = 0);
   MeshForStmt *create_mesh_for(mesh::Mesh *mesh,
                                mesh::MeshElementType element_type,
                                bool is_bit_vectorized = false,
-                               int num_cpu_threads = 0,
-                               int block_dim = 0);
+                               int num_cpu_threads = 0, int block_dim = 0);
   WhileStmt *create_while_true();
   IfStmt *create_if(Stmt *cond);
   WhileControlStmt *create_break();
@@ -137,32 +131,28 @@ class IRBuilder {
   ConstStmt *get_float32(float32 value);
   ConstStmt *get_float64(float64 value);
 
-  template <typename T>
-  Stmt *get_constant(DataType dt, const T &value) {
+  template <typename T> Stmt *get_constant(DataType dt, const T &value) {
     return insert(Stmt::make_typed<ConstStmt>(TypedConstant(dt, value)));
   }
 
   RandStmt *create_rand(DataType value_type);
 
   // Load kernel arguments.
-  ArgLoadStmt *create_arg_load(const std::vector<int> &arg_id,
-                               DataType dt,
-                               bool is_ptr,
-                               int arg_depth);
+  ArgLoadStmt *create_arg_load(const std::vector<int> &arg_id, DataType dt,
+                               bool is_ptr, int arg_depth);
   // Load kernel arguments.
   ArgLoadStmt *create_ndarray_arg_load(const std::vector<int> &arg_id,
-                                       DataType dt,
-                                       int total_dim,
+                                       DataType dt, int total_dim,
                                        int arg_depth);
 
   // The return value of the kernel.
   ReturnStmt *create_return(Stmt *value);
 
   // Unary operations. Returns the result.
-  UnaryOpStmt *create_cast(Stmt *value, DataType output_type);  // cast by value
+  UnaryOpStmt *create_cast(Stmt *value, DataType output_type); // cast by value
   UnaryOpStmt *create_bit_cast(Stmt *value, DataType output_type);
   UnaryOpStmt *create_neg(Stmt *value);
-  UnaryOpStmt *create_not(Stmt *value);  // bitwise
+  UnaryOpStmt *create_not(Stmt *value); // bitwise
   UnaryOpStmt *create_logical_not(Stmt *value);
   UnaryOpStmt *create_round(Stmt *value);
   UnaryOpStmt *create_floor(Stmt *value);
@@ -227,16 +217,14 @@ class IRBuilder {
   AtomicOpStmt *create_atomic_mul(Stmt *dest, Stmt *val);
 
   // Ternary operations. Returns the result.
-  TernaryOpStmt *create_select(Stmt *cond,
-                               Stmt *true_result,
+  TernaryOpStmt *create_select(Stmt *cond, Stmt *true_result,
                                Stmt *false_result);
 
   // Matrix Initialization
   MatrixInitStmt *create_matrix_init(std::vector<Stmt *> elements);
 
   // Print values and strings. Arguments can be Stmt* or std::string.
-  template <typename... Args>
-  PrintStmt *create_print(Args &&...args) {
+  template <typename... Args> PrintStmt *create_print(Args &&...args) {
     return insert(Stmt::make_typed<PrintStmt>(std::forward<Args>(args)...));
   }
 
@@ -251,8 +239,7 @@ class IRBuilder {
   ExternalPtrStmt *create_external_ptr(ArgLoadStmt *ptr,
                                        const std::vector<Stmt *> &indices,
                                        bool is_grad = false);
-  template <typename XStmt>
-  GlobalLoadStmt *create_global_load(XStmt *ptr) {
+  template <typename XStmt> GlobalLoadStmt *create_global_load(XStmt *ptr) {
     using DecayedType = typename std::decay_t<XStmt>;
     if constexpr (!std::is_base_of_v<Stmt, DecayedType>) {
       TI_ERROR("The argument is not a statement.");
@@ -264,8 +251,7 @@ class IRBuilder {
       TI_ERROR("Statement {} is not a global pointer.", ptr->name());
     }
   }
-  template <typename XStmt>
-  void create_global_store(XStmt *ptr, Stmt *data) {
+  template <typename XStmt> void create_global_store(XStmt *ptr, Stmt *data) {
     using DecayedType = typename std::decay_t<XStmt>;
     if constexpr (!std::is_base_of_v<Stmt, DecayedType>) {
       TI_ERROR("The argument is not a statement.");
@@ -287,18 +273,16 @@ class IRBuilder {
   void ad_stack_accumulate_adjoint(AdStackAllocaStmt *stack, Stmt *val);
 
   // Mesh related.
-  MeshRelationAccessStmt *get_relation_size(mesh::Mesh *mesh,
-                                            Stmt *mesh_idx,
+  MeshRelationAccessStmt *get_relation_size(mesh::Mesh *mesh, Stmt *mesh_idx,
                                             mesh::MeshElementType to_type);
-  MeshRelationAccessStmt *get_relation_access(mesh::Mesh *mesh,
-                                              Stmt *mesh_idx,
+  MeshRelationAccessStmt *get_relation_access(mesh::Mesh *mesh, Stmt *mesh_idx,
                                               mesh::MeshElementType to_type,
                                               Stmt *neighbor_idx);
   MeshPatchIndexStmt *get_patch_index();
 
- private:
+private:
   std::unique_ptr<Block> root_{nullptr};
   InsertPoint insert_point_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

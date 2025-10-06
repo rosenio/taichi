@@ -2,32 +2,32 @@
 
 #pragma once
 
+#include <atomic>
 #include <functional>
 #include <optional>
-#include <atomic>
-#include <stack>
 #include <shared_mutex>
+#include <stack>
 
 #define TI_RUNTIME_HOST
 #include "taichi/aot/module_builder.h"
 #include "taichi/ir/frontend_ir.h"
 #include "taichi/ir/ir.h"
-#include "taichi/ir/type_factory.h"
+#include "taichi/ir/mesh.h"
 #include "taichi/ir/snode.h"
-#include "taichi/util/lang_util.h"
+#include "taichi/ir/type_factory.h"
 #include "taichi/program/argpack.h"
-#include "taichi/program/program_impl.h"
 #include "taichi/program/callable.h"
+#include "taichi/program/context.h"
 #include "taichi/program/function.h"
 #include "taichi/program/kernel.h"
 #include "taichi/program/kernel_profiler.h"
+#include "taichi/program/program_impl.h"
 #include "taichi/program/snode_expr_utils.h"
 #include "taichi/program/snode_rw_accessors_bank.h"
-#include "taichi/program/context.h"
+#include "taichi/program/sparse_matrix.h"
 #include "taichi/struct/snode_tree.h"
 #include "taichi/system/threading.h"
-#include "taichi/program/sparse_matrix.h"
-#include "taichi/ir/mesh.h"
+#include "taichi/util/lang_util.h"
 
 namespace taichi::lang {
 
@@ -47,12 +47,12 @@ class StructCompiler;
  */
 
 class TI_DLL_EXPORT Program {
- public:
+public:
   using Kernel = taichi::lang::Kernel;
 
-  uint64 *result_buffer{nullptr};  // Note that this result_buffer is used
-                                   // only for runtime JIT functions (e.g.
-                                   // `runtime_memory_allocate_aligned`)
+  uint64 *result_buffer{nullptr}; // Note that this result_buffer is used
+                                  // only for runtime JIT functions (e.g.
+                                  // `runtime_memory_allocate_aligned`)
 
   std::vector<std::unique_ptr<Kernel>> kernels;
 
@@ -62,16 +62,13 @@ class TI_DLL_EXPORT Program {
   // migration. In the future each program should have its own copy.
   static TypeFactory &get_type_factory();
 
-  Program() : Program(default_compile_config.arch) {
-  }
+  Program() : Program(default_compile_config.arch) {}
 
   explicit Program(Arch arch);
 
   ~Program();
 
-  const CompileConfig &compile_config() const {
-    return compile_config_;
-  }
+  const CompileConfig &compile_config() const { return compile_config_; }
 
   struct KernelProfilerQueryResult {
     int counter{0};
@@ -87,21 +84,13 @@ class TI_DLL_EXPORT Program {
     return query_result;
   }
 
-  void clear_kernel_profile_info() {
-    profiler->clear();
-  }
+  void clear_kernel_profile_info() { profiler->clear(); }
 
-  void profiler_start(const std::string &name) {
-    profiler->start(name);
-  }
+  void profiler_start(const std::string &name) { profiler->start(name); }
 
-  void profiler_stop() {
-    profiler->stop();
-  }
+  void profiler_stop() { profiler->stop(); }
 
-  KernelProfilerBase *get_profiler() {
-    return profiler.get();
-  }
+  KernelProfilerBase *get_profiler() { return profiler.get(); }
 
   void synchronize();
 
@@ -143,18 +132,13 @@ class TI_DLL_EXPORT Program {
 
   uint64 fetch_result_uint64(int i);
 
-  template <typename T>
-  T fetch_result(int i) {
+  template <typename T> T fetch_result(int i) {
     return taichi_union_cast_with_different_sizes<T>(fetch_result_uint64(i));
   }
 
-  Arch get_host_arch() {
-    return host_arch();
-  }
+  Arch get_host_arch() { return host_arch(); }
 
-  float64 get_total_compilation_time() {
-    return total_compilation_time_;
-  }
+  float64 get_total_compilation_time() { return total_compilation_time_; }
 
   void finalize();
 
@@ -173,9 +157,7 @@ class TI_DLL_EXPORT Program {
   // Returns zero if the SNode is statically allocated
   std::size_t get_snode_num_dynamically_allocated(SNode *snode);
 
-  inline SNodeFieldMap *get_snode_to_fields() {
-    return &snode_to_fields_;
-  }
+  inline SNodeFieldMap *get_snode_to_fields() { return &snode_to_fields_; }
 
   inline SNodeRwAccessorsBank &get_snode_rw_accessors_bank() {
     return snode_rw_accessors_bank_;
@@ -221,9 +203,8 @@ class TI_DLL_EXPORT Program {
    */
   SNode *get_snode_root(int tree_id);
 
-  std::unique_ptr<AotModuleBuilder> make_aot_module_builder(
-      Arch arch,
-      const std::vector<std::string> &caps);
+  std::unique_ptr<AotModuleBuilder>
+  make_aot_module_builder(Arch arch, const std::vector<std::string> &caps);
 
   size_t get_field_in_tree_offset(int tree_id, const SNode *child) {
     return program_impl_->get_field_in_tree_offset(tree_id, child);
@@ -233,13 +214,9 @@ class TI_DLL_EXPORT Program {
     return program_impl_->get_snode_tree_device_ptr(tree_id);
   }
 
-  Device *get_compute_device() {
-    return program_impl_->get_compute_device();
-  }
+  Device *get_compute_device() { return program_impl_->get_compute_device(); }
 
-  Device *get_graphics_device() {
-    return program_impl_->get_graphics_device();
-  }
+  Device *get_graphics_device() { return program_impl_->get_graphics_device(); }
 
   // TODO: do we still need result_buffer?
   DeviceAllocation allocate_memory_on_device(std::size_t alloc_size,
@@ -250,12 +227,11 @@ class TI_DLL_EXPORT Program {
     return program_impl_->allocate_texture(params);
   }
 
-  Ndarray *create_ndarray(
-      const DataType type,
-      const std::vector<int> &shape,
-      ExternalArrayLayout layout = ExternalArrayLayout::kNull,
-      bool zero_fill = false,
-      const DebugInfo &dbg_info = DebugInfo());
+  Ndarray *
+  create_ndarray(const DataType type, const std::vector<int> &shape,
+                 ExternalArrayLayout layout = ExternalArrayLayout::kNull,
+                 bool zero_fill = false,
+                 const DebugInfo &dbg_info = DebugInfo());
 
   ArgPack *create_argpack(const DataType dt);
 
@@ -267,13 +243,13 @@ class TI_DLL_EXPORT Program {
     return program_impl_->get_kernel_argument_data_layout();
   };
 
-  std::pair<const StructType *, size_t> get_struct_type_with_data_layout(
-      const StructType *old_ty,
-      const std::string &layout);
+  std::pair<const StructType *, size_t>
+  get_struct_type_with_data_layout(const StructType *old_ty,
+                                   const std::string &layout);
 
-  std::pair<const ArgPackType *, size_t> get_argpack_type_with_data_layout(
-      const ArgPackType *old_ty,
-      const std::string &layout);
+  std::pair<const ArgPackType *, size_t>
+  get_argpack_type_with_data_layout(const ArgPackType *old_ty,
+                                    const std::string &layout);
 
   void delete_ndarray(Ndarray *ndarray);
 
@@ -321,7 +297,7 @@ class TI_DLL_EXPORT Program {
   // Once we migrated these implementations to ProgramImpl, lower-level objects
   // could store ProgramImpl rather than Program.
 
- private:
+private:
   CompileConfig compile_config_;
 
   uint64 ndarray_writer_counter_{0};
@@ -349,4 +325,4 @@ class TI_DLL_EXPORT Program {
   std::vector<std::unique_ptr<Texture>> textures_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

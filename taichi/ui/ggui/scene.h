@@ -6,7 +6,7 @@ namespace taichi::ui {
 namespace vulkan {
 
 class Scene final : public SceneBase {
- public:
+public:
   void set_camera(const Camera &camera) override;
   void lines(const SceneLinesInfo &info) override;
   void mesh(const MeshInfo &info) override;
@@ -15,6 +15,6 @@ class Scene final : public SceneBase {
   void ambient_light(glm::vec3 color) override;
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

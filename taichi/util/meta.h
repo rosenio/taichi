@@ -6,12 +6,12 @@
 #pragma once
 
 #include <cstring>
-#include <string>
-#include <map>
-#include <vector>
 #include <functional>
-#include <memory>
 #include <iostream>
+#include <map>
+#include <memory>
+#include <string>
+#include <vector>
 
 namespace taichi {
 
@@ -27,29 +27,24 @@ struct RepeatFunctionHelper {
 
 template <template <int> class F, int bgn, typename... Args>
 struct RepeatFunctionHelper<F, bgn, bgn, Args...> {
-  TI_FORCE_INLINE static void run(Args &&...args) {
-    return;
-  }
+  TI_FORCE_INLINE static void run(Args &&...args) { return; }
 };
 
 template <template <int> class F, int bgn, int end, typename... Args>
 TI_FORCE_INLINE void repeat_function(Args &&...args) {
   RepeatFunctionHelper<F, bgn, end, Args...>::run(std::forward<Args>(args)...);
 }
-}  // namespace meta
+} // namespace meta
 
 using meta::repeat_function;
 
-template <typename option, typename... Args>
-struct type_switch {
+template <typename option, typename... Args> struct type_switch {
   using type = typename std::conditional<
       std::is_same<typename option::first_type, std::true_type>::value,
-      typename option::second_type,
-      typename type_switch<Args...>::type>::type;
+      typename option::second_type, typename type_switch<Args...>::type>::type;
 };
 
-template <typename option>
-struct type_switch<option> {
+template <typename option> struct type_switch<option> {
   static_assert(
       std::is_same<typename option::first_type, std::true_type>::value,
       "None of the options in type_switch works.");
@@ -59,8 +54,7 @@ struct type_switch<option> {
 template <typename... Args>
 using type_switch_t = typename type_switch<Args...>::type;
 
-template <typename T, typename G>
-struct copy_refcv {
+template <typename T, typename G> struct copy_refcv {
   TI_STATIC_ASSERT(
       (std::is_same<G, std::remove_cv_t<std::remove_reference_t<G>>>::value));
   static constexpr bool has_lvalue_ref = std::is_lvalue_reference<T>::value;
@@ -86,13 +80,11 @@ struct is_specialization<Template<Args...>, Template> : std::true_type {};
 
 TI_STATIC_ASSERT((std::is_same<const volatile int, volatile const int>::value));
 TI_STATIC_ASSERT(
-    (std::is_same<int,
-                  std::remove_volatile_t<
-                      std::remove_const_t<const volatile int>>>::value));
-TI_STATIC_ASSERT(
-    (std::is_same<int,
-                  std::remove_const_t<
-                      std::remove_volatile_t<const volatile int>>>::value));
+    (std::is_same<int, std::remove_volatile_t<
+                           std::remove_const_t<const volatile int>>>::value));
+TI_STATIC_ASSERT((
+    std::is_same<int, std::remove_const_t<
+                          std::remove_volatile_t<const volatile int>>>::value));
 TI_STATIC_ASSERT((std::is_same<int &, std::add_const_t<int &>>::value));
 TI_STATIC_ASSERT((std::is_same<copy_refcv_t<int, real>, real>::value));
 TI_STATIC_ASSERT((std::is_same<copy_refcv_t<int &, real>, real &>::value));
@@ -105,4 +97,4 @@ TI_STATIC_ASSERT((std::is_same<copy_refcv_t<const volatile int &, real>,
                                const volatile real &>::value));
 TI_STATIC_ASSERT((is_specialization<std::vector<int>, std::vector>::value));
 
-}  // namespace taichi
+} // namespace taichi

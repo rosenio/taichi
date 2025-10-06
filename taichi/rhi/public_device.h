@@ -1,9 +1,9 @@
 #pragma once
 
-#include <string>
-#include <vector>
 #include <assert.h>
 #include <memory>
+#include <string>
+#include <vector>
 
 // https://gcc.gnu.org/wiki/Visibility
 #if defined _WIN32 || defined _WIN64 || defined __CYGWIN__
@@ -11,30 +11,30 @@
 #define RHI_DLL_EXPORT __attribute__((dllexport))
 #else
 #define RHI_DLL_EXPORT __declspec(dllexport)
-#endif  //  __GNUC__
+#endif //  __GNUC__
 #else
 #define RHI_DLL_EXPORT __attribute__((visibility("default")))
-#endif  // defined _WIN32 || defined _WIN64 || defined __CYGWIN__
+#endif // defined _WIN32 || defined _WIN64 || defined __CYGWIN__
 
 // Unreachable
-#if __cplusplus > 202002L  // C++23
+#if __cplusplus > 202002L // C++23
 #include <utility>
 #define RHI_UNREACHABLE std::unreachable();
-#else            // C++20 and below
-#ifdef __GNUC__  // GCC, Clang, ICC
+#else           // C++20 and below
+#ifdef __GNUC__ // GCC, Clang, ICC
 #define RHI_UNREACHABLE __builtin_unreachable();
-#else  // MSVC
+#else // MSVC
 #define RHI_UNREACHABLE __assume(false);
 #endif
 #endif
 
 // Not implemented
-#define RHI_NOT_IMPLEMENTED         \
-  assert(false && "Not supported"); \
+#define RHI_NOT_IMPLEMENTED                                                    \
+  assert(false && "Not supported");                                            \
   RHI_UNREACHABLE
 
-#include "taichi/rhi/device_capability.h"
 #include "taichi/rhi/arch.h"
+#include "taichi/rhi/device_capability.h"
 
 namespace taichi::lang {
 
@@ -50,16 +50,14 @@ const std::string rhi_result_to_string(RhiResult result);
 
 constexpr size_t kBufferSizeEntireSize = std::numeric_limits<size_t>::max();
 
-#define MAKE_ENUM_FLAGS(name)                  \
-  inline name operator|(name a, name b) {      \
-    return static_cast<name>(int(a) | int(b)); \
-  }                                            \
-  inline name operator&(name a, name b) {      \
-    return static_cast<name>(int(a) & int(b)); \
-  }                                            \
-  inline bool operator&&(name a, name b) {     \
-    return (int(a) & int(b)) != 0;             \
-  }
+#define MAKE_ENUM_FLAGS(name)                                                  \
+  inline name operator|(name a, name b) {                                      \
+    return static_cast<name>(int(a) | int(b));                                 \
+  }                                                                            \
+  inline name operator&(name a, name b) {                                      \
+    return static_cast<name>(int(a) & int(b));                                 \
+  }                                                                            \
+  inline bool operator&&(name a, name b) { return (int(a) & int(b)) != 0; }
 
 enum class BlendOp : uint32_t { add, subtract, reverse_subtract, min, max };
 
@@ -102,8 +100,7 @@ struct RHI_DLL_EXPORT DeviceAllocation {
 
 struct RHI_DLL_EXPORT DeviceAllocationGuard : public DeviceAllocation {
   explicit DeviceAllocationGuard(DeviceAllocation alloc)
-      : DeviceAllocation(alloc) {
-  }
+      : DeviceAllocation(alloc) {}
   DeviceAllocationGuard(const DeviceAllocationGuard &) = delete;
   ~DeviceAllocationGuard();
 };
@@ -111,8 +108,7 @@ struct RHI_DLL_EXPORT DeviceAllocationGuard : public DeviceAllocation {
 using DeviceAllocationUnique = std::unique_ptr<DeviceAllocationGuard>;
 
 struct RHI_DLL_EXPORT DeviceImageGuard : public DeviceAllocation {
-  explicit DeviceImageGuard(DeviceAllocation alloc) : DeviceAllocation(alloc) {
-  }
+  explicit DeviceImageGuard(DeviceAllocation alloc) : DeviceAllocation(alloc) {}
   DeviceImageGuard(const DeviceAllocationGuard &) = delete;
   ~DeviceImageGuard();
 };
@@ -127,9 +123,7 @@ struct RHI_DLL_EXPORT DevicePtr : public DeviceAllocation {
            other.offset == offset;
   }
 
-  bool operator!=(const DevicePtr &other) const {
-    return !(*this == other);
-  }
+  bool operator!=(const DevicePtr &other) const { return !(*this == other); }
 };
 
 constexpr DeviceAllocation kDeviceNullAllocation{};
@@ -140,7 +134,7 @@ struct ImageSamplerConfig {};
 
 // A set of shader resources (that is bound at once)
 class RHI_DLL_EXPORT ShaderResourceSet {
- public:
+public:
   virtual ~ShaderResourceSet() = default;
 
   /**
@@ -149,8 +143,7 @@ class RHI_DLL_EXPORT ShaderResourceSet {
    * @params[in] ptr The Device Pointer that is going to be bound
    * @params[in] size The size of the bound region of the buffer
    */
-  virtual ShaderResourceSet &rw_buffer(uint32_t binding,
-                                       DevicePtr ptr,
+  virtual ShaderResourceSet &rw_buffer(uint32_t binding, DevicePtr ptr,
                                        size_t size) = 0;
 
   /**
@@ -167,8 +160,7 @@ class RHI_DLL_EXPORT ShaderResourceSet {
    * @params[in] ptr The Device Pointer that is going to be bound
    * @params[in] size The size of the bound region of the buffer
    */
-  virtual ShaderResourceSet &buffer(uint32_t binding,
-                                    DevicePtr ptr,
+  virtual ShaderResourceSet &buffer(uint32_t binding, DevicePtr ptr,
                                     size_t size) = 0;
 
   /**
@@ -185,8 +177,7 @@ class RHI_DLL_EXPORT ShaderResourceSet {
    * @params[in] alloc The Device Allocation that is going to be bound
    * @params[in] sampler_config The texture sampling configuration
    */
-  virtual ShaderResourceSet &image(uint32_t binding,
-                                   DeviceAllocation alloc,
+  virtual ShaderResourceSet &image(uint32_t binding, DeviceAllocation alloc,
                                    ImageSamplerConfig sampler_config) {
     RHI_NOT_IMPLEMENTED;
   }
@@ -196,8 +187,7 @@ class RHI_DLL_EXPORT ShaderResourceSet {
    * @params binding The binding index of the resource
    * @params alloc The Device Allocation that is going to be bound
    */
-  virtual ShaderResourceSet &rw_image(uint32_t binding,
-                                      DeviceAllocation alloc,
+  virtual ShaderResourceSet &rw_image(uint32_t binding, DeviceAllocation alloc,
                                       int lod) {
     RHI_NOT_IMPLEMENTED
   }
@@ -205,7 +195,7 @@ class RHI_DLL_EXPORT ShaderResourceSet {
 
 // A set of states / resources for rasterization
 class RHI_DLL_EXPORT RasterResources {
- public:
+public:
   virtual ~RasterResources() = default;
 
   /**
@@ -266,7 +256,10 @@ enum class BufferFormat : uint32_t {
 #undef PER_BUFFER_FORMAT
 };
 
-class RHI_DLL_EXPORT Pipeline{public : virtual ~Pipeline(){}};
+class RHI_DLL_EXPORT Pipeline {
+public:
+  virtual ~Pipeline() {}
+};
 
 using UPipeline = std::unique_ptr<Pipeline>;
 
@@ -308,9 +301,8 @@ struct ImageCopyParams {
 };
 
 class RHI_DLL_EXPORT CommandList {
- public:
-  virtual ~CommandList() {
-  }
+public:
+  virtual ~CommandList() {}
 
   /**
    * Bind a pipeline to the command list.
@@ -387,8 +379,7 @@ class RHI_DLL_EXPORT CommandList {
    *                  The size will be clamped to the minimum between
    *                  `dst.size - dst.offset` and `src.size - src.offset`
    */
-  virtual void buffer_copy(DevicePtr dst,
-                           DevicePtr src,
+  virtual void buffer_copy(DevicePtr dst, DevicePtr src,
                            size_t size) noexcept = 0;
 
   /**
@@ -403,8 +394,7 @@ class RHI_DLL_EXPORT CommandList {
    * @params[in] size The size of the region.
    * - The size will be clamped to the underlying buffer's size.
    */
-  virtual void buffer_fill(DevicePtr ptr,
-                           size_t size,
+  virtual void buffer_fill(DevicePtr ptr, size_t size,
                            uint32_t data) noexcept = 0;
 
   /**
@@ -423,8 +413,7 @@ class RHI_DLL_EXPORT CommandList {
    * - `invalid_operation` if the current pipeline has variable block size
    * - `not_supported` if the requested X, Y, or Z is not supported
    */
-  virtual RhiResult dispatch(uint32_t x,
-                             uint32_t y = 1,
+  virtual RhiResult dispatch(uint32_t x, uint32_t y = 1,
                              uint32_t z = 1) noexcept = 0;
 
   struct ComputeSize {
@@ -456,17 +445,12 @@ class RHI_DLL_EXPORT CommandList {
   }
 
   // Profiler support
-  virtual void begin_profiler_scope(const std::string &kernel_name) {
-  }
+  virtual void begin_profiler_scope(const std::string &kernel_name) {}
 
-  virtual void end_profiler_scope() {
-  }
+  virtual void end_profiler_scope() {}
 
   // These are not implemented in compute only device
-  virtual void begin_renderpass(int x0,
-                                int y0,
-                                int x1,
-                                int y1,
+  virtual void begin_renderpass(int x0, int y0, int x1, int y1,
                                 uint32_t num_color_attachments,
                                 DeviceAllocation *color_attachments,
                                 bool *color_clear,
@@ -475,23 +459,17 @@ class RHI_DLL_EXPORT CommandList {
                                 bool depth_clear) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void end_renderpass() {
-    RHI_NOT_IMPLEMENTED
-  }
+  virtual void end_renderpass() { RHI_NOT_IMPLEMENTED }
   virtual void draw(uint32_t num_verticies, uint32_t start_vertex = 0) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void draw_instance(uint32_t num_verticies,
-                             uint32_t num_instances,
+  virtual void draw_instance(uint32_t num_verticies, uint32_t num_instances,
                              uint32_t start_vertex = 0,
                              uint32_t start_instance = 0) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void set_line_width(float width) {
-    RHI_NOT_IMPLEMENTED
-  }
-  virtual void draw_indexed(uint32_t num_indicies,
-                            uint32_t start_vertex = 0,
+  virtual void set_line_width(float width) { RHI_NOT_IMPLEMENTED }
+  virtual void draw_indexed(uint32_t num_indicies, uint32_t start_vertex = 0,
                             uint32_t start_index = 0) {
     RHI_NOT_IMPLEMENTED
   }
@@ -502,32 +480,27 @@ class RHI_DLL_EXPORT CommandList {
                                      uint32_t start_instance = 0) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void image_transition(DeviceAllocation img,
-                                ImageLayout old_layout,
+  virtual void image_transition(DeviceAllocation img, ImageLayout old_layout,
                                 ImageLayout new_layout) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void buffer_to_image(DeviceAllocation dst_img,
-                               DevicePtr src_buf,
+  virtual void buffer_to_image(DeviceAllocation dst_img, DevicePtr src_buf,
                                ImageLayout img_layout,
                                const BufferImageCopyParams &params) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void image_to_buffer(DevicePtr dst_buf,
-                               DeviceAllocation src_img,
+  virtual void image_to_buffer(DevicePtr dst_buf, DeviceAllocation src_img,
                                ImageLayout img_layout,
                                const BufferImageCopyParams &params) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void copy_image(DeviceAllocation dst_img,
-                          DeviceAllocation src_img,
+  virtual void copy_image(DeviceAllocation dst_img, DeviceAllocation src_img,
                           ImageLayout dst_img_layout,
                           ImageLayout src_img_layout,
                           const ImageCopyParams &params) {
     RHI_NOT_IMPLEMENTED
   }
-  virtual void blit_image(DeviceAllocation dst_img,
-                          DeviceAllocation src_img,
+  virtual void blit_image(DeviceAllocation dst_img, DeviceAllocation src_img,
                           ImageLayout dst_img_layout,
                           ImageLayout src_img_layout,
                           const ImageCopyParams &params) {
@@ -554,15 +527,16 @@ enum class AllocUsage : int {
 
 MAKE_ENUM_FLAGS(AllocUsage)
 
-class RHI_DLL_EXPORT
-StreamSemaphoreObject{public : virtual ~StreamSemaphoreObject(){}};
+class RHI_DLL_EXPORT StreamSemaphoreObject {
+public:
+  virtual ~StreamSemaphoreObject() {}
+};
 
 using StreamSemaphore = std::shared_ptr<StreamSemaphoreObject>;
 
 class RHI_DLL_EXPORT Stream {
- public:
-  virtual ~Stream() {
-  }
+public:
+  virtual ~Stream() {}
 
   /**
    * Allocates a new CommandList object from the stream.
@@ -581,34 +555,30 @@ class RHI_DLL_EXPORT Stream {
     return std::make_pair(std::unique_ptr<CommandList>(cmdlist), res);
   }
 
-  virtual StreamSemaphore submit(
-      CommandList *cmdlist,
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) = 0;
-  virtual StreamSemaphore submit_synced(
-      CommandList *cmdlist,
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) = 0;
+  virtual StreamSemaphore
+  submit(CommandList *cmdlist,
+         const std::vector<StreamSemaphore> &wait_semaphores = {}) = 0;
+  virtual StreamSemaphore
+  submit_synced(CommandList *cmdlist,
+                const std::vector<StreamSemaphore> &wait_semaphores = {}) = 0;
 
   virtual void command_sync() = 0;
 };
 
 class RHI_DLL_EXPORT PipelineCache {
- public:
+public:
   virtual ~PipelineCache() = default;
 
   /**
    * Get the pointer to the raw data of the cache.
    * - Can return `nullptr` if cache is invalid or empty.
    */
-  virtual void *data() noexcept {
-    return nullptr;
-  }
+  virtual void *data() noexcept { return nullptr; }
 
   /**
    * Get the size of the cache (in bytes).
    */
-  virtual size_t size() const noexcept {
-    return 0;
-  }
+  virtual size_t size() const noexcept { return 0; }
 };
 
 using UPipelineCache = std::unique_ptr<PipelineCache>;
@@ -616,7 +586,7 @@ using UPipelineCache = std::unique_ptr<PipelineCache>;
 class RHI_DLL_EXPORT Device {
   DeviceCapabilityConfig caps_{};
 
- public:
+public:
   virtual ~Device() {};
 
   struct AllocParams {
@@ -654,17 +624,16 @@ class RHI_DLL_EXPORT Device {
    * - `out_of_memory` if operation failed due to lack of device or host memory.
    * - `error` if operation failed due to other errors.
    */
-  virtual RhiResult create_pipeline_cache(
-      PipelineCache **out_cache,
-      size_t initial_size = 0,
-      const void *initial_data = nullptr) noexcept {
+  virtual RhiResult
+  create_pipeline_cache(PipelineCache **out_cache, size_t initial_size = 0,
+                        const void *initial_data = nullptr) noexcept {
     *out_cache = nullptr;
     return RhiResult::not_supported;
   }
 
-  inline std::pair<UPipelineCache, RhiResult> create_pipeline_cache_unique(
-      size_t initial_size = 0,
-      const void *initial_data = nullptr) noexcept {
+  inline std::pair<UPipelineCache, RhiResult>
+  create_pipeline_cache_unique(size_t initial_size = 0,
+                               const void *initial_data = nullptr) noexcept {
     PipelineCache *cache{nullptr};
     RhiResult res =
         this->create_pipeline_cache(&cache, initial_size, initial_data);
@@ -685,23 +654,22 @@ class RHI_DLL_EXPORT Device {
    * - `not_supported` if the pipeline uses features the device can't support.
    * - `error` if the operation failed due to other reasons.
    */
-  virtual RhiResult create_pipeline(
-      Pipeline **out_pipeline,
-      const PipelineSourceDesc &src,
-      std::string name = "Pipeline",
-      PipelineCache *cache = nullptr) noexcept = 0;
+  virtual RhiResult
+  create_pipeline(Pipeline **out_pipeline, const PipelineSourceDesc &src,
+                  std::string name = "Pipeline",
+                  PipelineCache *cache = nullptr) noexcept = 0;
 
-  inline std::pair<UPipeline, RhiResult> create_pipeline_unique(
-      const PipelineSourceDesc &src,
-      std::string name = "Pipeline",
-      PipelineCache *cache = nullptr) noexcept {
+  inline std::pair<UPipeline, RhiResult>
+  create_pipeline_unique(const PipelineSourceDesc &src,
+                         std::string name = "Pipeline",
+                         PipelineCache *cache = nullptr) noexcept {
     Pipeline *pipeline{nullptr};
     RhiResult res = this->create_pipeline(&pipeline, src, name, cache);
     return std::make_pair(UPipeline(pipeline), res);
   }
 
-  inline std::pair<DeviceAllocationUnique, RhiResult> allocate_memory_unique(
-      const AllocParams &params) {
+  inline std::pair<DeviceAllocationUnique, RhiResult>
+  allocate_memory_unique(const AllocParams &params) {
     DeviceAllocation alloc;
     RhiResult res = allocate_memory(params, &alloc);
     if (res != RhiResult::success) {
@@ -727,10 +695,8 @@ class RHI_DLL_EXPORT Device {
    * - `invalid_usage` if the specified source is incompatible or invalid.
    * - `error` if the operation failed due to other reasons.
    */
-  virtual RhiResult upload_data(DevicePtr *device_ptr,
-                                const void **data,
-                                size_t *size,
-                                int num_alloc = 1) noexcept;
+  virtual RhiResult upload_data(DevicePtr *device_ptr, const void **data,
+                                size_t *size, int num_alloc = 1) noexcept;
 
   /**
    * Read data from device allocations back to host immediately.
@@ -752,12 +718,10 @@ class RHI_DLL_EXPORT Device {
    * - `invalid_usage` if the specified source is incompatible or invalid.
    * - `error` if the operation failed due to other reasons.
    */
-  virtual RhiResult readback_data(
-      DevicePtr *device_ptr,
-      void **data,
-      size_t *size,
-      int num_alloc = 1,
-      const std::vector<StreamSemaphore> &wait_sema = {}) noexcept;
+  virtual RhiResult
+  readback_data(DevicePtr *device_ptr, void **data, size_t *size,
+                int num_alloc = 1,
+                const std::vector<StreamSemaphore> &wait_sema = {}) noexcept;
 
   // Each thraed will acquire its own stream
   virtual Stream *get_compute_stream() = 0;
@@ -792,8 +756,7 @@ class RHI_DLL_EXPORT Device {
    *         `invalid_usage` when `ptr.offset + size` is out-of-bounds.
    *         `error` when the mapping failed for other reasons.
    */
-  virtual RhiResult map_range(DevicePtr ptr,
-                              uint64_t size,
+  virtual RhiResult map_range(DevicePtr ptr, uint64_t size,
                               void **mapped_ptr) = 0;
 
   /**
@@ -831,38 +794,28 @@ class RHI_DLL_EXPORT Device {
   // Copy memory inter or intra devices (synced)
   enum class MemcpyCapability { Direct, RequiresStagingBuffer, RequiresHost };
 
-  static MemcpyCapability check_memcpy_capability(DevicePtr dst,
-                                                  DevicePtr src,
+  static MemcpyCapability check_memcpy_capability(DevicePtr dst, DevicePtr src,
                                                   uint64_t size);
 
   static void memcpy_direct(DevicePtr dst, DevicePtr src, uint64_t size);
 
-  static void memcpy_via_staging(DevicePtr dst,
-                                 DevicePtr staging,
-                                 DevicePtr src,
-                                 uint64_t size);
+  static void memcpy_via_staging(DevicePtr dst, DevicePtr staging,
+                                 DevicePtr src, uint64_t size);
 
-  static void memcpy_via_host(DevicePtr dst,
-                              void *host_buffer,
-                              DevicePtr src,
+  static void memcpy_via_host(DevicePtr dst, void *host_buffer, DevicePtr src,
                               uint64_t size);
 
   // Get all supported capabilities of the current created device.
   virtual Arch arch() const = 0;
-  inline const DeviceCapabilityConfig &get_caps() const {
-    return caps_;
-  }
+  inline const DeviceCapabilityConfig &get_caps() const { return caps_; }
   inline void set_caps(DeviceCapabilityConfig &&caps) {
     caps_ = std::move(caps);
   }
 
   // Profiler support
-  virtual void profiler_sync() {
-  }
+  virtual void profiler_sync() {}
 
-  virtual size_t profiler_get_sampler_count() {
-    return 0;
-  }
+  virtual size_t profiler_get_sampler_count() { return 0; }
 
   virtual std::vector<std::pair<std::string, double>>
   profiler_flush_sampled_time() {
@@ -871,14 +824,13 @@ class RHI_DLL_EXPORT Device {
 };
 
 class RHI_DLL_EXPORT Surface {
- public:
-  virtual ~Surface() {
-  }
+public:
+  virtual ~Surface() {}
 
   virtual StreamSemaphore acquire_next_image() = 0;
   virtual DeviceAllocation get_target_image() = 0;
-  virtual void present_image(
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) = 0;
+  virtual void
+  present_image(const std::vector<StreamSemaphore> &wait_semaphores = {}) = 0;
   virtual std::pair<uint32_t, uint32_t> get_size() = 0;
   virtual int get_image_count() = 0;
   virtual BufferFormat image_format() = 0;
@@ -959,13 +911,13 @@ struct RasterParams {
 };
 
 class RHI_DLL_EXPORT GraphicsDevice : public Device {
- public:
-  virtual std::unique_ptr<Pipeline> create_raster_pipeline(
-      const std::vector<PipelineSourceDesc> &src,
-      const RasterParams &raster_params,
-      const std::vector<VertexInputBinding> &vertex_inputs,
-      const std::vector<VertexInputAttribute> &vertex_attrs,
-      std::string name = "Pipeline") = 0;
+public:
+  virtual std::unique_ptr<Pipeline>
+  create_raster_pipeline(const std::vector<PipelineSourceDesc> &src,
+                         const RasterParams &raster_params,
+                         const std::vector<VertexInputBinding> &vertex_inputs,
+                         const std::vector<VertexInputAttribute> &vertex_attrs,
+                         std::string name = "Pipeline") = 0;
 
   virtual Stream *get_graphics_stream() = 0;
 
@@ -983,8 +935,8 @@ class RHI_DLL_EXPORT GraphicsDevice : public Device {
     return std::unique_ptr<RasterResources>(this->create_raster_resources());
   }
 
-  virtual std::unique_ptr<Surface> create_surface(
-      const SurfaceConfig &config) = 0;
+  virtual std::unique_ptr<Surface>
+  create_surface(const SurfaceConfig &config) = 0;
   // You are not expected to call this directly. If you want to use this image
   // in a taichi kernel, you usually want to create the image via
   // `GfxRuntime::create_image`. `GfxRuntime` is available in `ProgramImpl`
@@ -995,27 +947,21 @@ class RHI_DLL_EXPORT GraphicsDevice : public Device {
   }
   virtual void destroy_image(DeviceAllocation handle) = 0;
 
-  virtual void image_transition(DeviceAllocation img,
-                                ImageLayout old_layout,
+  virtual void image_transition(DeviceAllocation img, ImageLayout old_layout,
                                 ImageLayout new_layout);
-  virtual void buffer_to_image(DeviceAllocation dst_img,
-                               DevicePtr src_buf,
+  virtual void buffer_to_image(DeviceAllocation dst_img, DevicePtr src_buf,
                                ImageLayout img_layout,
                                const BufferImageCopyParams &params);
-  virtual void image_to_buffer(DevicePtr dst_buf,
-                               DeviceAllocation src_img,
+  virtual void image_to_buffer(DevicePtr dst_buf, DeviceAllocation src_img,
                                ImageLayout img_layout,
                                const BufferImageCopyParams &params);
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
-template <>
-class fmt::formatter<taichi::lang::RhiResult> {
- public:
-  constexpr auto parse(format_parse_context &ctx) {
-    return ctx.begin();
-  }
+template <> class fmt::formatter<taichi::lang::RhiResult> {
+public:
+  constexpr auto parse(format_parse_context &ctx) { return ctx.begin(); }
   template <typename Context>
   constexpr auto format(taichi::lang::RhiResult const &res,
                         Context &ctx) const {

@@ -41,8 +41,7 @@ constexpr std::size_t default_shared_mem_size = 65536;
 
 // Specialization for bool type. This solves the issue that return type ti.u1
 // always returns 0 in vulkan. This issue is caused by data endianness.
-template <bool, typename G>
-bool taichi_union_cast_with_different_sizes(G g) {
+template <bool, typename G> bool taichi_union_cast_with_different_sizes(G g) {
   return g != 0;
 }
 
@@ -56,8 +55,7 @@ T taichi_union_cast_with_different_sizes(G g) {
   return u.t;
 }
 
-template <typename T, typename G>
-T taichi_union_cast(G g) {
+template <typename T, typename G> T taichi_union_cast(G g) {
   static_assert(sizeof(T) == sizeof(G));
   return taichi_union_cast_with_different_sizes<T>(g);
 }

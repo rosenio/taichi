@@ -19,11 +19,9 @@ class SNodeRwAccessorsBank;
  * {Axis{0}, Axis{1}}.
  */
 class Axis {
- public:
+public:
   int value;
-  Axis() {
-    value = 0;
-  }
+  Axis() { value = 0; }
   explicit Axis(int value) : value(value) {
     TI_ERROR_UNLESS(0 <= value && value < taichi_max_num_indices,
                     "Too many dimensions. The maximum dimensionality is {}",
@@ -57,10 +55,10 @@ struct AxisExtractor {
  * Structural nodes
  */
 class SNode {
- public:
+public:
   // This class decouples SNode from the frontend expression.
   class GradInfoProvider {
-   public:
+  public:
     virtual ~GradInfoProvider() = default;
     virtual bool is_primal() const = 0;
     virtual SNodeGradType get_snode_grad_type() const = 0;
@@ -68,10 +66,7 @@ class SNode {
     virtual SNode *dual_snode() const = 0;
     virtual SNode *adjoint_checkbit_snode() const = 0;
 
-    template <typename T>
-    T *cast() {
-      return static_cast<T *>(this);
-    }
+    template <typename T> T *cast() { return static_cast<T *>(this); }
   };
   std::vector<std::unique_ptr<SNode>> ch;
 
@@ -106,9 +101,9 @@ class SNode {
   std::unique_ptr<GradInfoProvider> grad_info{nullptr};
 
   // Quant
-  PrimitiveType *physical_type{nullptr};  // for bit_struct and quant_array only
-  int id_in_bit_struct{-1};               // for children of bit_struct only
-  bool is_bit_level{false};  // true if inside bit_struct or quant_array
+  PrimitiveType *physical_type{nullptr}; // for bit_struct and quant_array only
+  int id_in_bit_struct{-1};              // for children of bit_struct only
+  bool is_bit_level{false}; // true if inside bit_struct or quant_array
 
   // Whether the path from root to |this| contains only `dense` SNodes.
   bool is_path_all_dense{true};
@@ -116,9 +111,7 @@ class SNode {
   explicit SNode(SNodeFieldMap *snode_to_fields = nullptr,
                  SNodeRwAccessorsBank *snode_rw_accessors_bank = nullptr);
 
-  SNode(int depth,
-        SNodeType t,
-        SNodeFieldMap *snode_to_fields = nullptr,
+  SNode(int depth, SNodeType t, SNodeFieldMap *snode_to_fields = nullptr,
         SNodeRwAccessorsBank *snode_rw_accessors_bank = nullptr);
 
   SNode(const SNode &);
@@ -135,107 +128,88 @@ class SNode {
 
   SNode &insert_children(SNodeType t);
 
-  SNode &create_node(std::vector<Axis> axes,
-                     std::vector<int> sizes,
-                     SNodeType type,
-                     const DebugInfo &dbg_info = DebugInfo());
+  SNode &create_node(std::vector<Axis> axes, std::vector<int> sizes,
+                     SNodeType type, const DebugInfo &dbg_info = DebugInfo());
 
   // SNodes maintains how flattened index bits are taken from indices
-  SNode &dense(const std::vector<Axis> &axes,
-               const std::vector<int> &sizes,
+  SNode &dense(const std::vector<Axis> &axes, const std::vector<int> &sizes,
                const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, sizes, SNodeType::dense, dbg_info);
   }
 
-  SNode &dense(const std::vector<Axis> &axes,
-               int sizes,
+  SNode &dense(const std::vector<Axis> &axes, int sizes,
                const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, std::vector<int>{sizes}, SNodeType::dense,
                        dbg_info);
   }
 
-  SNode &dense(const Axis &axis,
-               int size,
+  SNode &dense(const Axis &axis, int size,
                const DebugInfo &dbg_info = DebugInfo()) {
     return SNode::dense(std::vector<Axis>{axis}, size, dbg_info);
   }
 
-  SNode &pointer(const std::vector<Axis> &axes,
-                 const std::vector<int> &sizes,
+  SNode &pointer(const std::vector<Axis> &axes, const std::vector<int> &sizes,
                  const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, sizes, SNodeType::pointer, dbg_info);
   }
 
-  SNode &pointer(const std::vector<Axis> &axes,
-                 int sizes,
+  SNode &pointer(const std::vector<Axis> &axes, int sizes,
                  const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, std::vector<int>{sizes}, SNodeType::pointer,
                        dbg_info);
   }
 
-  SNode &pointer(const Axis &axis,
-                 int size,
+  SNode &pointer(const Axis &axis, int size,
                  const DebugInfo &dbg_info = DebugInfo()) {
     return SNode::pointer(std::vector<Axis>{axis}, size, dbg_info);
   }
 
-  SNode &bitmasked(const std::vector<Axis> &axes,
-                   const std::vector<int> &sizes,
+  SNode &bitmasked(const std::vector<Axis> &axes, const std::vector<int> &sizes,
                    const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, sizes, SNodeType::bitmasked, dbg_info);
   }
 
-  SNode &bitmasked(const std::vector<Axis> &axes,
-                   int sizes,
+  SNode &bitmasked(const std::vector<Axis> &axes, int sizes,
                    const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, std::vector<int>{sizes}, SNodeType::bitmasked,
                        dbg_info);
   }
 
-  SNode &bitmasked(const Axis &axis,
-                   int size,
+  SNode &bitmasked(const Axis &axis, int size,
                    const DebugInfo &dbg_info = DebugInfo()) {
     return SNode::bitmasked(std::vector<Axis>{axis}, size, dbg_info);
   }
 
-  SNode &hash(const std::vector<Axis> &axes,
-              const std::vector<int> &sizes,
+  SNode &hash(const std::vector<Axis> &axes, const std::vector<int> &sizes,
               const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, sizes, SNodeType::hash, dbg_info);
   }
 
-  SNode &hash(const std::vector<Axis> &axes,
-              int sizes,
+  SNode &hash(const std::vector<Axis> &axes, int sizes,
               const DebugInfo &dbg_info = DebugInfo()) {
     return create_node(axes, std::vector<int>{sizes}, SNodeType::hash,
                        dbg_info);
   }
 
-  SNode &hash(const Axis &axis,
-              int size,
+  SNode &hash(const Axis &axis, int size,
               const DebugInfo &dbg_info = DebugInfo()) {
     return hash(std::vector<Axis>{axis}, size, dbg_info);
   }
 
-  std::string type_name() {
-    return snode_type_name(type);
-  }
+  std::string type_name() { return snode_type_name(type); }
 
   SNode &bit_struct(BitStructType *bit_struct_type,
                     const DebugInfo &dbg_info = DebugInfo());
 
   SNode &quant_array(const std::vector<Axis> &axes,
-                     const std::vector<int> &sizes,
-                     int bits,
+                     const std::vector<int> &sizes, int bits,
                      const DebugInfo &dbg_info = DebugInfo());
 
   void print();
 
   void set_index_offsets(std::vector<int> index_offsets);
 
-  SNode &dynamic(const Axis &expr,
-                 int n,
-                 int chunk_size,
+  SNode &dynamic(const Axis &expr, int n, int chunk_size,
                  const DebugInfo &dbg_info = DebugInfo());
 
   SNode &morton(bool val = true) {
@@ -285,9 +259,7 @@ class SNode {
 
   SNode *get_least_sparse_ancestor() const;
 
-  std::string get_name() const {
-    return node_type_name;
-  }
+  std::string get_name() const { return node_type_name; }
 
   std::string element_listgen_func_name() const {
     return get_name() + "_element_listgen";
@@ -303,9 +275,7 @@ class SNode {
     return fmt::format("{}_refine_coordinates", get_name());
   }
 
-  int64 max_num_elements() const {
-    return num_cells_per_container;
-  }
+  int64 max_num_elements() const { return num_cells_per_container; }
 
   int64 get_total_num_elements_towards_root() const {
     int64 total_num_elemts = 1;
@@ -335,7 +305,7 @@ class SNode {
 
   Expr get_expr() const;
 
-  uint64 fetch_reader_result();  // TODO: refactor
+  uint64 fetch_reader_result(); // TODO: refactor
 
   // SNodeTree part
 
@@ -345,15 +315,13 @@ class SNode {
 
   const SNode *get_root() const;
 
-  static void reset_counter() {
-    counter = 0;
-  }
+  static void reset_counter() { counter = 0; }
 
- private:
+private:
   int snode_tree_id_{0};
   SNodeFieldMap *snode_to_fields_{nullptr};
   SNodeRwAccessorsBank *snode_rw_accessors_bank_{
-      nullptr};  // owned by the "Program" class
+      nullptr}; // owned by the "Program" class
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

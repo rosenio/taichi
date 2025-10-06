@@ -3,9 +3,9 @@
 namespace taichi {
 
 class HackedSignalRegister {
- public:
+public:
   explicit HackedSignalRegister();
   ~HackedSignalRegister();
 };
 
-}  // namespace taichi
+} // namespace taichi

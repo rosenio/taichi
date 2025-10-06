@@ -452,10 +452,10 @@ struct cusparseSpGEMMDescr;
 typedef struct cusparseSpGEMMDescr *cusparseSpGEMMDescr_t;
 
 typedef enum {
-  CUSPARSE_INDEX_16U = 1,  ///< 16-bit unsigned integer for matrix/vector
-                           ///< indices
-  CUSPARSE_INDEX_32I = 2,  ///< 32-bit signed integer for matrix/vector indices
-  CUSPARSE_INDEX_64I = 3   ///< 64-bit signed integer for matrix/vector indices
+  CUSPARSE_INDEX_16U = 1, ///< 16-bit unsigned integer for matrix/vector
+                          ///< indices
+  CUSPARSE_INDEX_32I = 2, ///< 32-bit signed integer for matrix/vector indices
+  CUSPARSE_INDEX_64I = 3  ///< 64-bit signed integer for matrix/vector indices
 } cusparseIndexType_t;
 
 typedef enum {
@@ -525,8 +525,8 @@ typedef enum {
 } cusparseAction_t;
 
 typedef enum {
-  CUSPARSE_CSR2CSC_ALG1 = 1,  // faster than V2 (in general), deterministc
-  CUSPARSE_CSR2CSC_ALG2 = 2   // low memory requirement, non-deterministc
+  CUSPARSE_CSR2CSC_ALG1 = 1, // faster than V2 (in general), deterministc
+  CUSPARSE_CSR2CSC_ALG2 = 2  // low memory requirement, non-deterministc
 } cusparseCsr2CscAlg_t;
 
 typedef enum {

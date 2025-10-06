@@ -228,15 +228,15 @@
 
 #ifndef TI_C_API_VERSION
 #define TI_C_API_VERSION 1007000
-#endif  // TI_C_API_VERSION
+#endif // TI_C_API_VERSION
 
 #ifndef TAICHI_H
 #include "taichi.h"
-#endif  // TAICHI_H
+#endif // TAICHI_H
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 // Alias `TiBool` (1.4.0)
 //
@@ -940,8 +940,7 @@ TI_DLL_EXPORT void TI_API_CALL ti_destroy_runtime(TiRuntime runtime);
 //
 // Force override the list of available capabilities in the runtime instance.
 TI_DLL_EXPORT void TI_API_CALL
-ti_set_runtime_capabilities_ext(TiRuntime runtime,
-                                uint32_t capability_count,
+ti_set_runtime_capabilities_ext(TiRuntime runtime, uint32_t capability_count,
                                 const TiCapabilityLevelInfo *capabilities);
 
 // Function `ti_get_runtime_capabilities` (1.4.0)
@@ -957,9 +956,8 @@ ti_get_runtime_capabilities(TiRuntime runtime,
 // Function `ti_allocate_memory` (1.4.0)
 //
 // Allocates a contiguous device memory with provided parameters.
-TI_DLL_EXPORT TiMemory TI_API_CALL
-ti_allocate_memory(TiRuntime runtime,
-                   const TiMemoryAllocateInfo *allocate_info);
+TI_DLL_EXPORT TiMemory TI_API_CALL ti_allocate_memory(
+    TiRuntime runtime, const TiMemoryAllocateInfo *allocate_info);
 
 // Function `ti_free_memory` (1.4.0)
 //
@@ -1005,18 +1003,16 @@ TI_DLL_EXPORT void TI_API_CALL ti_destroy_sampler(TiRuntime runtime,
 //
 // Copies the data in a contiguous subsection of the device memory to another
 // subsection. The two subsections *must not* overlap.
-TI_DLL_EXPORT void TI_API_CALL
-ti_copy_memory_device_to_device(TiRuntime runtime,
-                                const TiMemorySlice *dst_memory,
-                                const TiMemorySlice *src_memory);
+TI_DLL_EXPORT void TI_API_CALL ti_copy_memory_device_to_device(
+    TiRuntime runtime, const TiMemorySlice *dst_memory,
+    const TiMemorySlice *src_memory);
 
 // Function `ti_copy_image_device_to_device` (Device Command)
 //
 // Copies the image data in a contiguous subsection of the device image to
 // another subsection. The two subsections *must not* overlap.
 TI_DLL_EXPORT void TI_API_CALL
-ti_copy_image_device_to_device(TiRuntime runtime,
-                               const TiImageSlice *dst_image,
+ti_copy_image_device_to_device(TiRuntime runtime, const TiImageSlice *dst_image,
                                const TiImageSlice *src_image);
 
 // Function `ti_track_image_ext` (1.4.0)
@@ -1051,10 +1047,8 @@ TI_DLL_EXPORT void TI_API_CALL ti_launch_kernel(TiRuntime runtime,
 // Launches a Taichi compute graph with provided named arguments. The named
 // arguments *must* have the same count, names, and types as in the source code.
 TI_DLL_EXPORT void TI_API_CALL
-ti_launch_compute_graph(TiRuntime runtime,
-                        TiComputeGraph compute_graph,
-                        uint32_t arg_count,
-                        const TiNamedArgument *args);
+ti_launch_compute_graph(TiRuntime runtime, TiComputeGraph compute_graph,
+                        uint32_t arg_count, const TiNamedArgument *args);
 
 // Function `ti_flush` (1.4.0)
 //
@@ -1107,5 +1101,5 @@ TI_DLL_EXPORT TiComputeGraph TI_API_CALL
 ti_get_aot_module_compute_graph(TiAotModule aot_module, const char *name);
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
+} // extern "C"
+#endif // __cplusplus

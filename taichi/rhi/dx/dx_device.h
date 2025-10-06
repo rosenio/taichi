@@ -20,21 +20,18 @@ constexpr bool kD3d11ForceRef = false;
 void check_dx_error(HRESULT hr, const char *msg);
 
 class Dx11ResourceSet : public ShaderResourceSet {
- public:
+public:
   Dx11ResourceSet() = default;
   ~Dx11ResourceSet() override;
 
-  ShaderResourceSet &rw_buffer(uint32_t binding,
-                               DevicePtr ptr,
+  ShaderResourceSet &rw_buffer(uint32_t binding, DevicePtr ptr,
                                size_t size) final;
   ShaderResourceSet &rw_buffer(uint32_t binding, DeviceAllocation alloc) final;
   ShaderResourceSet &buffer(uint32_t binding, DevicePtr ptr, size_t size) final;
   ShaderResourceSet &buffer(uint32_t binding, DeviceAllocation alloc) final;
-  ShaderResourceSet &image(uint32_t binding,
-                           DeviceAllocation alloc,
+  ShaderResourceSet &image(uint32_t binding, DeviceAllocation alloc,
                            ImageSamplerConfig sampler_config) final;
-  ShaderResourceSet &rw_image(uint32_t binding,
-                              DeviceAllocation alloc,
+  ShaderResourceSet &rw_image(uint32_t binding, DeviceAllocation alloc,
                               int lod) final;
 
   const std::unordered_map<uint32_t, uint32_t> &uav_binding_to_alloc_id() {
@@ -45,7 +42,7 @@ class Dx11ResourceSet : public ShaderResourceSet {
     return cb_binding_to_alloc_id_;
   }
 
- private:
+private:
   std::unordered_map<uint32_t, uint32_t> uav_binding_to_alloc_id_;
   std::unordered_map<uint32_t, uint32_t> cb_binding_to_alloc_id_;
 };
@@ -67,20 +64,15 @@ class Dx11RasterResources : public RasterResources {
 class Dx11Device;
 
 class Dx11Pipeline : public Pipeline {
- public:
-  Dx11Pipeline(const PipelineSourceDesc &desc,
-               const std::string &name,
+public:
+  Dx11Pipeline(const PipelineSourceDesc &desc, const std::string &name,
                Dx11Device *device);
   ~Dx11Pipeline() override;
 
-  ID3D11ComputeShader *get_program() {
-    return compute_shader_;
-  }
-  const std::string &name() {
-    return name_;
-  }
+  ID3D11ComputeShader *get_program() { return compute_shader_; }
+  const std::string &name() { return name_; }
 
- private:
+private:
   // Can't use shared_ptr b/c this can cause device_ to be deallocated
   // pre-maturely
   Dx11Device *device_{nullptr};
@@ -90,25 +82,25 @@ class Dx11Pipeline : public Pipeline {
 };
 
 class Dx11Stream : public Stream {
- public:
+public:
   Dx11Stream(Dx11Device *);
   ~Dx11Stream() override;
 
   RhiResult new_command_list(CommandList **out_cmdlist) noexcept final;
-  StreamSemaphore submit(
-      CommandList *cmdlist,
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
+  StreamSemaphore
+  submit(CommandList *cmdlist,
+         const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
   StreamSemaphore submit_synced(
       CommandList *cmdlist,
       const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
   void command_sync() override;
 
- private:
+private:
   Dx11Device *device_{nullptr};
 };
 
 class Dx11CommandList : public CommandList {
- public:
+public:
   Dx11CommandList(Dx11Device *ti_device);
   ~Dx11CommandList() override;
 
@@ -124,37 +116,29 @@ class Dx11CommandList : public CommandList {
   RhiResult dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1) noexcept final;
 
   // These are not implemented in compute only device
-  void begin_renderpass(int x0,
-                        int y0,
-                        int x1,
-                        int y1,
+  void begin_renderpass(int x0, int y0, int x1, int y1,
                         uint32_t num_color_attachments,
-                        DeviceAllocation *color_attachments,
-                        bool *color_clear,
+                        DeviceAllocation *color_attachments, bool *color_clear,
                         std::vector<float> *clear_colors,
                         DeviceAllocation *depth_attachment,
                         bool depth_clear) override;
   void end_renderpass() override;
   void draw(uint32_t num_verticies, uint32_t start_vertex = 0) override;
   void set_line_width(float width) override;
-  void draw_indexed(uint32_t num_indicies,
-                    uint32_t start_vertex = 0,
+  void draw_indexed(uint32_t num_indicies, uint32_t start_vertex = 0,
                     uint32_t start_index = 0) override;
-  void image_transition(DeviceAllocation img,
-                        ImageLayout old_layout,
+  void image_transition(DeviceAllocation img, ImageLayout old_layout,
                         ImageLayout new_layout) override;
-  void buffer_to_image(DeviceAllocation dst_img,
-                       DevicePtr src_buf,
+  void buffer_to_image(DeviceAllocation dst_img, DevicePtr src_buf,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
-  void image_to_buffer(DevicePtr dst_buf,
-                       DeviceAllocation src_img,
+  void image_to_buffer(DevicePtr dst_buf, DeviceAllocation src_img,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
 
   void run_commands();
 
- private:
+private:
   ID3D11DeviceContext *d3d11_deferred_context_{nullptr};
   ID3D11CommandList *d3d11_command_list_{nullptr};
 
@@ -165,41 +149,31 @@ class Dx11CommandList : public CommandList {
 };
 
 class Dx11Device : public GraphicsDevice {
- public:
+public:
   Dx11Device();
   ~Dx11Device() override;
 
-  Arch arch() const override {
-    return Arch::dx11;
-  }
+  Arch arch() const override { return Arch::dx11; }
 
   RhiResult allocate_memory(const AllocParams &params,
                             DeviceAllocation *out_devalloc) override;
   void dealloc_memory(DeviceAllocation handle) override;
 
-  RhiResult upload_data(DevicePtr *device_ptr,
-                        const void **data,
-                        size_t *size,
+  RhiResult upload_data(DevicePtr *device_ptr, const void **data, size_t *size,
                         int num_alloc = 1) noexcept final;
 
   RhiResult readback_data(
-      DevicePtr *device_ptr,
-      void **data,
-      size_t *size,
-      int num_alloc = 1,
+      DevicePtr *device_ptr, void **data, size_t *size, int num_alloc = 1,
       const std::vector<StreamSemaphore> &wait_sema = {}) noexcept final;
 
-  ShaderResourceSet *create_resource_set() final {
-    return new Dx11ResourceSet;
-  }
+  ShaderResourceSet *create_resource_set() final { return new Dx11ResourceSet; }
 
   RasterResources *create_raster_resources() final {
     return new Dx11RasterResources;
   }
 
   RhiResult create_pipeline(Pipeline **out_pipeline,
-                            const PipelineSourceDesc &src,
-                            std::string name,
+                            const PipelineSourceDesc &src, std::string name,
                             PipelineCache *cache) noexcept final;
   RhiResult map_range(DevicePtr ptr, uint64_t size, void **mapped_ptr) final;
   RhiResult map(DeviceAllocation alloc, void **mapped_ptr) final;
@@ -207,34 +181,29 @@ class Dx11Device : public GraphicsDevice {
   void unmap(DeviceAllocation alloc) final;
   void memcpy_internal(DevicePtr dst, DevicePtr src, uint64_t size) override;
   Stream *get_compute_stream() override;
-  std::unique_ptr<Pipeline> create_raster_pipeline(
-      const std::vector<PipelineSourceDesc> &src,
-      const RasterParams &raster_params,
-      const std::vector<VertexInputBinding> &vertex_inputs,
-      const std::vector<VertexInputAttribute> &vertex_attrs,
-      std::string name = "Pipeline") override;
+  std::unique_ptr<Pipeline>
+  create_raster_pipeline(const std::vector<PipelineSourceDesc> &src,
+                         const RasterParams &raster_params,
+                         const std::vector<VertexInputBinding> &vertex_inputs,
+                         const std::vector<VertexInputAttribute> &vertex_attrs,
+                         std::string name = "Pipeline") override;
   Stream *get_graphics_stream() override;
   std::unique_ptr<Surface> create_surface(const SurfaceConfig &config) override;
   DeviceAllocation create_image(const ImageParams &params) override;
   void destroy_image(DeviceAllocation handle) override;
 
-  void image_transition(DeviceAllocation img,
-                        ImageLayout old_layout,
+  void image_transition(DeviceAllocation img, ImageLayout old_layout,
                         ImageLayout new_layout) override;
-  void buffer_to_image(DeviceAllocation dst_img,
-                       DevicePtr src_buf,
+  void buffer_to_image(DeviceAllocation dst_img, DevicePtr src_buf,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
-  void image_to_buffer(DevicePtr dst_buf,
-                       DeviceAllocation src_img,
+  void image_to_buffer(DevicePtr dst_buf, DeviceAllocation src_img,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
   void wait_idle() override;
 
   int live_dx11_object_count();
-  ID3D11DeviceContext *d3d11_context() {
-    return context_;
-  }
+  ID3D11DeviceContext *d3d11_context() { return context_; }
 
   ID3D11Buffer *alloc_id_to_default_copy(uint32_t alloc_id);
   ID3D11Buffer *alloc_id_to_buffer(ID3D11DeviceContext *context,
@@ -246,19 +215,15 @@ class Dx11Device : public GraphicsDevice {
   ID3D11Buffer *alloc_id_to_cb_buffer(ID3D11DeviceContext *context,
                                       uint32_t alloc_id);
 
-  ID3D11Device *d3d11_device() {
-    return device_;
-  }
+  ID3D11Device *d3d11_device() { return device_; }
 
   // cb_slot should be 1 after pre-occupied buffers
   // example: in the presence of args_t, cb_slot will be cb0
   // in the absence of args_t, cb_slot will be cb0
-  ID3D11Buffer *set_spirv_cross_numworkgroups(uint32_t x,
-                                              uint32_t y,
-                                              uint32_t z,
-                                              int cb_slot);
+  ID3D11Buffer *set_spirv_cross_numworkgroups(uint32_t x, uint32_t y,
+                                              uint32_t z, int cb_slot);
 
- private:
+private:
   void create_dx11_device();
   void destroy_dx11_device();
 
@@ -308,8 +273,7 @@ class Dx11Device : public GraphicsDevice {
       return get_dynamic_constants(context, device);
     }
 
-    void copy_back(ID3D11Buffer *buffer,
-                   ID3D11DeviceContext *context,
+    void copy_back(ID3D11Buffer *buffer, ID3D11DeviceContext *context,
                    ID3D11Device *device);
 
     ID3D11UnorderedAccessView *get_uav(ID3D11DeviceContext *context,
@@ -321,7 +285,7 @@ class Dx11Device : public GraphicsDevice {
   std::unique_ptr<Dx11Stream> stream_;
 };
 
-}  // namespace directx11
-}  // namespace taichi::lang
+} // namespace directx11
+} // namespace taichi::lang
 
 #endif

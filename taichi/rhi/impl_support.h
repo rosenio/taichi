@@ -4,9 +4,9 @@
 #include <assert.h>
 #include <forward_list>
 #include <initializer_list>
-#include <unordered_set>
 #include <mutex>
 #include <type_traits>
+#include <unordered_set>
 
 namespace taichi::lang {
 
@@ -14,9 +14,7 @@ namespace taichi::lang {
 // No public-facing API should use anything within `rhi_impl` namespace
 namespace rhi_impl {
 
-template <typename... Ts>
-void disabled_function([[maybe_unused]] Ts... C) {
-}
+template <typename... Ts> void disabled_function([[maybe_unused]] Ts... C) {}
 
 #if defined(SPDLOG_H) && defined(TI_WARN)
 #define RHI_LOG_ERROR(msg) TI_WARN("RHI Error : {}", msg)
@@ -41,12 +39,11 @@ void disabled_function([[maybe_unused]] Ts... C) {
 #endif
 
 #define RHI_ASSERT(cond) assert(cond);
-#define RHI_THROW_UNLESS(cond, exception) \
-  if (!(cond))                            \
+#define RHI_THROW_UNLESS(cond, exception)                                      \
+  if (!(cond))                                                                 \
     throw(exception);
 
-template <typename T>
-constexpr auto saturate_uadd(T a, T b) {
+template <typename T> constexpr auto saturate_uadd(T a, T b) {
   static_assert(std::is_unsigned<T>::value);
   const T c = a + b;
   if (c < a) {
@@ -55,8 +52,7 @@ constexpr auto saturate_uadd(T a, T b) {
   return c;
 }
 
-template <typename T>
-constexpr auto saturate_usub(T x, T y) {
+template <typename T> constexpr auto saturate_usub(T x, T y) {
   static_assert(std::is_unsigned<T>::value);
   T res = x - y;
   res &= -(res <= x);
@@ -67,28 +63,23 @@ constexpr auto saturate_usub(T x, T y) {
 // Wrapped return-code & object tuple for simplicity
 // Easier to read then std::pair
 // NOTE: If an internal function can fail, wrap return object with this!
-template <typename T>
-struct RhiReturn {
+template <typename T> struct RhiReturn {
   [[nodiscard]] RhiResult result;
   [[nodiscard]] T object;
 
-  RhiReturn(RhiResult &result, T &object) : result(result), object(object) {
-  }
+  RhiReturn(RhiResult &result, T &object) : result(result), object(object) {}
 
   RhiReturn(const RhiResult &result, const T &object)
-      : result(result), object(object) {
-  }
+      : result(result), object(object) {}
 
   RhiReturn(RhiResult &&result, T &&object)
-      : result(result), object(std::move(object)) {
-  }
+      : result(result), object(std::move(object)) {}
 
   RhiReturn &operator=(const RhiReturn &other) = default;
 };
 
 // Bi-directional map, useful for mapping between RHI enums and backend enums
-template <typename RhiType, typename BackendType>
-struct BidirMap {
+template <typename RhiType, typename BackendType> struct BidirMap {
   std::unordered_map<RhiType, BackendType> rhi2backend;
   std::unordered_map<BackendType, RhiType> backend2rhi;
 
@@ -103,27 +94,21 @@ struct BidirMap {
     return rhi2backend.find(v) != rhi2backend.cend();
   }
 
-  BackendType at(RhiType &v) const {
-    return rhi2backend.at(v);
-  }
+  BackendType at(RhiType &v) const { return rhi2backend.at(v); }
 
   bool exists(BackendType &v) const {
     return backend2rhi.find(v) != backend2rhi.cend();
   }
 
-  RhiType at(BackendType &v) const {
-    return backend2rhi.at(v);
-  }
+  RhiType at(BackendType &v) const { return backend2rhi.at(v); }
 };
 
 // A synchronized list of objects that is pointer stable & reuse objects
-template <class T>
-class SyncedPtrStableObjectList {
+template <class T> class SyncedPtrStableObjectList {
   using storage_block = std::array<uint8_t, sizeof(T)>;
 
- public:
-  template <typename... Params>
-  T &acquire(Params &&...args) {
+public:
+  template <typename... Params> T &acquire(Params &&...args) {
     std::lock_guard<std::mutex> _(lock_);
 
     void *storage = nullptr;
@@ -162,33 +147,29 @@ class SyncedPtrStableObjectList {
     objects_.clear();
   }
 
-  ~SyncedPtrStableObjectList() {
-    clear();
-  }
+  ~SyncedPtrStableObjectList() { clear(); }
 
- private:
+private:
   std::mutex lock_;
   std::forward_list<storage_block> objects_;
   std::vector<void *> free_nodes_;
 };
 
 // A helper to combine hash
-template <class T>
-inline void hash_combine(std::size_t &seed, const T &v) {
+template <class T> inline void hash_combine(std::size_t &seed, const T &v) {
   std::hash<T> hasher;
   seed ^= hasher(v) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
 }
 
 // A helper to remove copy constructor
 class NonAssignable {
- private:
+private:
   NonAssignable(NonAssignable const &);
   NonAssignable &operator=(NonAssignable const &);
 
- public:
-  NonAssignable() {
-  }
+public:
+  NonAssignable() {}
 };
 
-}  // namespace rhi_impl
-}  // namespace taichi::lang
+} // namespace rhi_impl
+} // namespace taichi::lang

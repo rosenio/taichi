@@ -7,14 +7,12 @@
 
 #include <vector>
 
-#include "taichi/common/core.h"
 #include "linalg.h"
+#include "taichi/common/core.h"
 
 namespace taichi {
 
-inline bool intersect(const Vector2 &a,
-                      const Vector2 &b,
-                      const Vector2 &c,
+inline bool intersect(const Vector2 &a, const Vector2 &b, const Vector2 &c,
                       const Vector2 &d) {
   if (cross(c - a, b - a) * cross(b - a, d - a) > 0 &&
       cross(a - d, c - d) * cross(c - d, b - d) > 0) {
@@ -24,8 +22,7 @@ inline bool intersect(const Vector2 &a,
   }
 }
 
-inline real nearest_distance(const Vector2 &p,
-                             const Vector2 &a,
+inline real nearest_distance(const Vector2 &p, const Vector2 &a,
                              const Vector2 &b) {
   real ab = length(a - b);
   Vector2 dir = normalized(b - a);
@@ -53,10 +50,9 @@ inline bool inside_polygon(const Vector2 &p,
   return count % 2 == 1;
 }
 
-inline std::vector<Vector2> points_inside_polygon(
-    std::vector<float> x_range,
-    std::vector<float> y_range,
-    const std::vector<Vector2> &polygon) {
+inline std::vector<Vector2>
+points_inside_polygon(std::vector<float> x_range, std::vector<float> y_range,
+                      const std::vector<Vector2> &polygon) {
   std::vector<Vector2> ret;
   for (float x = x_range[0]; x < x_range[1]; x += x_range[2]) {
     for (float y = y_range[0]; y < y_range[1]; y += y_range[2]) {
@@ -85,4 +81,4 @@ inline std::vector<Vector2> points_inside_sphere(std::vector<float> x_range,
   return ret;
 }
 
-}  // namespace taichi
+} // namespace taichi

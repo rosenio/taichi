@@ -1,13 +1,13 @@
 #pragma once
-#include "taichi/util/lang_util.h"
 #include "taichi/aot/graph_data.h"
 #include "taichi/aot/module_loader.h"
+#include "taichi/util/lang_util.h"
 
 namespace taichi::lang {
 namespace llvm_aot {
 
 class KernelImpl : public aot::Kernel {
- public:
+public:
   explicit KernelImpl(FunctionType fn,
                       LlvmOfflineCache::KernelCacheData &&kernel_data)
       : kernel_data_(std::move(kernel_data)), fn_(fn) {
@@ -20,40 +20,36 @@ class KernelImpl : public aot::Kernel {
     }
     args_type = kernel_data_.args_type;
     args_size = kernel_data_.args_size;
-    arch = Arch::x64;  // Only for letting the launch context builder know
-                       // the arch uses LLVM.
-                       // TODO: remove arch after the refactoring of
-                       //  SPIR-V based backends completes.
+    arch = Arch::x64; // Only for letting the launch context builder know
+                      // the arch uses LLVM.
+                      // TODO: remove arch after the refactoring of
+                      //  SPIR-V based backends completes.
     name = kernel_data_.kernel_key;
   }
 
-  void launch(LaunchContextBuilder &ctx) override {
-    fn_(ctx);
-  }
+  void launch(LaunchContextBuilder &ctx) override { fn_(ctx); }
 
   LlvmOfflineCache::KernelCacheData kernel_data_;
 
- private:
+private:
   FunctionType fn_;
 };
 
 class FieldImpl : public aot::Field {
- public:
+public:
   explicit FieldImpl(const LlvmOfflineCache::FieldCacheData &field)
-      : field_(field) {
-  }
+      : field_(field) {}
 
   explicit FieldImpl(LlvmOfflineCache::FieldCacheData &&field)
-      : field_(std::move(field)) {
-  }
+      : field_(std::move(field)) {}
 
   LlvmOfflineCache::FieldCacheData get_snode_tree_cache() const {
     return field_;
   }
 
- private:
+private:
   LlvmOfflineCache::FieldCacheData field_;
 };
 
-}  // namespace llvm_aot
-}  // namespace taichi::lang
+} // namespace llvm_aot
+} // namespace taichi::lang

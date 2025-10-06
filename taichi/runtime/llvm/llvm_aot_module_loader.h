@@ -16,12 +16,11 @@ TI_DLL_EXPORT void allocate_aot_snode_tree_type(aot::Module *aot_module,
                                                 uint64 *result_buffer);
 
 class LlvmAotModule final : public aot::Module {
- public:
+public:
   explicit LlvmAotModule(const std::string &module_path,
                          LlvmRuntimeExecutor *executor,
                          std::unique_ptr<LLVM::KernelLauncher> kernel_launcher)
-      : executor_(executor),
-        kernel_launcher_(std::move(kernel_launcher)),
+      : executor_(executor), kernel_launcher_(std::move(kernel_launcher)),
         cache_reader_(LlvmOfflineCacheFileReader::make(module_path)) {
     TI_ASSERT(executor_ != nullptr);
 
@@ -29,25 +28,15 @@ class LlvmAotModule final : public aot::Module {
     read_from_binary_file(graphs_, graph_path);
   }
 
-  Arch arch() const override {
-    return executor_->get_config().arch;
-  }
+  Arch arch() const override { return executor_->get_config().arch; }
 
-  uint64_t version() const override {
-    return 0;
-  }
+  uint64_t version() const override { return 0; }
 
-  size_t get_root_size() const override {
-    return 0;
-  }
+  size_t get_root_size() const override { return 0; }
 
-  LlvmRuntimeExecutor *const get_runtime_executor() {
-    return executor_;
-  }
+  LlvmRuntimeExecutor *const get_runtime_executor() { return executor_; }
 
-  size_t get_num_snode_trees() {
-    return cache_reader_->get_num_snode_trees();
-  }
+  size_t get_num_snode_trees() { return cache_reader_->get_num_snode_trees(); }
 
   void set_initialized_snode_tree(int snode_tree_id) {
     initialized_snode_tree_ids.insert(snode_tree_id);
@@ -57,22 +46,22 @@ class LlvmAotModule final : public aot::Module {
     return initialized_snode_tree_ids.count(snode_tree_id);
   }
 
-  std::unique_ptr<aot::CompiledGraph> get_graph(
-      const std::string &name) override;
+  std::unique_ptr<aot::CompiledGraph>
+  get_graph(const std::string &name) override;
 
- protected:
-  FunctionType convert_module_to_function(
-      const std::string &name,
-      LlvmOfflineCache::KernelCacheData &&loaded);
+protected:
+  FunctionType
+  convert_module_to_function(const std::string &name,
+                             LlvmOfflineCache::KernelCacheData &&loaded);
 
-  LlvmOfflineCache::KernelCacheData load_kernel_from_cache(
-      const std::string &name);
+  LlvmOfflineCache::KernelCacheData
+  load_kernel_from_cache(const std::string &name);
 
-  std::unique_ptr<aot::Kernel> make_new_kernel(
-      const std::string &name) override;
+  std::unique_ptr<aot::Kernel>
+  make_new_kernel(const std::string &name) override;
 
-  std::unique_ptr<aot::KernelTemplate> make_new_kernel_template(
-      const std::string &name) override {
+  std::unique_ptr<aot::KernelTemplate>
+  make_new_kernel_template(const std::string &name) override {
     TI_NOT_IMPLEMENTED;
   }
 
@@ -97,8 +86,8 @@ struct TI_DLL_EXPORT AotModuleParams {
   std::unique_ptr<LLVM::KernelLauncher> kernel_launcher{nullptr};
 };
 
-TI_DLL_EXPORT std::unique_ptr<aot::Module> make_aot_module(
-    AotModuleParams mod_params);
+TI_DLL_EXPORT std::unique_ptr<aot::Module>
+make_aot_module(AotModuleParams mod_params);
 
-}  // namespace LLVM
-}  // namespace taichi::lang
+} // namespace LLVM
+} // namespace taichi::lang

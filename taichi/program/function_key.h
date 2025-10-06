@@ -14,7 +14,7 @@ namespace taichi::lang {
  * to participate in the hash computation.
  */
 class FunctionKey {
- public:
+public:
   std::string func_name;
   int func_id;
   int instance_id;
@@ -26,13 +26,12 @@ class FunctionKey {
   [[nodiscard]] std::string get_full_name() const;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace std {
-template <>
-struct hash<taichi::lang::FunctionKey> {
+template <> struct hash<taichi::lang::FunctionKey> {
   std::size_t operator()(const taichi::lang::FunctionKey &key) const noexcept {
     return key.func_id ^ (key.instance_id << 16);
   }
 };
-}  // namespace std
+} // namespace std

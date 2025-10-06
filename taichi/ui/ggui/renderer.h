@@ -1,37 +1,37 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
 #include <algorithm>
-#include <chrono>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <cstdint>
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <memory>
 #include <optional>
 #include <set>
-#include <memory>
+#include <stdexcept>
+#include <vector>
 
-#include "taichi/ui/utils/utils.h"
-#include "taichi/ui/ggui/vertex.h"
-#include "taichi/ui/ggui/scene.h"
-#include "taichi/ui/ggui/app_context.h"
-#include "taichi/ui/ggui/swap_chain.h"
-#include "taichi/ui/ggui/renderable.h"
 #include "taichi/ui/common/canvas_base.h"
+#include "taichi/ui/ggui/app_context.h"
+#include "taichi/ui/ggui/renderable.h"
+#include "taichi/ui/ggui/scene.h"
+#include "taichi/ui/ggui/swap_chain.h"
+#include "taichi/ui/ggui/vertex.h"
+#include "taichi/ui/utils/utils.h"
 
 #include "gui.h"
 #include "gui_metal.h"
 
-#include "renderables/set_image.h"
-#include "renderables/triangles.h"
-#include "renderables/mesh.h"
-#include "renderables/particles.h"
 #include "renderables/circles.h"
 #include "renderables/lines.h"
+#include "renderables/mesh.h"
+#include "renderables/particles.h"
 #include "renderables/scene_lines.h"
+#include "renderables/set_image.h"
+#include "renderables/triangles.h"
 
 #ifdef TI_WITH_METAL
 #include "nswindow_adapter.h"
@@ -39,14 +39,14 @@
 
 namespace taichi::lang {
 class Program;
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace taichi::ui {
 
 namespace vulkan {
 
 class TI_DLL_EXPORT Renderer {
- public:
+public:
   void init(lang::Program *prog, TaichiWindow *window, const AppConfig &config);
   ~Renderer();
 
@@ -83,7 +83,7 @@ class TI_DLL_EXPORT Renderer {
 
   taichi::lang::StreamSemaphore get_render_complete_semaphore();
 
- private:
+private:
   void resize_lights_ssbo(int new_ssbo_size);
   void update_scene_data(SceneBase *scene);
   void init_scene_ubo();
@@ -101,10 +101,9 @@ class TI_DLL_EXPORT Renderer {
 
   taichi::lang::StreamSemaphore render_complete_semaphore_{nullptr};
 
-  template <typename T>
-  T *get_renderable_of_type(VertexAttributes vbo_attrs);
+  template <typename T> T *get_renderable_of_type(VertexAttributes vbo_attrs);
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

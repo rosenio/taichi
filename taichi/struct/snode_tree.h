@@ -13,7 +13,7 @@ namespace taichi::lang {
  * An SNodeTree will be backed by a contiguous chunk of memory.
  */
 class SNodeTree {
- public:
+public:
   constexpr static int kFirstID = 0;
 
   /**
@@ -24,19 +24,13 @@ class SNodeTree {
    */
   explicit SNodeTree(int id, std::unique_ptr<SNode> root);
 
-  int id() const {
-    return id_;
-  }
+  int id() const { return id_; }
 
-  const SNode *root() const {
-    return root_.get();
-  }
+  const SNode *root() const { return root_.get(); }
 
-  SNode *root() {
-    return root_.get();
-  }
+  SNode *root() { return root_.get(); }
 
- private:
+private:
   int id_{0};
   std::unique_ptr<SNode> root_{nullptr};
 
@@ -51,4 +45,4 @@ class SNodeTree {
  */
 std::unordered_map<int, int> get_snodes_to_root_id(const SNode &root);
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

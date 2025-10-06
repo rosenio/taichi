@@ -1,9 +1,9 @@
 #pragma once
 
+#include "taichi/common/logging.h"
 #include <exception>
 #include <string>
 #include <string_view>
-#include "taichi/common/logging.h"
 
 namespace taichi::lang {
 
@@ -20,40 +20,29 @@ struct DebugInfo {
 
   explicit DebugInfo() = default;
 
-  explicit DebugInfo(std::string tb_) : tb(tb_) {
-  }
+  explicit DebugInfo(std::string tb_) : tb(tb_) {}
 
-  explicit DebugInfo(const char *tb_) : tb(tb_) {
-  }
+  explicit DebugInfo(const char *tb_) : tb(tb_) {}
 
-  std::string get_last_tb() const {
-    return tb;
-  }
+  std::string get_last_tb() const { return tb; }
 
-  std::string const &get_tb() const {
-    return tb;
-  }
+  std::string const &get_tb() const { return tb; }
 
-  void set_tb(std::string const &tb) {
-    this->tb = tb;
-  }
+  void set_tb(std::string const &tb) { this->tb = tb; }
 };
 
 class TaichiExceptionImpl : public std::exception {
   friend struct ErrorEmitter;
 
- protected:
+protected:
   std::string msg_;
 
- public:
+public:
   // Add default constructor to allow passing Exception to ErrorEmitter
   // TODO: remove this and find a better way
   explicit TaichiExceptionImpl() = default;
-  explicit TaichiExceptionImpl(const std::string msg) : msg_(msg) {
-  }
-  const char *what() const noexcept override {
-    return msg_.c_str();
-  }
+  explicit TaichiExceptionImpl(const std::string msg) : msg_(msg) {}
+  const char *what() const noexcept override { return msg_.c_str(); }
 };
 
 class TaichiError : public TaichiExceptionImpl {
@@ -63,10 +52,10 @@ class TaichiError : public TaichiExceptionImpl {
 class TaichiWarning : public TaichiExceptionImpl {
   using TaichiExceptionImpl::TaichiExceptionImpl;
 
- protected:
+protected:
   static constexpr std::string_view name_ = "TaichiWarning";
 
- public:
+public:
   void emit() {
     taichi::Logger::get_instance().warn(std::string(name_) + "\n" + msg_);
   }
@@ -127,16 +116,16 @@ struct ErrorEmitter {
   ErrorEmitter(ErrorEmitter &&) = delete;
 
   // Emit an error on stmt with error message
-  template <typename E,
-            typename = std::enable_if_t<
-                std::is_base_of_v<TaichiExceptionImpl, std::decay_t<E>>>,
-            // The expected type for T is `Stmt`, `Expression`, or `DebugInfo`.
-            // These types have a member function named get_tb() that returns
-            // trace back information as a `std::string`.
-            typename T,
-            typename = std::enable_if_t<std::is_same_v<
-                std::decay_t<decltype(std::declval<T>()->get_tb())>,
-                std::string>>>
+  template <
+      typename E,
+      typename = std::enable_if_t<
+          std::is_base_of_v<TaichiExceptionImpl, std::decay_t<E>>>,
+      // The expected type for T is `Stmt`, `Expression`, or `DebugInfo`.
+      // These types have a member function named get_tb() that returns
+      // trace back information as a `std::string`.
+      typename T,
+      typename = std::enable_if_t<std::is_same_v<
+          std::decay_t<decltype(std::declval<T>()->get_tb())>, std::string>>>
   ErrorEmitter(E &&error, T p_dbg_info, std::string &&error_msg) {
     if constexpr ((std::is_same_v<std::decay_t<T>, DebugInfo *> ||
                    std::is_same_v<std::decay_t<T>, const DebugInfo *>) &&
@@ -158,4 +147,4 @@ struct ErrorEmitter {
   }
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

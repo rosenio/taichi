@@ -13,4 +13,4 @@ class ExitOnError;
 namespace orc {
 class ThreadSafeContext;
 }
-}  // namespace llvm
+} // namespace llvm

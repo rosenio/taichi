@@ -55,7 +55,7 @@ void check_func_call_signature(llvm::FunctionType *func_type,
                                llvm::IRBuilder<> *builder);
 
 class LLVMModuleBuilder {
- public:
+public:
   std::unique_ptr<llvm::Module> module{nullptr};
   llvm::BasicBlock *entry_block{nullptr};
   std::unique_ptr<llvm::IRBuilder<>> builder{nullptr};
@@ -103,22 +103,19 @@ class LLVMModuleBuilder {
     return f;
   }
 
-  llvm::Value *call(llvm::IRBuilder<> *builder,
-                    llvm::Value *func,
+  llvm::Value *call(llvm::IRBuilder<> *builder, llvm::Value *func,
                     llvm::FunctionType *func_ty,
                     std::vector<llvm::Value *> args) {
     check_func_call_signature(func_ty, func->getName(), args, builder);
     return builder->CreateCall(func_ty, func, std::move(args));
   }
 
-  llvm::Value *call(llvm::Value *func,
-                    llvm::FunctionType *func_ty,
+  llvm::Value *call(llvm::Value *func, llvm::FunctionType *func_ty,
                     std::vector<llvm::Value *> args) {
     return call(builder.get(), func, func_ty, std::move(args));
   }
 
-  llvm::Value *call(llvm::IRBuilder<> *builder,
-                    llvm::Function *func,
+  llvm::Value *call(llvm::IRBuilder<> *builder, llvm::Function *func,
                     std::vector<llvm::Value *> args) {
     return call(builder, func, func->getFunctionType(), std::move(args));
   }
@@ -127,8 +124,7 @@ class LLVMModuleBuilder {
     return call(builder.get(), func, std::move(args));
   }
 
-  llvm::Value *call(llvm::IRBuilder<> *builder,
-                    const std::string &func_name,
+  llvm::Value *call(llvm::IRBuilder<> *builder, const std::string &func_name,
                     std::vector<llvm::Value *> args) {
     auto func = get_runtime_function(func_name);
     return call(builder, func, std::move(args));
@@ -140,8 +136,7 @@ class LLVMModuleBuilder {
   }
 
   template <typename... Args>
-  llvm::Value *call(llvm::IRBuilder<> *builder,
-                    llvm::Function *func,
+  llvm::Value *call(llvm::IRBuilder<> *builder, llvm::Function *func,
                     Args *...args) {
     return call(builder, func, {args...});
   }
@@ -152,8 +147,7 @@ class LLVMModuleBuilder {
   }
 
   template <typename... Args>
-  llvm::Value *call(llvm::IRBuilder<> *builder,
-                    const std::string &func_name,
+  llvm::Value *call(llvm::IRBuilder<> *builder, const std::string &func_name,
                     Args *...args) {
     return call(builder, func_name, {args...});
   }
@@ -165,17 +159,15 @@ class LLVMModuleBuilder {
 };
 
 class RuntimeObject {
- public:
+public:
   std::string cls_name;
   llvm::Value *ptr{nullptr};
   LLVMModuleBuilder *mb{nullptr};
   llvm::Type *type{nullptr};
   llvm::IRBuilder<> *builder{nullptr};
 
-  RuntimeObject(const std::string &cls_name,
-                LLVMModuleBuilder *mb,
-                llvm::IRBuilder<> *builder,
-                llvm::Value *init = nullptr)
+  RuntimeObject(const std::string &cls_name, LLVMModuleBuilder *mb,
+                llvm::IRBuilder<> *builder, llvm::Value *init = nullptr)
       : cls_name(cls_name), mb(mb), builder(builder) {
     type = mb->get_runtime_type(cls_name);
     if (init == nullptr) {
@@ -219,4 +211,4 @@ class RuntimeObject {
   }
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

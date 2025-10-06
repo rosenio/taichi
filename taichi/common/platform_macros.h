@@ -15,10 +15,10 @@
 #define TI_DLL_EXPORT __attribute__((dllexport))
 #else
 #define TI_DLL_EXPORT __declspec(dllexport)
-#endif  //  __GNUC__
+#endif //  __GNUC__
 #else
 #define TI_DLL_EXPORT __attribute__((visibility("default")))
-#endif  // defined _WIN32 || defined _WIN64 || defined __CYGWIN__
+#endif // defined _WIN32 || defined _WIN64 || defined __CYGWIN__
 
 // Windows
 #if defined(_WIN64)
@@ -43,7 +43,7 @@ static_assert(false, "32-bit Windows systems are not supported")
 #define TI_PLATFORM_OSX
 #endif
 
-#if (defined(TI_PLATFORM_LINUX) || defined(TI_PLATFORM_OSX) || \
+#if (defined(TI_PLATFORM_LINUX) || defined(TI_PLATFORM_OSX) ||                 \
      defined(__unix__))
 #define TI_PLATFORM_UNIX
 #endif

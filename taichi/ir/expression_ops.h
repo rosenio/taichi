@@ -8,67 +8,61 @@
 #undef DEFINE_EXPRESSION_FUNC_BINARY
 #undef DEFINE_EXPRESSION_FUNC_TERNARY
 
-#define DEFINE_EXPRESSION_OP_UNARY(op, opname)                       \
-  Expr expr_##opname(const Expr &expr) {                             \
-    return Expr::make<UnaryOpExpression>(UnaryOpType::opname, expr); \
-  }                                                                  \
-  Expr operator op(const Expr &expr) {                               \
-    return expr_##opname(expr);                                      \
+#define DEFINE_EXPRESSION_OP_UNARY(op, opname)                                 \
+  Expr expr_##opname(const Expr &expr) {                                       \
+    return Expr::make<UnaryOpExpression>(UnaryOpType::opname, expr);           \
+  }                                                                            \
+  Expr operator op(const Expr &expr) { return expr_##opname(expr); }
+
+#define DEFINE_EXPRESSION_FUNC_UNARY(opname)                                   \
+  Expr opname(const Expr &expr) {                                              \
+    return Expr::make<UnaryOpExpression>(UnaryOpType::opname, expr);           \
+  }                                                                            \
+  Expr expr_##opname(const Expr &expr) { return opname(expr); }
+
+#define DEFINE_EXPRESSION_OP_BINARY(op, opname)                                \
+  Expr operator op(const Expr &lhs, const Expr &rhs) {                         \
+    return Expr::make<BinaryOpExpression>(BinaryOpType::opname, lhs, rhs);     \
+  }                                                                            \
+  Expr expr_##opname(const Expr &lhs, const Expr &rhs) { return lhs op rhs; }
+
+#define DEFINE_EXPRESSION_FUNC_BINARY(opname)                                  \
+  Expr opname(const Expr &lhs, const Expr &rhs) {                              \
+    return Expr::make<BinaryOpExpression>(BinaryOpType::opname, lhs, rhs);     \
+  }                                                                            \
+  Expr expr_##opname(const Expr &lhs, const Expr &rhs) {                       \
+    return opname(lhs, rhs);                                                   \
   }
 
-#define DEFINE_EXPRESSION_FUNC_UNARY(opname)                         \
-  Expr opname(const Expr &expr) {                                    \
-    return Expr::make<UnaryOpExpression>(UnaryOpType::opname, expr); \
-  }                                                                  \
-  Expr expr_##opname(const Expr &expr) {                             \
-    return opname(expr);                                             \
-  }
-
-#define DEFINE_EXPRESSION_OP_BINARY(op, opname)                            \
-  Expr operator op(const Expr &lhs, const Expr &rhs) {                     \
-    return Expr::make<BinaryOpExpression>(BinaryOpType::opname, lhs, rhs); \
-  }                                                                        \
-  Expr expr_##opname(const Expr &lhs, const Expr &rhs) {                   \
-    return lhs op rhs;                                                     \
-  }
-
-#define DEFINE_EXPRESSION_FUNC_BINARY(opname)                              \
-  Expr opname(const Expr &lhs, const Expr &rhs) {                          \
-    return Expr::make<BinaryOpExpression>(BinaryOpType::opname, lhs, rhs); \
-  }                                                                        \
-  Expr expr_##opname(const Expr &lhs, const Expr &rhs) {                   \
-    return opname(lhs, rhs);                                               \
-  }
-
-#define DEFINE_EXPRESSION_FUNC_TERNARY(opname)                               \
-  Expr expr_##opname(const Expr &cond, const Expr &lhs, const Expr &rhs) {   \
-    return Expr::make<TernaryOpExpression>(TernaryOpType::opname, cond, lhs, \
-                                           rhs);                             \
-  }                                                                          \
-  Expr opname(const Expr &cond, const Expr &lhs, const Expr &rhs) {          \
-    return expr_##opname(cond, lhs, rhs);                                    \
+#define DEFINE_EXPRESSION_FUNC_TERNARY(opname)                                 \
+  Expr expr_##opname(const Expr &cond, const Expr &lhs, const Expr &rhs) {     \
+    return Expr::make<TernaryOpExpression>(TernaryOpType::opname, cond, lhs,   \
+                                           rhs);                               \
+  }                                                                            \
+  Expr opname(const Expr &cond, const Expr &lhs, const Expr &rhs) {            \
+    return expr_##opname(cond, lhs, rhs);                                      \
   }
 
 #else
 
-#define DEFINE_EXPRESSION_OP_UNARY(op, opname) \
-  Expr operator op(const Expr &expr);          \
+#define DEFINE_EXPRESSION_OP_UNARY(op, opname)                                 \
+  Expr operator op(const Expr &expr);                                          \
   Expr expr_##opname(const Expr &expr);
 
-#define DEFINE_EXPRESSION_FUNC_UNARY(opname) \
-  Expr opname(const Expr &expr);             \
+#define DEFINE_EXPRESSION_FUNC_UNARY(opname)                                   \
+  Expr opname(const Expr &expr);                                               \
   Expr expr_##opname(const Expr &expr);
 
-#define DEFINE_EXPRESSION_OP_BINARY(op, opname)       \
-  Expr operator op(const Expr &lhs, const Expr &rhs); \
+#define DEFINE_EXPRESSION_OP_BINARY(op, opname)                                \
+  Expr operator op(const Expr &lhs, const Expr &rhs);                          \
   Expr expr_##opname(const Expr &lhs, const Expr &rhs);
 
-#define DEFINE_EXPRESSION_FUNC_BINARY(opname)    \
-  Expr opname(const Expr &lhs, const Expr &rhs); \
+#define DEFINE_EXPRESSION_FUNC_BINARY(opname)                                  \
+  Expr opname(const Expr &lhs, const Expr &rhs);                               \
   Expr expr_##opname(const Expr &lhs, const Expr &rhs);
 
-#define DEFINE_EXPRESSION_FUNC_TERNARY(opname)                     \
-  Expr opname(const Expr &cond, const Expr &lhs, const Expr &rhs); \
+#define DEFINE_EXPRESSION_FUNC_TERNARY(opname)                                 \
+  Expr opname(const Expr &cond, const Expr &lhs, const Expr &rhs);             \
   Expr expr_##opname(const Expr &cond, const Expr &lhs, const Expr &rhs);
 
 #endif
@@ -128,7 +122,7 @@ DEFINE_EXPRESSION_FUNC_BINARY(bit_shr)
 DEFINE_EXPRESSION_FUNC_TERNARY(select)
 DEFINE_EXPRESSION_FUNC_TERNARY(ifte)
 
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 #undef DEFINE_EXPRESSION_OP_UNARY
 #undef DEFINE_EXPRESSION_OP_BINARY

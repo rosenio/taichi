@@ -1,14 +1,14 @@
 // Definitions of utility functions and enums
 #pragma once
 
-#include "taichi/util/io.h"
 #include "taichi/common/core.h"
-#include "taichi/system/profiler.h"
 #include "taichi/common/exceptions.h"
 #include "taichi/ir/stmt_op_types.h"
 #include "taichi/ir/type.h"
-#include "taichi/ir/type_utils.h"
 #include "taichi/ir/type_factory.h"
+#include "taichi/ir/type_utils.h"
+#include "taichi/system/profiler.h"
+#include "taichi/util/io.h"
 
 namespace taichi::lang {
 
@@ -18,8 +18,7 @@ real get_cpu_frequency();
 
 extern real default_measurement_time;
 
-real measure_cpe(std::function<void()> target,
-                 int64 elements_per_call,
+real measure_cpe(std::function<void()> target, int64 elements_per_call,
                  real time_second = default_measurement_time);
 
 class LaunchContextBuilder;
@@ -67,7 +66,7 @@ std::string runtime_lib_dir();
 
 bool command_exist(const std::string &command);
 
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace taichi {
 void initialize_benchmark();
@@ -86,4 +85,4 @@ template <typename T>
 using function_pointer_type =
     decltype(function_pointer_helper(std::declval<T>()));
 
-}  // namespace taichi
+} // namespace taichi

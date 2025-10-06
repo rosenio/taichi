@@ -9,19 +9,19 @@ namespace taichi::lang {
 namespace directx11 {
 
 class Dx11InfoQueue {
- public:
+public:
   struct Entry {
     std::string type;
     void *addr;
     int refcount;
     int intref;
   };
-  static std::vector<Entry> parse_reference_count(
-      const std::vector<std::string> &);
+  static std::vector<Entry>
+  parse_reference_count(const std::vector<std::string> &);
   explicit Dx11InfoQueue(ID3D11Device *device);
   int live_object_count();
 
- private:
+private:
   bool has_updated_messages();
   std::vector<std::string> get_updated_messages();
   std::vector<Entry> live_objects_;
@@ -32,7 +32,7 @@ class Dx11InfoQueue {
   int last_message_count_;
 };
 
-}  // namespace directx11
-}  // namespace taichi::lang
+} // namespace directx11
+} // namespace taichi::lang
 
 #endif

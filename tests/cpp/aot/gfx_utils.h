@@ -1,17 +1,16 @@
 #pragma once
 #include "gtest/gtest.h"
 
-#include "taichi/rhi/device.h"
 #include "taichi/aot/graph_data.h"
 #include "taichi/program/graph_builder.h"
 #include "taichi/program/program.h"
+#include "taichi/rhi/device.h"
 
 namespace taichi::lang {
 namespace aot_test_utils {
-[[maybe_unused]] static void write_devalloc(
-    taichi::lang::DeviceAllocation &alloc,
-    const void *data,
-    size_t size);
+[[maybe_unused]] static void
+write_devalloc(taichi::lang::DeviceAllocation &alloc, const void *data,
+               size_t size);
 
 [[maybe_unused]] static void
 load_devalloc(taichi::lang::DeviceAllocation &alloc, void *data, size_t size);
@@ -30,5 +29,5 @@ void view_devalloc_as_ndarray(Device *device_);
                                              taichi::lang::Device *device);
 
 [[maybe_unused]] void run_mpm88_graph(Arch arch, taichi::lang::Device *device_);
-}  // namespace aot_test_utils
-}  // namespace taichi::lang
+} // namespace aot_test_utils
+} // namespace taichi::lang

@@ -1,16 +1,16 @@
 #pragma once
 
-#include "taichi/program/compile_config.h"
-#include "taichi/ir/visitors.h"
-#include "taichi/ir/statements.h"
 #include "taichi/ir/mesh.h"
+#include "taichi/ir/statements.h"
+#include "taichi/ir/visitors.h"
+#include "taichi/program/compile_config.h"
 
 #include <set>
 
 namespace taichi::lang {
 
 class MeshBLSCache {
- public:
+public:
   using AccessFlag = taichi::lang::AccessFlag;
   using Rec = std::map<std::pair<mesh::MeshElementType, mesh::ConvType>,
                        std::set<std::pair<SNode *, AccessFlag>>>;
@@ -35,10 +35,8 @@ class MeshBLSCache {
     unique_accessed = 0;
   }
 
-  bool access(mesh::MeshElementType element_type,
-              mesh::ConvType conv_type,
-              AccessFlag flags,
-              Stmt *idx) {
+  bool access(mesh::MeshElementType element_type, mesh::ConvType conv_type,
+              AccessFlag flags, Stmt *idx) {
     if (!initialized) {
       initialized = true;
       this->conv_type = conv_type;
@@ -74,7 +72,7 @@ class MeshBLSCache {
 };
 
 class MeshBLSCaches {
- public:
+public:
   std::map<SNode *, MeshBLSCache> caches;
 
   using AccessFlag = MeshBLSCache::AccessFlag;
@@ -90,11 +88,8 @@ class MeshBLSCaches {
     }
   }
 
-  bool access(SNode *snode,
-              mesh::MeshElementType element_type,
-              mesh::ConvType conv_type,
-              AccessFlag flags,
-              Stmt *idx) {
+  bool access(SNode *snode, mesh::MeshElementType element_type,
+              mesh::ConvType conv_type, AccessFlag flags, Stmt *idx) {
     if (caches.find(snode) == caches.end())
       return false;
     return caches.find(snode)->second.access(element_type, conv_type, flags,
@@ -109,9 +104,7 @@ class MeshBLSCaches {
     return rec;
   }
 
-  bool has(SNode *snode) {
-    return caches.find(snode) != caches.end();
-  }
+  bool has(SNode *snode) { return caches.find(snode) != caches.end(); }
 
   MeshBLSCache &get(SNode *snode) {
     TI_ASSERT(caches.find(snode) != caches.end());
@@ -123,14 +116,11 @@ class MeshBLSCaches {
 class MeshBLSAnalyzer : public BasicStmtVisitor {
   using BasicStmtVisitor::visit;
 
- public:
-  MeshBLSAnalyzer(OffloadedStmt *for_stmt,
-                  MeshBLSCaches *caches,
-                  bool auto_mesh_local,
-                  const CompileConfig &config);
+public:
+  MeshBLSAnalyzer(OffloadedStmt *for_stmt, MeshBLSCaches *caches,
+                  bool auto_mesh_local, const CompileConfig &config);
 
-  void visit(GlobalPtrStmt *stmt) override {
-  }
+  void visit(GlobalPtrStmt *stmt) override {}
 
   // Do not eliminate global data access
   void visit(GlobalLoadStmt *stmt) override;
@@ -143,7 +133,7 @@ class MeshBLSAnalyzer : public BasicStmtVisitor {
 
   bool run();
 
- private:
+private:
   void record_access(Stmt *stmt, AccessFlag flag);
 
   OffloadedStmt *for_stmt_{nullptr};
@@ -153,4 +143,4 @@ class MeshBLSAnalyzer : public BasicStmtVisitor {
   CompileConfig config_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

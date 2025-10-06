@@ -11,7 +11,7 @@
 namespace taichi {
 
 class Benchmark : public Unit {
- protected:
+protected:
   int dummy;
   int warm_up_iterations;
   int64 workload;
@@ -23,7 +23,7 @@ class Benchmark : public Unit {
 
   virtual void finalize() {};
 
- public:
+public:
   void initialize(const Config &config) override {
     warm_up_iterations = config.get("warm_up_iterations", 16);
     workload = config.get("workload", int64(1024));
@@ -54,11 +54,9 @@ class Benchmark : public Unit {
     return elapsed / (iterations * workload);
   }
 
-  bool test() const override {
-    return true;
-  }
+  bool test() const override { return true; }
 };
 
 TI_INTERFACE(Benchmark)
 
-}  // namespace taichi
+} // namespace taichi

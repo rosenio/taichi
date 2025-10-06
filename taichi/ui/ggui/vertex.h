@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stddef.h>
 #include "taichi/common/platform_macros.h"
+#include <stddef.h>
 
 #include <type_traits>
 
@@ -44,7 +44,7 @@ constexpr inline VertexAttributes operator|(VertexAttributes src,
 }
 
 class TI_DLL_EXPORT VboHelpers {
- public:
+public:
   constexpr static VertexAttributes kOrderedAttrs[] = {
       VertexAttributes::kPos,
       VertexAttributes::kNormal,
@@ -66,5 +66,5 @@ class TI_DLL_EXPORT VboHelpers {
   }
 };
 
-}  // namespace ui
-}  // namespace taichi
+} // namespace ui
+} // namespace taichi

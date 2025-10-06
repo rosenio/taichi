@@ -1,8 +1,8 @@
 #pragma once
 
 #include <optional>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "taichi/ir/statements.h"
 #include "taichi/ir/type.h"
@@ -14,12 +14,12 @@ namespace taichi::lang {
  * VM based on CHI).
  */
 class ArithmeticInterpretor {
- public:
+public:
   /**
    * Evaluation context that maps from a Stmt to a constant value.
    */
   class EvalContext {
-   public:
+  public:
     /**
      * Pre-defines a value for statement @param s.
      *
@@ -53,20 +53,16 @@ class ArithmeticInterpretor {
      *
      * @param s: Statement to ignore
      */
-    void ignore(const Stmt *s) {
-      ignored_.insert(s);
-    }
+    void ignore(const Stmt *s) { ignored_.insert(s); }
 
     /**
      * Checks if statement @param s is ignored.
      *
      * @return: True if ignored
      */
-    bool should_ignore(const Stmt *s) {
-      return ignored_.count(s) > 0;
-    }
+    bool should_ignore(const Stmt *s) { return ignored_.count(s) > 0; }
 
-   private:
+  private:
     std::unordered_map<const Stmt *, TypedConstant> map_;
     std::unordered_set<const Stmt *> ignored_;
   };
@@ -95,4 +91,4 @@ class ArithmeticInterpretor {
                                         const EvalContext &init_ctx) const;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

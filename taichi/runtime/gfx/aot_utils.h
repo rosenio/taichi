@@ -1,10 +1,10 @@
 #pragma once
 
-#include <vector>
 #include <map>
+#include <vector>
 
-#include "taichi/codegen/spirv/kernel_utils.h"
 #include "taichi/aot/module_loader.h"
+#include "taichi/codegen/spirv/kernel_utils.h"
 
 namespace taichi::lang {
 namespace gfx {
@@ -23,5 +23,5 @@ struct TaichiAotData {
   TI_IO_DEF(kernels, fields, required_caps, root_buffer_size);
 };
 
-}  // namespace gfx
-}  // namespace taichi::lang
+} // namespace gfx
+} // namespace taichi::lang

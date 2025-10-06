@@ -1,45 +1,36 @@
 #pragma once
 
-#include <vector>
 #include <variant>
+#include <vector>
 
 namespace taichi {
 
-template <typename T, class Container = std::vector<T>>
-struct one_or_more {
+template <typename T, class Container = std::vector<T>> struct one_or_more {
   using value_type = T;
 
   std::variant<value_type, Container> var;
 
   // NOLINTNEXTLINE
-  one_or_more(value_type const &value) : var(value) {
-  }
+  one_or_more(value_type const &value) : var(value) {}
 
   // NOLINTNEXTLINE
-  one_or_more(value_type &value) : var(value) {
-  }
+  one_or_more(value_type &value) : var(value) {}
 
   // NOLINTNEXTLINE
-  one_or_more(value_type &&value) : var(std::move(value)) {
-  }
+  one_or_more(value_type &&value) : var(std::move(value)) {}
 
   // NOLINTNEXTLINE
-  one_or_more(Container const &value) : var(value) {
-  }
+  one_or_more(Container const &value) : var(value) {}
 
   // NOLINTNEXTLINE
-  one_or_more(Container &value) : var(value) {
-  }
+  one_or_more(Container &value) : var(value) {}
 
   // NOLINTNEXTLINE
-  one_or_more(Container &&value) : var(std::move(value)) {
-  }
+  one_or_more(Container &&value) : var(std::move(value)) {}
 
-  one_or_more(one_or_more &value) : var(value.var) {
-  }
+  one_or_more(one_or_more &value) : var(value.var) {}
 
-  one_or_more(one_or_more &&value) : var(std::move(value.var)) {
-  }
+  one_or_more(one_or_more &&value) : var(std::move(value.var)) {}
 
   one_or_more &operator=(one_or_more &&) = default;
 
@@ -89,4 +80,4 @@ struct one_or_more {
   }
 };
 
-}  // namespace taichi
+} // namespace taichi

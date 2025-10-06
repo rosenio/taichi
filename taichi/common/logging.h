@@ -1,7 +1,7 @@
 #pragma once
 
-#include <functional>
 #include <cstring>
+#include <functional>
 
 // This is necessary for TI_UNREACHABLE
 #include "taichi/common/platform_macros.h"
@@ -15,16 +15,16 @@ class logger;
 }
 
 #ifdef _WIN64
-#define __FILENAME__ \
+#define __FILENAME__                                                           \
   (strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
 #else
-#define __FILENAME__ \
+#define __FILENAME__                                                           \
   (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__)
 #endif
 
-#define SPD_AUGMENTED_LOG(X, ...)                                        \
-  taichi::Logger::get_instance().X(                                      \
-      fmt::format("[{}:{}@{}] ", __FILENAME__, __FUNCTION__, __LINE__) + \
+#define SPD_AUGMENTED_LOG(X, ...)                                              \
+  taichi::Logger::get_instance().X(                                            \
+      fmt::format("[{}:{}@{}] ", __FILENAME__, __FUNCTION__, __LINE__) +       \
       fmt::format(__VA_ARGS__))
 
 #if defined(TI_PLATFORM_WINDOWS)
@@ -37,73 +37,73 @@ class logger;
 #define TI_DEBUG(...) SPD_AUGMENTED_LOG(debug, __VA_ARGS__)
 #define TI_INFO(...) SPD_AUGMENTED_LOG(info, __VA_ARGS__)
 #define TI_WARN(...) SPD_AUGMENTED_LOG(warn, __VA_ARGS__)
-#define TI_ERROR(...)                      \
-  {                                        \
-    SPD_AUGMENTED_LOG(error, __VA_ARGS__); \
-    TI_UNREACHABLE;                        \
+#define TI_ERROR(...)                                                          \
+  {                                                                            \
+    SPD_AUGMENTED_LOG(error, __VA_ARGS__);                                     \
+    TI_UNREACHABLE;                                                            \
   }
-#define TI_CRITICAL(...)                      \
-  {                                           \
-    SPD_AUGMENTED_LOG(critical, __VA_ARGS__); \
-    TI_UNREACHABLE;                           \
+#define TI_CRITICAL(...)                                                       \
+  {                                                                            \
+    SPD_AUGMENTED_LOG(critical, __VA_ARGS__);                                  \
+    TI_UNREACHABLE;                                                            \
   }
 
-#define TI_TRACE_IF(condition, ...) \
-  if (condition) {                  \
-    TI_TRACE(__VA_ARGS__);          \
+#define TI_TRACE_IF(condition, ...)                                            \
+  if (condition) {                                                             \
+    TI_TRACE(__VA_ARGS__);                                                     \
   }
-#define TI_TRACE_UNLESS(condition, ...) \
-  if (!(condition)) {                   \
-    TI_TRACE(__VA_ARGS__);              \
+#define TI_TRACE_UNLESS(condition, ...)                                        \
+  if (!(condition)) {                                                          \
+    TI_TRACE(__VA_ARGS__);                                                     \
   }
-#define TI_DEBUG_IF(condition, ...) \
-  if (condition) {                  \
-    TI_DEBUG(__VA_ARGS__);          \
+#define TI_DEBUG_IF(condition, ...)                                            \
+  if (condition) {                                                             \
+    TI_DEBUG(__VA_ARGS__);                                                     \
   }
-#define TI_DEBUG_UNLESS(condition, ...) \
-  if (!(condition)) {                   \
-    TI_DEBUG(__VA_ARGS__);              \
+#define TI_DEBUG_UNLESS(condition, ...)                                        \
+  if (!(condition)) {                                                          \
+    TI_DEBUG(__VA_ARGS__);                                                     \
   }
-#define TI_INFO_IF(condition, ...) \
-  if (condition) {                 \
-    TI_INFO(__VA_ARGS__);          \
+#define TI_INFO_IF(condition, ...)                                             \
+  if (condition) {                                                             \
+    TI_INFO(__VA_ARGS__);                                                      \
   }
-#define TI_INFO_UNLESS(condition, ...) \
-  if (!(condition)) {                  \
-    TI_INFO(__VA_ARGS__);              \
+#define TI_INFO_UNLESS(condition, ...)                                         \
+  if (!(condition)) {                                                          \
+    TI_INFO(__VA_ARGS__);                                                      \
   }
-#define TI_WARN_IF(condition, ...) \
-  if (condition) {                 \
-    TI_WARN(__VA_ARGS__);          \
+#define TI_WARN_IF(condition, ...)                                             \
+  if (condition) {                                                             \
+    TI_WARN(__VA_ARGS__);                                                      \
   }
-#define TI_WARN_UNLESS(condition, ...) \
-  if (!(condition)) {                  \
-    TI_WARN(__VA_ARGS__);              \
+#define TI_WARN_UNLESS(condition, ...)                                         \
+  if (!(condition)) {                                                          \
+    TI_WARN(__VA_ARGS__);                                                      \
   }
-#define TI_ERROR_IF(condition, ...) \
-  if (condition) {                  \
-    TI_ERROR(__VA_ARGS__);          \
+#define TI_ERROR_IF(condition, ...)                                            \
+  if (condition) {                                                             \
+    TI_ERROR(__VA_ARGS__);                                                     \
   }
-#define TI_ERROR_UNLESS(condition, ...) \
-  if (!(condition)) {                   \
-    TI_ERROR(__VA_ARGS__);              \
+#define TI_ERROR_UNLESS(condition, ...)                                        \
+  if (!(condition)) {                                                          \
+    TI_ERROR(__VA_ARGS__);                                                     \
   }
-#define TI_CRITICAL_IF(condition, ...) \
-  if (condition) {                     \
-    TI_CRITICAL(__VA_ARGS__);          \
+#define TI_CRITICAL_IF(condition, ...)                                         \
+  if (condition) {                                                             \
+    TI_CRITICAL(__VA_ARGS__);                                                  \
   }
-#define TI_CRITICAL_UNLESS(condition, ...) \
-  if (!(condition)) {                      \
-    TI_CRITICAL(__VA_ARGS__);              \
+#define TI_CRITICAL_UNLESS(condition, ...)                                     \
+  if (!(condition)) {                                                          \
+    TI_CRITICAL(__VA_ARGS__);                                                  \
   }
 
 #define TI_ASSERT(x) TI_ASSERT_INFO((x), "Assertion failure: " #x)
-#define TI_ASSERT_INFO(x, ...)             \
-  {                                        \
-    bool ___ret___ = static_cast<bool>(x); \
-    if (!___ret___) {                      \
-      TI_ERROR(__VA_ARGS__);               \
-    }                                      \
+#define TI_ASSERT_INFO(x, ...)                                                 \
+  {                                                                            \
+    bool ___ret___ = static_cast<bool>(x);                                     \
+    if (!___ret___) {                                                          \
+      TI_ERROR(__VA_ARGS__);                                                   \
+    }                                                                          \
   }
 #define TI_NOT_IMPLEMENTED TI_ERROR("Not supported.");
 
@@ -112,27 +112,27 @@ class logger;
 
 #define TI_LOG_SET_PATTERN(x) spdlog::set_pattern(x);
 
-#define TI_FLUSH_LOGGER                     \
-  {                                         \
-    taichi::Logger::get_instance().flush(); \
+#define TI_FLUSH_LOGGER                                                        \
+  {                                                                            \
+    taichi::Logger::get_instance().flush();                                    \
   };
 
-#define TI_P(x)                                                \
-  {                                                            \
-    TI_INFO("{}", taichi::TextSerializer::serialize(#x, (x))); \
+#define TI_P(x)                                                                \
+  {                                                                            \
+    TI_INFO("{}", taichi::TextSerializer::serialize(#x, (x)));                 \
   }
 
 namespace taichi {
 
 class TI_DLL_EXPORT Logger {
- private:
+private:
   std::shared_ptr<spdlog::logger> console_;
   int level_;
   std::function<void()> print_stacktrace_fn_;
 
   Logger();
 
- public:
+public:
   void trace(const std::string &s);
   void debug(const std::string &s);
   void info(const std::string &s);
@@ -152,4 +152,4 @@ class TI_DLL_EXPORT Logger {
   static Logger &get_instance();
 };
 
-}  // namespace taichi
+} // namespace taichi

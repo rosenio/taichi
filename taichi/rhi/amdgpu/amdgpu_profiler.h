@@ -1,18 +1,18 @@
 #pragma once
 
-#include "taichi/system/timeline.h"
 #include "taichi/program/kernel_profiler.h"
-#include "taichi/rhi/amdgpu/amdgpu_driver.h"
 #include "taichi/rhi/amdgpu/amdgpu_context.h"
+#include "taichi/rhi/amdgpu/amdgpu_driver.h"
+#include "taichi/system/timeline.h"
 
-#include <string>
 #include <stdint.h>
+#include <string>
 
 namespace taichi::lang {
 class EventToolkitAMDGPU;
 
 class KernelProfilerAMDGPU : public KernelProfilerBase {
- public:
+public:
   KernelProfilerAMDGPU() {
     event_toolkit_ = std::make_unique<EventToolkitAMDGPU>();
   }
@@ -20,11 +20,8 @@ class KernelProfilerAMDGPU : public KernelProfilerBase {
 
   bool reinit_with_metrics(const std::vector<std::string> metrics) override;
   void trace(KernelProfilerBase::TaskHandle &task_handle,
-             const std::string &kernel_name,
-             void *kernel,
-             uint32_t grid_size,
-             uint32_t block_size,
-             uint32_t dynamic_smem_size);
+             const std::string &kernel_name, void *kernel, uint32_t grid_size,
+             uint32_t block_size, uint32_t dynamic_smem_size);
   void sync() override;
   void update() override;
   void clear() override;
@@ -34,26 +31,24 @@ class KernelProfilerAMDGPU : public KernelProfilerBase {
 
   bool statistics_on_traced_records();
 
-  KernelProfilerBase::TaskHandle start_with_handle(
-      const std::string &kernel_name) override;
+  KernelProfilerBase::TaskHandle
+  start_with_handle(const std::string &kernel_name) override;
 
- private:
+private:
   std::unique_ptr<EventToolkitAMDGPU> event_toolkit_{nullptr};
   uint32_t records_size_after_sync_{0};
 };
 
 class EventToolkitAMDGPU {
- public:
+public:
   void update_record(uint32_t records_size_after_sync,
                      std::vector<KernelProfileTracedRecord> &traced_records);
-  KernelProfilerBase::TaskHandle start_with_handle(
-      const std::string &kernel_name);
+  KernelProfilerBase::TaskHandle
+  start_with_handle(const std::string &kernel_name);
   void update_timeline(std::vector<KernelProfileTracedRecord> &traced_records);
-  void clear() {
-    event_records_.clear();
-  }
+  void clear() { event_records_.clear(); }
 
- private:
+private:
   struct EventRecord {
     std::string name;
     float kernel_elapsed_time_in_ms{0.0};
@@ -66,12 +61,8 @@ class EventToolkitAMDGPU {
   // for cuEvent profiling, clear after sync()
   std::vector<EventRecord> event_records_;
 
- public:
-  EventRecord *get_current_event_record() {
-    return &(event_records_.back());
-  }
-  void *get_base_event() const {
-    return base_event_;
-  }
+public:
+  EventRecord *get_current_event_record() { return &(event_records_.back()); }
+  void *get_base_event() const { return base_event_; }
 };
-}  // namespace taichi::lang
+} // namespace taichi::lang

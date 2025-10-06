@@ -1,16 +1,16 @@
 #pragma once
 
-#include "taichi/aot/module_builder.h"
-#include "taichi/ir/statements.h"
-#include "taichi/common/logging.h"
-#include "taichi/struct/snode_tree.h"
-#include "taichi/program/snode_expr_utils.h"
-#include "taichi/program/kernel_profiler.h"
-#include "taichi/program/kernel_launcher.h"
-#include "taichi/rhi/device.h"
 #include "taichi/aot/graph_data.h"
+#include "taichi/aot/module_builder.h"
 #include "taichi/codegen/kernel_compiler.h"
+#include "taichi/common/logging.h"
 #include "taichi/compilation_manager/kernel_compilation_manager.h"
+#include "taichi/ir/statements.h"
+#include "taichi/program/kernel_launcher.h"
+#include "taichi/program/kernel_profiler.h"
+#include "taichi/program/snode_expr_utils.h"
+#include "taichi/rhi/device.h"
+#include "taichi/struct/snode_tree.h"
 
 namespace taichi::lang {
 
@@ -26,12 +26,12 @@ struct ComputeOpImageRef {
 struct RuntimeContext;
 
 class ProgramImpl {
- public:
+public:
   // TODO: Make it safer, we exposed it for now as it's directly accessed
   // outside.
   CompileConfig *config;
 
- public:
+public:
   explicit ProgramImpl(CompileConfig &config);
 
   /**
@@ -54,9 +54,8 @@ class ProgramImpl {
 
   virtual void destroy_snode_tree(SNodeTree *snode_tree) = 0;
 
-  virtual std::size_t get_snode_num_dynamically_allocated(
-      SNode *snode,
-      uint64 *result_buffer) = 0;
+  virtual std::size_t
+  get_snode_num_dynamically_allocated(SNode *snode, uint64 *result_buffer) = 0;
 
   /**
    * Perform a backend synchronization.
@@ -71,21 +70,17 @@ class ProgramImpl {
   /**
    * Make a AotModulerBuilder.
    */
-  virtual std::unique_ptr<AotModuleBuilder> make_aot_module_builder(
-      const DeviceCapabilityConfig &caps) = 0;
+  virtual std::unique_ptr<AotModuleBuilder>
+  make_aot_module_builder(const DeviceCapabilityConfig &caps) = 0;
 
   /**
    * Dump Offline-cache data to disk
    */
   virtual void dump_cache_data_to_disk();
 
-  virtual Device *get_compute_device() {
-    return nullptr;
-  }
+  virtual Device *get_compute_device() { return nullptr; }
 
-  virtual Device *get_graphics_device() {
-    return nullptr;
-  }
+  virtual Device *get_graphics_device() { return nullptr; }
 
   virtual size_t get_field_in_tree_offset(int tree_id, const SNode *child) {
     return 0;
@@ -100,16 +95,13 @@ class ProgramImpl {
     return kDeviceNullAllocation;
   }
 
-  virtual bool used_in_kernel(DeviceAllocationId) {
-    return false;
-  }
+  virtual bool used_in_kernel(DeviceAllocationId) { return false; }
 
   virtual DeviceAllocation allocate_texture(const ImageParams &params) {
     return kDeviceNullAllocation;
   }
 
-  virtual ~ProgramImpl() {
-  }
+  virtual ~ProgramImpl() {}
 
   // TODO: Move to Runtime Object
   virtual uint64_t *get_device_alloc_info_ptr(const DeviceAllocation &alloc) {
@@ -119,8 +111,7 @@ class ProgramImpl {
   }
 
   // TODO: Move to Runtime Object
-  virtual void fill_ndarray(const DeviceAllocation &alloc,
-                            std::size_t size,
+  virtual void fill_ndarray(const DeviceAllocation &alloc, std::size_t size,
                             uint32_t data) {
     TI_ERROR("fill_ndarray() not implemented on the current backend");
   }
@@ -142,20 +133,15 @@ class ProgramImpl {
     TI_ERROR("check_runtime_error() not implemented on the current backend");
   }
 
-  virtual void finalize() {
-  }
+  virtual void finalize() {}
 
   virtual uint64 fetch_result_uint64(int i, uint64 *result_buffer) {
     return result_buffer[i];
   }
 
-  virtual std::string get_kernel_return_data_layout() {
-    return "";
-  };
+  virtual std::string get_kernel_return_data_layout() { return ""; };
 
-  virtual std::string get_kernel_argument_data_layout() {
-    return "";
-  };
+  virtual std::string get_kernel_argument_data_layout() { return ""; };
 
   virtual std::pair<const StructType *, size_t>
   get_struct_type_with_data_layout(const StructType *old_ty,
@@ -167,20 +153,18 @@ class ProgramImpl {
 
   KernelLauncher &get_kernel_launcher();
 
-  virtual DeviceCapabilityConfig get_device_caps() {
-    return {};
-  }
+  virtual DeviceCapabilityConfig get_device_caps() { return {}; }
 
- protected:
+protected:
   virtual std::unique_ptr<KernelCompiler> make_kernel_compiler() = 0;
 
   virtual std::unique_ptr<KernelLauncher> make_kernel_launcher() {
     TI_NOT_IMPLEMENTED;
   }
 
- private:
+private:
   std::unique_ptr<KernelCompilationManager> kernel_com_mgr_;
   std::unique_ptr<KernelLauncher> kernel_launcher_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

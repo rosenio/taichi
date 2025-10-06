@@ -6,8 +6,7 @@ namespace io {
 
 // A universal filesystem interface for read-only access.
 struct TI_DLL_EXPORT VirtualDir {
-  virtual ~VirtualDir() {
-  }
+  virtual ~VirtualDir() {}
 
   // Open a virtual directory based on what `path` points to. Zip files and
   // filesystem directories are supported.
@@ -21,8 +20,7 @@ struct TI_DLL_EXPORT VirtualDir {
   // Load the first `size` bytes from the file at `path` in the virtual
   // directory. Returns the number of bytes read. Returns 0 if the file doesn't
   // exist.
-  virtual size_t load_file(const std::string &path,
-                           void *data,
+  virtual size_t load_file(const std::string &path, void *data,
                            size_t size) const = 0;
 
   template <typename T>
@@ -43,5 +41,5 @@ struct TI_DLL_EXPORT VirtualDir {
   }
 };
 
-}  // namespace io
-}  // namespace taichi
+} // namespace io
+} // namespace taichi

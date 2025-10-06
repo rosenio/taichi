@@ -1,19 +1,19 @@
 #pragma once
 #ifdef TI_WITH_METAL
+#include "taichi/rhi/metal/metal_device.h"
 #include "taichi_core_impl.h"
 #include "taichi_gfx_impl.h"
-#include "taichi/rhi/metal/metal_device.h"
 
 namespace capi {
 
 class MetalRuntime;
 
 class MetalRuntime : public GfxRuntime {
- private:
+private:
   std::unique_ptr<taichi::lang::metal::MetalDevice> mtl_device_;
   taichi::lang::gfx::GfxRuntime gfx_runtime_;
 
- public:
+public:
   explicit MetalRuntime();
   explicit MetalRuntime(
       std::unique_ptr<taichi::lang::metal::MetalDevice> &&mtl_device);
@@ -22,11 +22,11 @@ class MetalRuntime : public GfxRuntime {
   taichi::lang::gfx::GfxRuntime &get_gfx_runtime() override;
 
   taichi::lang::metal::MetalDevice &get_mtl();
-  virtual TiImage allocate_image(
-      const taichi::lang::ImageParams &params) override final;
+  virtual TiImage
+  allocate_image(const taichi::lang::ImageParams &params) override final;
   virtual void free_image(TiImage image) override final;
 };
 
-}  // namespace capi
+} // namespace capi
 
-#endif  // TI_WITH_METAL
+#endif // TI_WITH_METAL

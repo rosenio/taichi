@@ -1,19 +1,19 @@
 #pragma once
 #include "taichi/common/core.h"
 #include "taichi/rhi/device.h"
-#include "taichi/rhi/llvm/llvm_device.h"
 #include "taichi/rhi/llvm/allocator.h"
-#include <mutex>
-#include <vector>
+#include "taichi/rhi/llvm/llvm_device.h"
 #include <memory>
+#include <mutex>
 #include <thread>
+#include <vector>
 
 namespace taichi::lang {
 
 // A memory pool that runs on the host
 
 class TI_DLL_EXPORT DeviceMemoryPool {
- public:
+public:
   std::unique_ptr<CachingAllocator> allocator_{nullptr};
   static const size_t page_size;
 
@@ -27,7 +27,7 @@ class TI_DLL_EXPORT DeviceMemoryPool {
   explicit DeviceMemoryPool(bool merge_upon_release);
   ~DeviceMemoryPool();
 
- protected:
+protected:
   void *allocate_raw_memory(std::size_t size, bool managed = false);
   void deallocate_raw_memory(void *ptr);
 
@@ -39,4 +39,4 @@ class TI_DLL_EXPORT DeviceMemoryPool {
   bool merge_upon_release_ = true;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

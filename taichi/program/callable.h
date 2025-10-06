@@ -12,25 +12,19 @@ class IRNode;
 class FrontendContext;
 
 class TI_DLL_EXPORT CallableBase {
- public:
+public:
   struct Parameter {
     std::string name;
     bool is_array{
-        false};  // This is true for both ndarray and external array args.
+        false}; // This is true for both ndarray and external array args.
     bool is_argpack{false};
-    std::size_t total_dim{0};  // total dim of array
+    std::size_t total_dim{0}; // total dim of array
     BufferFormat format{BufferFormat::unknown};
-    bool needs_grad{false};  // TODO: reorder for better alignment
+    bool needs_grad{false}; // TODO: reorder for better alignment
     std::vector<int> element_shape{};
     ParameterType ptype{ParameterType::kUnknown};
-    TI_IO_DEF(is_array,
-              is_argpack,
-              total_dim,
-              format,
-              dt_,
-              needs_grad,
-              element_shape,
-              ptype);
+    TI_IO_DEF(is_array, is_argpack, total_dim, format, dt_, needs_grad,
+              element_shape, ptype);
 
     bool operator==(const Parameter &o) const {
       return is_array == o.is_array && total_dim == o.total_dim &&
@@ -53,10 +47,8 @@ class TI_DLL_EXPORT CallableBase {
     possible regressions.
     */
     explicit Parameter(const DataType &dt = PrimitiveType::unknown,
-                       bool is_array = false,
-                       bool is_argpack = false,
-                       std::size_t size_unused = 0,
-                       int total_dim = 0,
+                       bool is_array = false, bool is_argpack = false,
+                       std::size_t size_unused = 0, int total_dim = 0,
                        std::vector<int> element_shape = {},
                        BufferFormat format = BufferFormat::unknown,
                        bool needs_grad = false) {
@@ -80,23 +72,15 @@ class TI_DLL_EXPORT CallableBase {
       this->needs_grad = needs_grad;
     }
 
-    std::vector<int> get_element_shape() const {
-      return dt_.get_shape();
-    }
+    std::vector<int> get_element_shape() const { return dt_.get_shape(); }
 
-    DataType get_element_type() const {
-      return dt_.get_element_type();
-    }
+    DataType get_element_type() const { return dt_.get_element_type(); }
 
-    int get_element_size() const {
-      return data_type_size(dt_);
-    }
+    int get_element_size() const { return data_type_size(dt_); }
 
-    DataType get_dtype() const {
-      return dt_;
-    }
+    DataType get_dtype() const { return dt_; }
 
-   private:
+  private:
     DataType dt_;
   };
 
@@ -105,19 +89,16 @@ class TI_DLL_EXPORT CallableBase {
 
     TI_IO_DEF(dt);
 
-    explicit Ret(const DataType &dt = PrimitiveType::unknown) : dt(dt) {
-    }
+    explicit Ret(const DataType &dt = PrimitiveType::unknown) : dt(dt) {}
   };
 
   std::vector<Parameter> parameter_list;
   // Note: `nested_parameters` stores not only nested parameters, but also
   // those parameters in `parameter_list`.
-  std::unordered_map<std::vector<int>,
-                     Parameter,
+  std::unordered_map<std::vector<int>, Parameter,
                      hashing::Hasher<std::vector<int>>>
       nested_parameters;
-  std::unordered_map<std::vector<int>,
-                     const StructType *,
+  std::unordered_map<std::vector<int>, const StructType *,
                      hashing::Hasher<std::vector<int>>>
       argpack_types;
   std::vector<Ret> rets;
@@ -133,7 +114,7 @@ class TI_DLL_EXPORT CallableBase {
 };
 
 class TI_DLL_EXPORT Callable : public CallableBase {
- public:
+public:
   Program *program{nullptr};
   std::unique_ptr<IRNode> ir{nullptr};
   std::unique_ptr<FrontendContext> context{nullptr};
@@ -144,20 +125,17 @@ class TI_DLL_EXPORT Callable : public CallableBase {
 
   std::vector<int> insert_scalar_param(const DataType &dt,
                                        const std::string &name = "");
-  std::vector<int> insert_arr_param(const DataType &dt,
-                                    int total_dim,
+  std::vector<int> insert_arr_param(const DataType &dt, int total_dim,
                                     std::vector<int> element_shape,
                                     const std::string &name = "");
-  std::vector<int> insert_ndarray_param(const DataType &dt,
-                                        int ndim,
+  std::vector<int> insert_ndarray_param(const DataType &dt, int ndim,
                                         const std::string &name = "",
                                         bool needs_grad = false);
   std::vector<int> insert_texture_param(int total_dim,
                                         const std::string &name = "");
   std::vector<int> insert_pointer_param(const DataType &dt,
                                         const std::string &name = "");
-  std::vector<int> insert_rw_texture_param(int total_dim,
-                                           BufferFormat format,
+  std::vector<int> insert_rw_texture_param(int total_dim, BufferFormat format,
                                            const std::string &name = "");
 
   std::vector<int> insert_argpack_param_and_push(const std::string &name = "");
@@ -172,7 +150,7 @@ class TI_DLL_EXPORT Callable : public CallableBase {
 
   [[nodiscard]] virtual std::string get_name() const = 0;
 
- private:
+private:
   std::vector<int> add_parameter(const Parameter &param);
   // Note: These stacks are used for inserting params inside argpacks. When
   // we call finalize_params(), all of them are required to be empty then.
@@ -181,4 +159,4 @@ class TI_DLL_EXPORT Callable : public CallableBase {
   std::stack<std::string> temp_argpack_name_stack_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

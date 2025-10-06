@@ -3,15 +3,12 @@
 namespace taichi::lang {
 
 class FakeStructCompiler : public StructCompiler {
- public:
-  void generate_types(SNode &) override {
-  }
+public:
+  void generate_types(SNode &) override {}
 
-  void generate_child_accessors(SNode &) override {
-  }
+  void generate_child_accessors(SNode &) override {}
 
-  void run(SNode &root) override {
-  }
+  void run(SNode &root) override {}
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

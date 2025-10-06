@@ -8,13 +8,10 @@
 #include "array_2d.h"
 
 namespace taichi {
-template <int dim>
-class IndexND;
+template <int dim> class IndexND;
 
-template <int dim>
-class RegionND;
+template <int dim> class RegionND;
 
-template <int dim, typename T>
-class ArrayND;
+template <int dim, typename T> class ArrayND;
 
-}  // namespace taichi
+} // namespace taichi

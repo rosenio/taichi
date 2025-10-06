@@ -12,17 +12,14 @@
 namespace taichi {
 
 class ExceptionForPython : public std::exception {
- private:
+private:
   std::string msg_;
 
- public:
-  explicit ExceptionForPython(const std::string &msg) : msg_(msg) {
-  }
-  char const *what() const noexcept override {
-    return msg_.c_str();
-  }
+public:
+  explicit ExceptionForPython(const std::string &msg) : msg_(msg) {}
+  char const *what() const noexcept override { return msg_.c_str(); }
 };
 
 void raise_assertion_failure_in_python(const std::string &msg);
 
-}  // namespace taichi
+} // namespace taichi

@@ -8,14 +8,13 @@ inline bool is_error_ignorable(TiError error) {
 }
 
 class CapiTest : public ::testing::Test {
- public:
+public:
   void ASSERT_TAICHI_SUCCESS() {
     ti::Error actual = ti::get_last_error();
     EXPECT_EQ(actual.error, TI_ERROR_SUCCESS);
   }
 
-  void EXPECT_TAICHI_ERROR(TiError expected,
-                           const std::string &match = "",
+  void EXPECT_TAICHI_ERROR(TiError expected, const std::string &match = "",
                            bool reset_error = true) {
     ti::Error err = ti::get_last_error();
 
@@ -28,9 +27,8 @@ class CapiTest : public ::testing::Test {
       ti::set_last_error(TI_ERROR_SUCCESS);
   }
 
- protected:
-  virtual void SetUp() {
-  }
+protected:
+  virtual void SetUp() {}
 
   virtual void TearDown() {
     ti::Error err = ti::get_last_error();

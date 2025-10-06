@@ -1,7 +1,7 @@
-#include <functional>
+#include "taichi/ir/expression_ops.h"
 #include "taichi/ir/frontend_ir.h"
 #include "taichi/ir/ir.h"
-#include "taichi/ir/expression_ops.h"
+#include <functional>
 
 namespace taichi::lang {
 
@@ -21,27 +21,8 @@ Expr svd_bitwise_and(const Expr &a, const Expr &b) {
 }
 
 template <typename Tf, typename Ti>
-std::tuple<Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr,
-           Expr>
+std::tuple<Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr,
+           Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr, Expr>
 sifakis_svd_export(ASTBuilder *ast_builder, const Expr &mat, int num_iters) {
   auto expanded_exprs = ast_builder->expand_exprs({mat});
   TI_ASSERT(expanded_exprs.size() == 9);
@@ -906,4 +887,4 @@ sifakis_svd_export(ASTBuilder *ast_builder, const Expr &mat, int num_iters) {
                          Sa11, Sa22, Sa33);
 }
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

@@ -5,10 +5,10 @@
 
 #pragma once
 
-#include <string>
+#include "taichi/common/core.h"
 #include <cstdio>
 #include <map>
-#include "taichi/common/core.h"
+#include <string>
 #if defined(TI_PLATFORM_UNIX)
 #include <sys/time.h>
 #else
@@ -20,19 +20,19 @@
 
 namespace taichi {
 
-#define TIME(x)                                                      \
-  {                                                                  \
-    char timer_name[1000];                                           \
-    sprintf_s(timer_name, "%s[%d]: %s", __FILENAME__, __LINE__, #x); \
-    taichi::Time::Timer _(timer_name);                               \
-    x;                                                               \
+#define TIME(x)                                                                \
+  {                                                                            \
+    char timer_name[1000];                                                     \
+    sprintf_s(timer_name, "%s[%d]: %s", __FILENAME__, __LINE__, #x);           \
+    taichi::Time::Timer _(timer_name);                                         \
+    x;                                                                         \
   }
 #define TI_TIME(x) TIME(x)
 
 #include <stdint.h>
 
 class TI_DLL_EXPORT Time {
- public:
+public:
   static double get_time();
   static uint64 get_cycles();
   static void wait_until(double t);
@@ -44,7 +44,7 @@ class TI_DLL_EXPORT Time {
   class Timer {
     static std::map<std::string, std::pair<double, int>> memo;
 
-   protected:
+  protected:
     std::string name;
     double start_time;
 
@@ -56,35 +56,29 @@ class TI_DLL_EXPORT Time {
 
     bool have_output;
 
-   public:
+  public:
     explicit Timer(std::string name);
 
-    Timer() {
-    }
+    Timer() {}
 
-    virtual ~Timer() {
-      output();
-    }
+    virtual ~Timer() { output(); }
   };
 
   class TickTimer : public Timer {
-   protected:
+  protected:
     double get_time() override;
 
-    void print_record(const char *left,
-                      double elapsed,
+    void print_record(const char *left, double elapsed,
                       double average) override;
 
-   public:
+  public:
     explicit TickTimer(std::string name);
 
-    ~TickTimer() override {
-      output();
-    }
+    ~TickTimer() override { output(); }
   };
 
   class FPSCounter {
-   public:
+  public:
     static void count(std::string name) {
       if (last_refresh.find(name) == last_refresh.end()) {
         last_refresh[name] = get_time();
@@ -99,10 +93,10 @@ class TI_DLL_EXPORT Time {
       }
     }
 
-   private:
+  private:
     static std::map<std::string, double> last_refresh;
     static std::map<std::string, int> counter;
   };
 };
 
-}  // namespace taichi
+} // namespace taichi

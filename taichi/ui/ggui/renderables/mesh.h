@@ -1,41 +1,41 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
+#include "taichi/ui/ggui/vertex.h"
+#include "taichi/ui/utils/utils.h"
 #include <algorithm>
-#include <chrono>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <cstdint>
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
 #include <optional>
 #include <set>
-#include "taichi/ui/utils/utils.h"
-#include "taichi/ui/ggui/vertex.h"
+#include <stdexcept>
+#include <vector>
 
-#include "taichi/ui/ggui/app_context.h"
-#include "taichi/ui/ggui/swap_chain.h"
-#include "taichi/ui/ggui/renderable.h"
 #include "taichi/program/field_info.h"
+#include "taichi/ui/ggui/app_context.h"
+#include "taichi/ui/ggui/renderable.h"
 #include "taichi/ui/ggui/scene.h"
+#include "taichi/ui/ggui/swap_chain.h"
 
 namespace taichi::ui {
 
 namespace vulkan {
 
 class Mesh final : public Renderable {
- public:
+public:
   Mesh(AppContext *app_context, VertexAttributes vbo_attrs);
 
   void update_data(const MeshInfo &info);
   void update_scene_data(DevicePtr ssbo_ptr, DevicePtr ubo_ptr) override;
 
-  void record_this_frame_commands(
-      taichi::lang::CommandList *command_list) override;
+  void
+  record_this_frame_commands(taichi::lang::CommandList *command_list) override;
 
- private:
+private:
   DevicePtr lights_ssbo_ptr;
   DevicePtr scene_ubo_ptr;
 
@@ -56,6 +56,6 @@ class Mesh final : public Renderable {
   void resize_mesh_storage_buffers(size_t ssbo_size);
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

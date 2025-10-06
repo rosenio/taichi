@@ -7,7 +7,7 @@ namespace taichi::lang {
 namespace gfx {
 
 class KernelLauncher : public lang::KernelLauncher {
- public:
+public:
   struct Config {
     GfxRuntime *gfx_runtime_{nullptr};
   };
@@ -17,11 +17,11 @@ class KernelLauncher : public lang::KernelLauncher {
   void launch_kernel(const lang::CompiledKernelData &compiled_kernel_data,
                      LaunchContextBuilder &ctx) override;
 
- private:
+private:
   Handle register_kernel(const lang::CompiledKernelData &compiled_kernel_data);
 
   Config config_;
 };
 
-}  // namespace gfx
-}  // namespace taichi::lang
+} // namespace gfx
+} // namespace taichi::lang

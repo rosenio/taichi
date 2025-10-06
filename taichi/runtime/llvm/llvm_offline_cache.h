@@ -3,13 +3,13 @@
 #include <memory>
 
 #ifdef TI_WITH_LLVM
-#include "llvm/IR/Module.h"
+#include "taichi/codegen/llvm/compiled_kernel_data.h"
+#include "taichi/codegen/llvm/llvm_compiled_data.h"
 #include "taichi/common/core.h"
 #include "taichi/common/serialization.h"
 #include "taichi/program/kernel.h"
 #include "taichi/util/offline_cache.h"
-#include "taichi/codegen/llvm/llvm_compiled_data.h"
-#include "taichi/codegen/llvm/compiled_kernel_data.h"
+#include "llvm/IR/Module.h"
 
 namespace taichi::lang {
 
@@ -18,7 +18,7 @@ namespace taichi::lang {
 // TODO(PGZXB): Rename these structs/classes.
 
 struct LlvmOfflineCache {
-  using Version = uint16[3];  // {MAJOR, MINOR, PATCH}
+  using Version = uint16[3]; // {MAJOR, MINOR, PATCH}
 
   enum Format {
     LL = 0x01,
@@ -38,9 +38,9 @@ struct LlvmOfflineCache {
     size_t args_size{0};
 
     // For cache cleaning
-    std::size_t size{0};          // byte
-    std::time_t created_at{0};    // millsec
-    std::time_t last_used_at{0};  // millsec
+    std::size_t size{0};         // byte
+    std::time_t created_at{0};   // millsec
+    std::time_t last_used_at{0}; // millsec
 
     KernelCacheData() = default;
     KernelCacheData(KernelCacheData &&) = default;
@@ -50,17 +50,8 @@ struct LlvmOfflineCache {
     KernelCacheData clone() const;
     LLVM::CompiledKernelData::InternalData convert_to_llvm_ckd_data() const;
 
-    TI_IO_DEF(kernel_key,
-              args,
-              compiled_data,
-              size,
-              created_at,
-              last_used_at,
-              rets,
-              ret_type,
-              ret_size,
-              args_type,
-              args_size);
+    TI_IO_DEF(kernel_key, args, compiled_data, size, created_at, last_used_at,
+              rets, ret_type, ret_size, args_type, args_size);
   };
 
   struct FieldCacheData {
@@ -107,46 +98,43 @@ struct LlvmOfflineCache {
     // other
   };
 
-  using KernelMetadata = KernelCacheData;  // Required by CacheCleaner
+  using KernelMetadata = KernelCacheData; // Required by CacheCleaner
 
   Version version{};
-  std::size_t size{0};  // byte
+  std::size_t size{0}; // byte
 
   // TODO(zhanlue): we need a better identifier for each FieldCacheData
   // (SNodeTree) Given that snode_tree_id is not continuous, it is ridiculous to
   // ask the users to remember each of the snode_tree_ids
   // ** Find a way to name each SNodeTree **
-  std::unordered_map<int, FieldCacheData> fields;  // key = snode_tree_id
+  std::unordered_map<int, FieldCacheData> fields; // key = snode_tree_id
 
-  std::unordered_map<std::string, KernelCacheData>
-      kernels;  // key = kernel_name
+  std::unordered_map<std::string, KernelCacheData> kernels; // key = kernel_name
 
   // NOTE: The "version" must be the first field to be serialized
   TI_IO_DEF(version, size, fields, kernels);
 };
 
 class LlvmOfflineCacheFileReader {
- public:
+public:
   bool get_kernel_cache(LlvmOfflineCache::KernelCacheData &res,
-                        const std::string &key,
-                        llvm::LLVMContext &llvm_ctx);
+                        const std::string &key, llvm::LLVMContext &llvm_ctx);
 
   bool get_field_cache(LlvmOfflineCache::FieldCacheData &res,
                        int snode_tree_id);
 
   size_t get_num_snode_trees();
 
-  static std::unique_ptr<LlvmOfflineCacheFileReader> make(
-      const std::string &path,
-      LlvmOfflineCache::Format format = LlvmOfflineCache::Format::LL);
+  static std::unique_ptr<LlvmOfflineCacheFileReader>
+  make(const std::string &path,
+       LlvmOfflineCache::Format format = LlvmOfflineCache::Format::LL);
 
   static bool load_meta_data(LlvmOfflineCache &data,
                              const std::string &cache_file_path,
                              bool with_lock = true);
 
- private:
-  LlvmOfflineCacheFileReader(const std::string &path,
-                             LlvmOfflineCache &&data,
+private:
+  LlvmOfflineCacheFileReader(const std::string &path, LlvmOfflineCache &&data,
                              LlvmOfflineCache::Format format);
 
   std::unique_ptr<llvm::Module> load_module(const std::string &path_prefix,
@@ -159,7 +147,7 @@ class LlvmOfflineCacheFileReader {
 };
 
 class LlvmOfflineCacheFileWriter {
- public:
+public:
   using CleanCachePolicy = offline_cache::CleanCachePolicy;
 
   void set_data(LlvmOfflineCache &&data) {
@@ -180,16 +168,12 @@ class LlvmOfflineCacheFileWriter {
             LlvmOfflineCache::Format format = LlvmOfflineCache::Format::LL,
             bool merge_with_old = false);
 
-  void set_no_mangle() {
-    mangled_ = true;
-  }
+  void set_no_mangle() { mangled_ = true; }
 
-  static void clean_cache(const std::string &path,
-                          CleanCachePolicy policy,
-                          int max_bytes,
-                          double cleaning_factor);
+  static void clean_cache(const std::string &path, CleanCachePolicy policy,
+                          int max_bytes, double cleaning_factor);
 
- private:
+private:
   void merge_with(LlvmOfflineCache &&data);
 
   void mangle_offloaded_task_name(const std::string &kernel_key,
@@ -199,5 +183,5 @@ class LlvmOfflineCacheFileWriter {
   bool mangled_{false};
 };
 
-}  // namespace taichi::lang
-#endif  // TI_WITH_LLVM
+} // namespace taichi::lang
+#endif // TI_WITH_LLVM

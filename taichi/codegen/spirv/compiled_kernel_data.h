@@ -8,7 +8,7 @@ namespace taichi::lang {
 namespace spirv {
 
 class CompiledKernelData : public lang::CompiledKernelData {
- public:
+public:
   struct InternalData {
     using TaskCode = std::vector<uint32_t>;
     using TasksCode = std::vector<TaskCode>;
@@ -32,15 +32,13 @@ class CompiledKernelData : public lang::CompiledKernelData {
   Arch arch() const override;
   std::unique_ptr<lang::CompiledKernelData> clone() const override;
 
-  const InternalData &get_internal_data() const {
-    return data_;
-  }
+  const InternalData &get_internal_data() const { return data_; }
 
- protected:
+protected:
   Err load_impl(const CompiledKernelDataFile &file) override;
   Err dump_impl(CompiledKernelDataFile &file) const override;
 
- private:
+private:
   static Err src2str(const InternalData::Source &src, std::string &result);
   static Err str2src(const std::string &str, InternalData::Source &result);
 
@@ -48,6 +46,6 @@ class CompiledKernelData : public lang::CompiledKernelData {
   InternalData data_;
 };
 
-}  // namespace spirv
+} // namespace spirv
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

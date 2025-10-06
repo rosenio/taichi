@@ -14,10 +14,10 @@
 #include <vector>
 
 #include "taichi/rhi/vulkan/vulkan_device.h"
+#include "taichi/ui/common/renderable_info.h"
 #include "taichi/ui/ggui/app_context.h"
 #include "taichi/ui/ggui/swap_chain.h"
 #include "taichi/ui/ggui/vertex.h"
-#include "taichi/ui/common/renderable_info.h"
 #include "taichi/ui/utils/utils.h"
 
 namespace taichi {
@@ -52,17 +52,16 @@ struct RenderableConfig {
 };
 
 class Renderable {
- public:
+public:
   bool is_3d_renderable{false};
   void update_data(const RenderableInfo &info);
   virtual void update_scene_data(DevicePtr ssbo_ptr, DevicePtr ubo_ptr);
 
-  virtual void record_this_frame_commands(
-      taichi::lang::CommandList *command_list);
+  virtual void
+  record_this_frame_commands(taichi::lang::CommandList *command_list);
 
-  virtual void record_prepass_this_frame_commands(
-      taichi::lang::CommandList *command_list) {
-  }
+  virtual void
+  record_prepass_this_frame_commands(taichi::lang::CommandList *command_list) {}
 
   virtual ~Renderable() = default;
 
@@ -75,20 +74,17 @@ class Renderable {
                                          DeviceAllocationUnique &buffer,
                                          DeviceAllocationUnique &staging);
 
-  static void copy_helper(taichi::lang::Program *prog,
-                          DevicePtr dst,
-                          DevicePtr src,
-                          DevicePtr staging,
-                          size_t size);
+  static void copy_helper(taichi::lang::Program *prog, DevicePtr dst,
+                          DevicePtr src, DevicePtr staging, size_t size);
 
- protected:
+protected:
   RenderableConfig config_;
   AppContext *app_context_;
 
   int max_vertices_count{0};
   int max_indices_count{0};
 
-  Pipeline *pipeline_{nullptr};  // Factory owns pipelines
+  Pipeline *pipeline_{nullptr}; // Factory owns pipelines
   std::unique_ptr<ShaderResourceSet> resource_set_{nullptr};
 
   DeviceAllocationUnique vertex_buffer_{nullptr};
@@ -102,13 +98,13 @@ class Renderable {
 
   bool indexed_{false};
 
- protected:
+protected:
   void init(const RenderableConfig &config_, AppContext *app_context);
   void init_buffers();
 
   virtual void create_graphics_pipeline();
 };
 
-}  // namespace vulkan
-}  // namespace ui
-}  // namespace taichi
+} // namespace vulkan
+} // namespace ui
+} // namespace taichi

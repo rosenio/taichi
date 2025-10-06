@@ -1,15 +1,15 @@
 #pragma once
 
+#include "taichi/common/ref_counted_pool.h"
 #include "taichi/rhi/device.h"
 #include "taichi/rhi/vulkan/vulkan_api.h"
 #include "taichi/rhi/vulkan/vulkan_utils.h"
-#include "taichi/common/ref_counted_pool.h"
 
 #include "vk_mem_alloc.h"
 
+#include <list>
 #include <memory>
 #include <optional>
-#include <list>
 #include <variant>
 
 namespace taichi::lang {
@@ -29,8 +29,7 @@ struct SpirvCodeView {
   SpirvCodeView() = default;
 
   explicit SpirvCodeView(const std::vector<uint32_t> &code)
-      : data(code.data()), size(code.size() * sizeof(uint32_t)) {
-  }
+      : data(code.data()), size(code.size() * sizeof(uint32_t)) {}
 };
 
 struct VulkanRenderPassDesc {
@@ -75,7 +74,7 @@ struct VulkanFramebufferDesc {
 };
 
 class VulkanResourceSet : public ShaderResourceSet {
- public:
+public:
   struct Buffer {
     vkapi::IVkBuffer buffer{nullptr};
     VkDeviceSize offset{0};
@@ -85,21 +84,15 @@ class VulkanResourceSet : public ShaderResourceSet {
       return buffer == rhs.buffer && offset == rhs.offset && size == rhs.size;
     }
 
-    bool operator!=(const Buffer &rhs) const {
-      return !(*this == rhs);
-    }
+    bool operator!=(const Buffer &rhs) const { return !(*this == rhs); }
   };
 
   struct Image {
     vkapi::IVkImageView view{nullptr};
 
-    bool operator==(const Image &rhs) const {
-      return view == rhs.view;
-    }
+    bool operator==(const Image &rhs) const { return view == rhs.view; }
 
-    bool operator!=(const Image &rhs) const {
-      return view != rhs.view;
-    }
+    bool operator!=(const Image &rhs) const { return view != rhs.view; }
   };
 
   struct Texture {
@@ -110,9 +103,7 @@ class VulkanResourceSet : public ShaderResourceSet {
       return view == rhs.view && sampler == rhs.sampler;
     }
 
-    bool operator!=(const Texture &rhs) const {
-      return !(*this == rhs);
-    }
+    bool operator!=(const Texture &rhs) const { return !(*this == rhs); }
   };
 
   struct Binding {
@@ -204,30 +195,23 @@ class VulkanResourceSet : public ShaderResourceSet {
   VulkanResourceSet(const VulkanResourceSet &other) = default;
   ~VulkanResourceSet() override;
 
-  ShaderResourceSet &rw_buffer(uint32_t binding,
-                               DevicePtr ptr,
+  ShaderResourceSet &rw_buffer(uint32_t binding, DevicePtr ptr,
                                size_t size) final;
   ShaderResourceSet &rw_buffer(uint32_t binding, DeviceAllocation alloc) final;
   ShaderResourceSet &buffer(uint32_t binding, DevicePtr ptr, size_t size) final;
   ShaderResourceSet &buffer(uint32_t binding, DeviceAllocation alloc) final;
-  ShaderResourceSet &image(uint32_t binding,
-                           DeviceAllocation alloc,
+  ShaderResourceSet &image(uint32_t binding, DeviceAllocation alloc,
                            ImageSamplerConfig sampler_config) final;
-  ShaderResourceSet &rw_image(uint32_t binding,
-                              DeviceAllocation alloc,
+  ShaderResourceSet &rw_image(uint32_t binding, DeviceAllocation alloc,
                               int lod) final;
 
   rhi_impl::RhiReturn<vkapi::IVkDescriptorSet> finalize();
 
-  vkapi::IVkDescriptorSetLayout get_layout() {
-    return layout_;
-  }
+  vkapi::IVkDescriptorSetLayout get_layout() { return layout_; }
 
-  const std::map<uint32_t, Binding> &get_bindings() const {
-    return bindings_;
-  }
+  const std::map<uint32_t, Binding> &get_bindings() const { return bindings_; }
 
- private:
+private:
   std::map<uint32_t, Binding> bindings_;
   VulkanDevice *device_;
 
@@ -238,9 +222,8 @@ class VulkanResourceSet : public ShaderResourceSet {
 };
 
 class VulkanRasterResources : public RasterResources {
- public:
-  explicit VulkanRasterResources(VulkanDevice *device) : device_(device) {
-  }
+public:
+  explicit VulkanRasterResources(VulkanDevice *device) : device_(device) {}
 
   struct BufferBinding {
     vkapi::IVkBuffer buffer{nullptr};
@@ -256,25 +239,22 @@ class VulkanRasterResources : public RasterResources {
   RasterResources &vertex_buffer(DevicePtr ptr, uint32_t binding = 0) final;
   RasterResources &index_buffer(DevicePtr ptr, size_t index_width) final;
 
- private:
+private:
   VulkanDevice *device_;
 };
 
 class VulkanPipelineCache : public PipelineCache {
- public:
-  VulkanPipelineCache(VulkanDevice *device,
-                      size_t initial_size,
+public:
+  VulkanPipelineCache(VulkanDevice *device, size_t initial_size,
                       const void *initial_data);
   ~VulkanPipelineCache() override;
 
   void *data() noexcept final;
   size_t size() const noexcept final;
 
-  vkapi::IVkPipelineCache vk_pipeline_cache() {
-    return cache_;
-  }
+  vkapi::IVkPipelineCache vk_pipeline_cache() { return cache_; }
 
- private:
+private:
   VulkanDevice *device_{nullptr};
   vkapi::IVkPipelineCache cache_{nullptr};
   std::vector<uint8_t> data_shadow_;
@@ -283,7 +263,7 @@ class VulkanPipelineCache : public PipelineCache {
 // VulkanPipeline maps to a vkapi::IVkPipeline, or a SPIR-V module (a GLSL
 // compute shader).
 class VulkanPipeline : public Pipeline {
- public:
+public:
   struct Params {
     VulkanDevice *device{nullptr};
     std::vector<SpirvCodeView> code;
@@ -293,41 +273,32 @@ class VulkanPipeline : public Pipeline {
 
   explicit VulkanPipeline(const Params &params);
   explicit VulkanPipeline(
-      const Params &params,
-      const RasterParams &raster_params,
+      const Params &params, const RasterParams &raster_params,
       const std::vector<VertexInputBinding> &vertex_inputs,
       const std::vector<VertexInputAttribute> &vertex_attrs);
   ~VulkanPipeline() override;
 
-  vkapi::IVkPipelineLayout pipeline_layout() const {
-    return pipeline_layout_;
-  }
+  vkapi::IVkPipelineLayout pipeline_layout() const { return pipeline_layout_; }
 
-  vkapi::IVkPipeline pipeline() const {
-    return pipeline_;
-  }
+  vkapi::IVkPipeline pipeline() const { return pipeline_; }
 
-  vkapi::IVkPipeline graphics_pipeline(
-      const VulkanRenderPassDesc &renderpass_desc,
-      vkapi::IVkRenderPass renderpass);
+  vkapi::IVkPipeline
+  graphics_pipeline(const VulkanRenderPassDesc &renderpass_desc,
+                    vkapi::IVkRenderPass renderpass);
 
-  vkapi::IVkPipeline graphics_pipeline_dynamic(
-      const VulkanRenderPassDesc &renderpass_desc);
+  vkapi::IVkPipeline
+  graphics_pipeline_dynamic(const VulkanRenderPassDesc &renderpass_desc);
 
-  const std::string &name() const {
-    return name_;
-  }
+  const std::string &name() const { return name_; }
 
-  bool is_graphics() const {
-    return graphics_pipeline_template_ != nullptr;
-  }
+  bool is_graphics() const { return graphics_pipeline_template_ != nullptr; }
 
   std::unordered_map<uint32_t, VulkanResourceSet> &
   get_resource_set_templates() {
     return set_templates_;
   }
 
- private:
+private:
   void create_descriptor_set_layout(const Params &params);
   void create_shader_stages(const Params &params);
   void create_pipeline_layout();
@@ -358,8 +329,8 @@ class VulkanPipeline : public Pipeline {
     VkGraphicsPipelineCreateInfo pipeline_info{};
   };
 
-  VulkanDevice &ti_device_;          // not owned
-  VkDevice device_{VK_NULL_HANDLE};  // not owned
+  VulkanDevice &ti_device_;         // not owned
+  VkDevice device_{VK_NULL_HANDLE}; // not owned
 
   std::string name_;
 
@@ -370,8 +341,7 @@ class VulkanPipeline : public Pipeline {
       graphics_pipeline_;
 
   // For KHR_dynamic_rendering
-  std::unordered_map<VulkanRenderPassDesc,
-                     vkapi::IVkPipeline,
+  std::unordered_map<VulkanRenderPassDesc, vkapi::IVkPipeline,
                      RenderPassDescHasher>
       graphics_pipeline_dynamic_;
 
@@ -383,9 +353,8 @@ class VulkanPipeline : public Pipeline {
 };
 
 class VulkanCommandList : public CommandList {
- public:
-  VulkanCommandList(VulkanDevice *ti_device,
-                    VulkanStream *stream,
+public:
+  VulkanCommandList(VulkanDevice *ti_device, VulkanStream *stream,
                     vkapi::IVkCommandBuffer buffer);
   ~VulkanCommandList() override;
 
@@ -399,53 +368,39 @@ class VulkanCommandList : public CommandList {
   void buffer_copy(DevicePtr dst, DevicePtr src, size_t size) noexcept final;
   void buffer_fill(DevicePtr ptr, size_t size, uint32_t data) noexcept final;
   RhiResult dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1) noexcept final;
-  void begin_renderpass(int x0,
-                        int y0,
-                        int x1,
-                        int y1,
+  void begin_renderpass(int x0, int y0, int x1, int y1,
                         uint32_t num_color_attachments,
-                        DeviceAllocation *color_attachments,
-                        bool *color_clear,
+                        DeviceAllocation *color_attachments, bool *color_clear,
                         std::vector<float> *clear_colors,
                         DeviceAllocation *depth_attachment,
                         bool depth_clear) override;
   void end_renderpass() override;
   void draw(uint32_t num_verticies, uint32_t start_vertex = 0) override;
-  void draw_instance(uint32_t num_verticies,
-                     uint32_t num_instances,
+  void draw_instance(uint32_t num_verticies, uint32_t num_instances,
                      uint32_t start_vertex = 0,
                      uint32_t start_instance = 0) override;
-  void draw_indexed(uint32_t num_indicies,
-                    uint32_t start_vertex = 0,
+  void draw_indexed(uint32_t num_indicies, uint32_t start_vertex = 0,
                     uint32_t start_index = 0) override;
-  void draw_indexed_instance(uint32_t num_indicies,
-                             uint32_t num_instances,
+  void draw_indexed_instance(uint32_t num_indicies, uint32_t num_instances,
                              uint32_t start_vertex = 0,
                              uint32_t start_index = 0,
                              uint32_t start_instance = 0) override;
   void set_line_width(float width) override;
-  void image_transition(DeviceAllocation img,
-                        ImageLayout old_layout,
+  void image_transition(DeviceAllocation img, ImageLayout old_layout,
                         ImageLayout new_layout) override;
-  void buffer_to_image(DeviceAllocation dst_img,
-                       DevicePtr src_buf,
+  void buffer_to_image(DeviceAllocation dst_img, DevicePtr src_buf,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
-  void image_to_buffer(DevicePtr dst_buf,
-                       DeviceAllocation src_img,
+  void image_to_buffer(DevicePtr dst_buf, DeviceAllocation src_img,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
 
-  void copy_image(DeviceAllocation dst_img,
-                  DeviceAllocation src_img,
-                  ImageLayout dst_img_layout,
-                  ImageLayout src_img_layout,
+  void copy_image(DeviceAllocation dst_img, DeviceAllocation src_img,
+                  ImageLayout dst_img_layout, ImageLayout src_img_layout,
                   const ImageCopyParams &params) override;
 
-  void blit_image(DeviceAllocation dst_img,
-                  DeviceAllocation src_img,
-                  ImageLayout dst_img_layout,
-                  ImageLayout src_img_layout,
+  void blit_image(DeviceAllocation dst_img, DeviceAllocation src_img,
+                  ImageLayout dst_img_layout, ImageLayout src_img_layout,
                   const ImageCopyParams &params) override;
 
   vkapi::IVkRenderPass current_renderpass();
@@ -459,7 +414,7 @@ class VulkanCommandList : public CommandList {
   void begin_profiler_scope(const std::string &kernel_name) override;
   void end_profiler_scope() override;
 
- private:
+private:
   bool finalized_{false};
   VulkanDevice *ti_device_;
   VulkanStream *stream_;
@@ -476,7 +431,7 @@ class VulkanCommandList : public CommandList {
 };
 
 class VulkanSurface : public Surface {
- public:
+public:
   VulkanSurface(VulkanDevice *device, const SurfaceConfig &config);
   ~VulkanSurface() override;
 
@@ -490,7 +445,7 @@ class VulkanSurface : public Surface {
   BufferFormat image_format() override;
   void resize(uint32_t width, uint32_t height) override;
 
- private:
+private:
   void create_swap_chain();
   void destroy_swap_chain();
 
@@ -515,39 +470,35 @@ struct DescPool {
   // Threads share descriptor sets
   RefCountedPool<vkapi::IVkDescriptorSet, true> sets;
 
-  explicit DescPool(VkDescriptorPool pool) : pool(pool) {
-  }
+  explicit DescPool(VkDescriptorPool pool) : pool(pool) {}
 };
 
 class VulkanStreamSemaphoreObject : public StreamSemaphoreObject {
- public:
+public:
   explicit VulkanStreamSemaphoreObject(vkapi::IVkSemaphore sema)
-      : vkapi_ref(sema) {
-  }
-  ~VulkanStreamSemaphoreObject() override {
-  }
+      : vkapi_ref(sema) {}
+  ~VulkanStreamSemaphoreObject() override {}
 
   vkapi::IVkSemaphore vkapi_ref{nullptr};
 };
 
 class VulkanStream : public Stream {
- public:
-  VulkanStream(VulkanDevice &device,
-               VkQueue queue,
+public:
+  VulkanStream(VulkanDevice &device, VkQueue queue,
                uint32_t queue_family_index);
   ~VulkanStream() override;
 
   RhiResult new_command_list(CommandList **out_cmdlist) noexcept final;
-  StreamSemaphore submit(
-      CommandList *cmdlist,
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
+  StreamSemaphore
+  submit(CommandList *cmdlist,
+         const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
   StreamSemaphore submit_synced(
       CommandList *cmdlist,
       const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
 
   void command_sync() override;
 
- private:
+private:
   struct TrackedCmdbuf {
     vkapi::IVkFence fence;
     vkapi::IVkCommandBuffer buf;
@@ -573,7 +524,7 @@ struct VulkanCapabilities {
 };
 
 class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
- public:
+public:
   struct Params {
     PFN_vkGetInstanceProcAddr get_proc_addr{nullptr};
     VkInstance instance{VK_NULL_HANDLE};
@@ -589,18 +540,14 @@ class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
   void init_vulkan_structs(Params &params);
   ~VulkanDevice() override;
 
-  Arch arch() const override {
-    return Arch::vulkan;
-  }
+  Arch arch() const override { return Arch::vulkan; }
 
-  RhiResult create_pipeline_cache(
-      PipelineCache **out_cache,
-      size_t initial_size = 0,
-      const void *initial_data = nullptr) noexcept final;
+  RhiResult
+  create_pipeline_cache(PipelineCache **out_cache, size_t initial_size = 0,
+                        const void *initial_data = nullptr) noexcept final;
 
   RhiResult create_pipeline(Pipeline **out_pipeline,
-                            const PipelineSourceDesc &src,
-                            std::string name,
+                            const PipelineSourceDesc &src, std::string name,
                             PipelineCache *cache) noexcept final;
 
   RhiResult allocate_memory(const AllocParams &params,
@@ -627,12 +574,12 @@ class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
 
   void wait_idle() override;
 
-  std::unique_ptr<Pipeline> create_raster_pipeline(
-      const std::vector<PipelineSourceDesc> &src,
-      const RasterParams &raster_params,
-      const std::vector<VertexInputBinding> &vertex_inputs,
-      const std::vector<VertexInputAttribute> &vertex_attrs,
-      std::string name = "Pipeline") override;
+  std::unique_ptr<Pipeline>
+  create_raster_pipeline(const std::vector<PipelineSourceDesc> &src,
+                         const RasterParams &raster_params,
+                         const std::vector<VertexInputBinding> &vertex_inputs,
+                         const std::vector<VertexInputAttribute> &vertex_attrs,
+                         std::string name = "Pipeline") override;
 
   std::unique_ptr<Surface> create_surface(const SurfaceConfig &config) override;
 
@@ -640,17 +587,11 @@ class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
   void destroy_image(DeviceAllocation handle) override;
 
   // Vulkan specific functions
-  VkInstance vk_instance() const {
-    return instance_;
-  }
+  VkInstance vk_instance() const { return instance_; }
 
-  VkDevice vk_device() const {
-    return device_;
-  }
+  VkDevice vk_device() const { return device_; }
 
-  VkPhysicalDevice vk_physical_device() const {
-    return physical_device_;
-  }
+  VkPhysicalDevice vk_physical_device() const { return physical_device_; }
 
   uint32_t compute_queue_family_index() const {
     return compute_queue_family_index_;
@@ -660,28 +601,22 @@ class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
     return graphics_queue_family_index_;
   }
 
-  VkQueue graphics_queue() const {
-    return graphics_queue_;
-  }
+  VkQueue graphics_queue() const { return graphics_queue_; }
 
-  VkQueue compute_queue() const {
-    return compute_queue_;
-  }
+  VkQueue compute_queue() const { return compute_queue_; }
 
-  std::tuple<VkDeviceMemory, size_t, size_t> get_vkmemory_offset_size(
-      const DeviceAllocation &alloc) const;
+  std::tuple<VkDeviceMemory, size_t, size_t>
+  get_vkmemory_offset_size(const DeviceAllocation &alloc) const;
 
   vkapi::IVkBuffer get_vkbuffer(const DeviceAllocation &alloc) const;
 
   size_t get_vkbuffer_size(const DeviceAllocation &alloc) const;
 
-  std::tuple<vkapi::IVkImage, vkapi::IVkImageView, VkFormat> get_vk_image(
-      const DeviceAllocation &alloc) const;
+  std::tuple<vkapi::IVkImage, vkapi::IVkImageView, VkFormat>
+  get_vk_image(const DeviceAllocation &alloc) const;
 
-  DeviceAllocation import_vkbuffer(vkapi::IVkBuffer buffer,
-                                   size_t size,
-                                   VkDeviceMemory memory,
-                                   VkDeviceSize offset);
+  DeviceAllocation import_vkbuffer(vkapi::IVkBuffer buffer, size_t size,
+                                   VkDeviceMemory memory, VkDeviceSize offset);
 
   DeviceAllocation import_vk_image(vkapi::IVkImage image,
                                    vkapi::IVkImageView view,
@@ -697,15 +632,11 @@ class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
   vkapi::IVkFramebuffer get_framebuffer(const VulkanFramebufferDesc &desc);
 
   vkapi::IVkDescriptorSetLayout get_desc_set_layout(VulkanResourceSet &set);
-  rhi_impl::RhiReturn<vkapi::IVkDescriptorSet> alloc_desc_set(
-      vkapi::IVkDescriptorSetLayout layout);
+  rhi_impl::RhiReturn<vkapi::IVkDescriptorSet>
+  alloc_desc_set(vkapi::IVkDescriptorSetLayout layout);
 
-  constexpr VulkanCapabilities &vk_caps() {
-    return vk_caps_;
-  }
-  constexpr const VulkanCapabilities &vk_caps() const {
-    return vk_caps_;
-  }
+  constexpr VulkanCapabilities &vk_caps() { return vk_caps_; }
+  constexpr const VulkanCapabilities &vk_caps() const { return vk_caps_; }
 
   const VkPhysicalDeviceProperties &get_vk_physical_device_props() const {
     return vk_device_properties_;
@@ -721,15 +652,13 @@ class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
     return samplers_.back().second;
   }
 
-  size_t profiler_get_sampler_count() override {
-    return samplers_.size();
-  }
+  size_t profiler_get_sampler_count() override { return samplers_.size(); }
 
   void profiler_sync() override;
-  std::vector<std::pair<std::string, double>> profiler_flush_sampled_time()
-      override;
+  std::vector<std::pair<std::string, double>>
+  profiler_flush_sampled_time() override;
 
- private:
+private:
   friend VulkanSurface;
 
   void create_vma_allocator();
@@ -783,39 +712,35 @@ class TI_DLL_EXPORT VulkanDevice : public GraphicsDevice {
   rhi_impl::SyncedPtrStableObjectList<ImageAllocInternal> image_allocations_;
 
   // Renderpass
-  unordered_map<VulkanRenderPassDesc,
-                vkapi::IVkRenderPass,
+  unordered_map<VulkanRenderPassDesc, vkapi::IVkRenderPass,
                 RenderPassDescHasher>
       renderpass_pools_;
 
   // Descriptors / Layouts / Pools
-  unordered_map<VulkanResourceSet,
-                vkapi::IVkDescriptorSetLayout,
+  unordered_map<VulkanResourceSet, vkapi::IVkDescriptorSetLayout,
                 VulkanResourceSet::SetLayoutHasher,
                 VulkanResourceSet::SetLayoutCmp>
       desc_set_layouts_;
   vkapi::IVkDescriptorPool desc_pool_{nullptr};
 
   // Internal implementaion functions
-  inline static AllocationInternal &get_alloc_internal(
-      const DeviceAllocation &alloc) {
+  inline static AllocationInternal &
+  get_alloc_internal(const DeviceAllocation &alloc) {
     return *reinterpret_cast<AllocationInternal *>(alloc.alloc_id);
   }
 
-  inline static ImageAllocInternal &get_image_alloc_internal(
-      const DeviceAllocation &alloc) {
+  inline static ImageAllocInternal &
+  get_image_alloc_internal(const DeviceAllocation &alloc) {
     return *reinterpret_cast<ImageAllocInternal *>(alloc.alloc_id);
   }
 
-  RhiResult map_internal(AllocationInternal &alloc_int,
-                         size_t offset,
-                         size_t size,
-                         void **mapped_ptr);
+  RhiResult map_internal(AllocationInternal &alloc_int, size_t offset,
+                         size_t size, void **mapped_ptr);
 
   // Profiler support
   std::vector<std::pair<std::string, vkapi::IVkQueryPool>> samplers_;
   std::vector<std::pair<std::string, double>> sampled_records_;
 };
 
-}  // namespace vulkan
-}  // namespace taichi::lang
+} // namespace vulkan
+} // namespace taichi::lang

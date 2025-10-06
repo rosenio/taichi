@@ -1,15 +1,15 @@
 #pragma once
 
 #include "taichi/program/field_info.h"
-#include "taichi/ui/common/scene_base.h"
 #include "taichi/ui/common/renderable_info.h"
+#include "taichi/ui/common/scene_base.h"
 #include "taichi/ui/utils/utils.h"
 
 namespace taichi::lang {
 
 class Texture;
 
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace taichi::ui {
 
@@ -35,7 +35,7 @@ struct LinesInfo {
 };
 
 class CanvasBase {
- public:
+public:
   virtual void set_background_color(const glm::vec3 &color) = 0;
   virtual void set_image(const SetImageInfo &info) = 0;
   virtual void set_image(taichi::lang::Texture *tex) = 0;
@@ -46,4 +46,4 @@ class CanvasBase {
   virtual ~CanvasBase() = default;
 };
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <sstream>
 #include <iostream>
+#include <sstream>
 
 namespace taichi {
 
@@ -12,8 +12,7 @@ struct PythonPrintBuffer {
   std::stringstream ss;
   bool enabled{false};
 
-  template <typename T>
-  PythonPrintBuffer &operator<<(const T &t) {
+  template <typename T> PythonPrintBuffer &operator<<(const T &t) {
     if (enabled)
       ss << t;
     else
@@ -29,4 +28,4 @@ struct PythonPrintBuffer {
 
 extern PythonPrintBuffer py_cout;
 
-}  // namespace taichi
+} // namespace taichi

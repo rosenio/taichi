@@ -5,7 +5,7 @@
 namespace taichi::lang {
 
 class DemoteMeshStatements : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Args {
@@ -13,4 +13,4 @@ class DemoteMeshStatements : public Pass {
   };
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "taichi/rhi/device.h"
 #include "taichi/codegen/spirv/snode_struct_compiler.h"
+#include "taichi/rhi/device.h"
 #include "taichi/struct/snode_tree.h"
 
 namespace taichi::lang {
@@ -16,10 +16,10 @@ class GfxRuntime;
  *
  */
 class SNodeTreeManager {
- private:
+private:
   using CompiledSNodeStructs = taichi::lang::spirv::CompiledSNodeStructs;
 
- public:
+public:
   explicit SNodeTreeManager(GfxRuntime *rtm);
 
   const std::vector<CompiledSNodeStructs> &get_compiled_structs() const {
@@ -34,10 +34,10 @@ class SNodeTreeManager {
 
   DevicePtr get_snode_tree_device_ptr(int tree_id);
 
- private:
+private:
   GfxRuntime *const runtime_;
   std::vector<CompiledSNodeStructs> compiled_snode_structs_;
 };
 
-}  // namespace gfx
-}  // namespace taichi::lang
+} // namespace gfx
+} // namespace taichi::lang

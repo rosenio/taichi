@@ -12,7 +12,7 @@ namespace taichi::lang {
 class Program;
 
 class TI_DLL_EXPORT ArgPack {
- public:
+public:
   /* Constructs a ArgPack managed by Program.
    * Memory allocation and deallocation is handled by Program.
    */
@@ -36,9 +36,9 @@ class TI_DLL_EXPORT ArgPack {
 
   ~ArgPack();
 
- private:
+private:
   Program *prog_{nullptr};
 
   DataType get_element_dt(const std::vector<int> &i) const;
 };
-}  // namespace taichi::lang
+} // namespace taichi::lang

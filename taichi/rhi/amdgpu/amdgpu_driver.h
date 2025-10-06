@@ -38,16 +38,11 @@ constexpr uint32 HIP_MEMORYTYPE_DEVICE = 1;
 
 std::string get_amdgpu_error_message(uint32 err);
 
-template <typename... Args>
-class AMDGPUFunction {
- public:
-  AMDGPUFunction() {
-    function_ = nullptr;
-  }
+template <typename... Args> class AMDGPUFunction {
+public:
+  AMDGPUFunction() { function_ = nullptr; }
 
-  void set(void *func_ptr) {
-    function_ = (func_type *)func_ptr;
-  }
+  void set(void *func_ptr) { function_ = (func_type *)func_ptr; }
 
   uint32 call(Args... args) {
     TI_ASSERT(function_ != nullptr);
@@ -61,9 +56,7 @@ class AMDGPUFunction {
     symbol_name_ = symbol_name;
   }
 
-  void set_lock(std::mutex *lock) {
-    driver_lock_ = lock;
-  }
+  void set_lock(std::mutex *lock) { driver_lock_ = lock; }
 
   std::string get_error_message(uint32 err) {
     return get_amdgpu_error_message(err) +
@@ -81,7 +74,7 @@ class AMDGPUFunction {
     TI_ERROR_IF(err, get_error_message(err));
   }
 
- private:
+private:
   using func_type = uint32_t(Args...);
 
   func_type *function_{nullptr};
@@ -90,10 +83,10 @@ class AMDGPUFunction {
 };
 
 class AMDGPUDriverBase {
- public:
+public:
   ~AMDGPUDriverBase() = default;
 
- protected:
+protected:
   std::unique_ptr<DynamicLoader> loader_;
   AMDGPUDriverBase();
 
@@ -103,8 +96,8 @@ class AMDGPUDriverBase {
 };
 
 class AMDGPUDriver : protected AMDGPUDriverBase {
- public:
-#define PER_AMDGPU_FUNCTION(name, symbol_name, ...) \
+public:
+#define PER_AMDGPU_FUNCTION(name, symbol_name, ...)                            \
   AMDGPUFunction<__VA_ARGS__> name;
 #include "taichi/rhi/amdgpu/amdgpu_driver_functions.inc.h"
 #undef PER_AMDGPU_FUNCTION
@@ -123,7 +116,7 @@ class AMDGPUDriver : protected AMDGPUDriverBase {
 
   static AMDGPUDriver &get_instance_without_context();
 
- private:
+private:
   AMDGPUDriver();
 
   std::mutex lock_;
@@ -131,5 +124,5 @@ class AMDGPUDriver : protected AMDGPUDriverBase {
   // bool rocm_version_valid_{false};
 };
 
-}  // namespace lang
-}  // namespace taichi
+} // namespace lang
+} // namespace taichi

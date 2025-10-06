@@ -29,14 +29,14 @@
 // JSON generated ser/de.
 // @PENGUINLIONG
 #pragma once
-#include <memory>
-#include <array>
-#include <vector>
-#include <map>
-#include <unordered_map>
-#include <type_traits>
-#include <optional>
 #include "taichi/common/json.h"
+#include <array>
+#include <map>
+#include <memory>
+#include <optional>
+#include <type_traits>
+#include <unordered_map>
+#include <vector>
 
 namespace liong {
 namespace json {
@@ -72,8 +72,7 @@ struct FieldNameList {
   }
 
   explicit FieldNameList(const char *field_names)
-      : field_names(split_field_names(field_names)) {
-  }
+      : field_names(split_field_names(field_names)) {}
 };
 
 namespace type {
@@ -81,31 +80,27 @@ template <typename T>
 using remove_cvref =
     typename std::remove_cv<typename std::remove_reference<T>::type>;
 
-template <typename T>
-using remove_cvref_t = typename remove_cvref<T>::type;
-}  // namespace type
+template <typename T> using remove_cvref_t = typename remove_cvref<T>::type;
+} // namespace type
 
-template <typename T>
-struct has_ptr_serde {
+template <typename T> struct has_ptr_serde {
   template <typename T_>
-  static constexpr auto helper(T_ *) -> std::is_same<
-      decltype((T_::jsonserde_ptr_io(std::declval<const T_ *&>(),
-                                     std::declval<JsonValue &>(),
-                                     std::declval<bool>(),
-                                     std::declval<bool>()))),
-      void>;
+  static constexpr auto helper(T_ *)
+      -> std::is_same<decltype((T_::jsonserde_ptr_io(
+                          std::declval<const T_ *&>(),
+                          std::declval<JsonValue &>(), std::declval<bool>(),
+                          std::declval<bool>()))),
+                      void>;
 
-  template <typename>
-  static constexpr auto helper(...) -> std::false_type;
+  template <typename> static constexpr auto helper(...) -> std::false_type;
 
- public:
+public:
   using T__ = typename type::remove_cvref_t<T>;
   using type = decltype(helper<T__>(nullptr));
   static constexpr bool value = type::value;
 };
 
-template <typename T>
-struct JsonSerde {
+template <typename T> struct JsonSerde {
   template <typename T__, typename T_ = typename type::remove_cvref_t<T__>>
   static T_ &get_writable(T__ &&t) {
     return *const_cast<T_ *>(&t);
@@ -126,13 +121,13 @@ struct JsonSerde {
   }
 
   template <typename U = typename std::remove_cv<T>::type>
-  static void deserialize(
-      const JsonValue &j,
-      typename std::enable_if_t<
-          std::is_pointer_v<U> &&
-              has_ptr_serde<std::remove_pointer_t<U>>::value,
-          T> &x,
-      bool strict) {
+  static void
+  deserialize(const JsonValue &j,
+              typename std::enable_if_t<
+                  std::is_pointer_v<U> &&
+                      has_ptr_serde<std::remove_pointer_t<U>>::value,
+                  T> &x,
+              bool strict) {
     using T_ = std::remove_pointer_t<T>;
     T_::jsonserde_ptr_io((const T_ *&)x, get_writable(j), /*writing=*/false,
                          /*strict=*/strict);
@@ -140,27 +135,27 @@ struct JsonSerde {
 
   // Numeric and boolean types (integers and floating-point numbers).
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(
-      typename std::enable_if_t<std::is_arithmetic<U>::value, T> x) {
+  static JsonValue
+  serialize(typename std::enable_if_t<std::is_arithmetic<U>::value, T> x) {
     return JsonValue(x);
   }
   template <typename U = typename std::remove_cv<T>::type>
-  static void deserialize(
-      const JsonValue &j,
-      typename std::enable_if_t<std::is_arithmetic<U>::value, T> &x,
-      bool strict) {
+  static void
+  deserialize(const JsonValue &j,
+              typename std::enable_if_t<std::is_arithmetic<U>::value, T> &x,
+              bool strict) {
     x = (T)j;
   }
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(
-      typename std::enable_if_t<std::is_enum<U>::value, T> x) {
+  static JsonValue
+  serialize(typename std::enable_if_t<std::is_enum<U>::value, T> x) {
     return JsonValue((typename std::underlying_type<T>::type)x);
   }
   template <typename U = typename std::remove_cv<T>::type>
-  static void deserialize(
-      const JsonValue &j,
-      typename std::enable_if_t<std::is_enum<U>::value, T> &x,
-      bool strict) {
+  static void
+  deserialize(const JsonValue &j,
+              typename std::enable_if_t<std::is_enum<U>::value, T> &x,
+              bool strict) {
     x = (T)(typename std::underlying_type<T>::type)j;
   }
 
@@ -180,11 +175,11 @@ struct JsonSerde {
 
   // Structure types (with a `FieldNameList` field provided).
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(
-      const typename std::enable_if_t<
-          std::is_same<decltype(std::declval<U>().json_serialize_fields()),
-                       JsonValue>::value,
-          T> &x) {
+  static JsonValue
+  serialize(const typename std::enable_if_t<
+            std::is_same<decltype(std::declval<U>().json_serialize_fields()),
+                         JsonValue>::value,
+            T> &x) {
     return JsonValue(x.json_serialize_fields());
   }
   template <typename U = typename std::remove_cv<T>::type>
@@ -202,11 +197,12 @@ struct JsonSerde {
 
   // Key-value pairs.
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(const typename std::enable_if_t<
-                             std::is_same<std::pair<typename U::first_type,
-                                                    typename U::second_type>,
-                                          T>::value,
-                             T> &x) {
+  static JsonValue
+  serialize(const typename std::enable_if_t<
+            std::is_same<
+                std::pair<typename U::first_type, typename U::second_type>,
+                T>::value,
+            T> &x) {
     JsonObject obj{};
     obj.inner.emplace(std::make_pair<const std::string, JsonValue>(
         "key", JsonSerde<typename T::first_type>::serialize(x.first)));
@@ -229,10 +225,10 @@ struct JsonSerde {
 
   // Owned pointer (requires default constructable).
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(
-      const typename std::enable_if_t<
-          std::is_same<std::unique_ptr<typename U::element_type>, T>::value,
-          T> &x) {
+  static JsonValue
+  serialize(const typename std::enable_if_t<
+            std::is_same<std::unique_ptr<typename U::element_type>, T>::value,
+            T> &x) {
     if (x == nullptr) {
       return JsonValue(nullptr);
     } else {
@@ -243,8 +239,8 @@ struct JsonSerde {
   static void deserialize(
       const JsonValue &j,
       typename std::enable_if_t<
-          std::is_same<std::unique_ptr<typename U::element_type>, T>::value,
-          T> &x,
+          std::is_same<std::unique_ptr<typename U::element_type>, T>::value, T>
+          &x,
       bool strict) {
     if (j.is_null()) {
       x = nullptr;
@@ -256,8 +252,8 @@ struct JsonSerde {
 
   // Array types (requires default + move constructable).
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(
-      const typename std::enable_if_t<std::is_array<U>::value, T> &x) {
+  static JsonValue
+  serialize(const typename std::enable_if_t<std::is_array<U>::value, T> &x) {
     JsonArray arr{};
     for (const auto &xx : x) {
       arr.inner.emplace_back(
@@ -266,11 +262,12 @@ struct JsonSerde {
     return JsonValue(std::move(arr));
   }
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(const typename std::enable_if_t<
-                             std::is_same<std::array<typename U::value_type,
-                                                     std::tuple_size<U>::value>,
-                                          T>::value,
-                             T> &x) {
+  static JsonValue
+  serialize(const typename std::enable_if_t<
+            std::is_same<
+                std::array<typename U::value_type, std::tuple_size<U>::value>,
+                T>::value,
+            T> &x) {
     JsonArray arr{};
     for (const auto &xx : x) {
       arr.inner.emplace_back(JsonSerde<typename T::value_type>::serialize(xx));
@@ -280,8 +277,7 @@ struct JsonSerde {
   template <typename U = typename std::remove_cv<T>::type>
   static JsonValue serialize(
       const typename std::enable_if_t<
-          std::is_same<std::vector<typename U::value_type>, T>::value,
-          T> &x) {
+          std::is_same<std::vector<typename U::value_type>, T>::value, T> &x) {
     JsonArray arr{};
     for (const auto &xx : x) {
       arr.inner.emplace_back(JsonSerde<typename T::value_type>::serialize(xx));
@@ -289,10 +285,10 @@ struct JsonSerde {
     return JsonValue(std::move(arr));
   }
   template <typename U = typename std::remove_cv<T>::type>
-  static void deserialize(
-      const JsonValue &j,
-      typename std::enable_if_t<std::is_array<U>::value, T> &x,
-      bool strict) {
+  static void
+  deserialize(const JsonValue &j,
+              typename std::enable_if_t<std::is_array<U>::value, T> &x,
+              bool strict) {
     for (size_t i = 0; i < std::extent<T>::value; ++i) {
       JsonSerde<typename std::remove_extent_t<T>>::deserialize(j[i], x[i],
                                                                strict);
@@ -315,8 +311,7 @@ struct JsonSerde {
   static void deserialize(
       const JsonValue &j,
       typename std::enable_if_t<
-          std::is_same<std::vector<typename U::value_type>, T>::value,
-          T> &x,
+          std::is_same<std::vector<typename U::value_type>, T>::value, T> &x,
       bool strict) {
     x.clear();
     for (const auto &elem : j.elems()) {
@@ -388,10 +383,10 @@ struct JsonSerde {
 
   // Optional types (requires default + move constructable).
   template <typename U = typename std::remove_cv<T>::type>
-  static JsonValue serialize(
-      const typename std::enable_if_t<
-          std::is_same<std::optional<typename U::value_type>, T>::value,
-          T> &x) {
+  static JsonValue
+  serialize(const typename std::enable_if_t<
+            std::is_same<std::optional<typename U::value_type>, T>::value, T>
+                &x) {
     if (x.has_value()) {
       return JsonSerde<typename T::value_type>::serialize(x.value());
     } else {
@@ -402,8 +397,7 @@ struct JsonSerde {
   static void deserialize(
       const JsonValue &j,
       typename std::enable_if_t<
-          std::is_same<std::optional<typename U::value_type>, T>::value,
-          T> &x,
+          std::is_same<std::optional<typename U::value_type>, T>::value, T> &x,
       bool strict) {
     if (j.is_null()) {
       x = std::nullopt;
@@ -415,23 +409,19 @@ struct JsonSerde {
   }
 };
 
-template <typename... TArgs>
-struct JsonSerdeFieldImpl {};
+template <typename... TArgs> struct JsonSerdeFieldImpl {};
 template <typename TFirst, typename... TOthers>
 struct JsonSerdeFieldImpl<TFirst, TOthers...> {
   inline static void serialize(JsonObject &obj,
                                std::vector<std::string>::const_iterator name,
-                               const TFirst &first,
-                               const TOthers &...others) {
+                               const TFirst &first, const TOthers &...others) {
     obj.inner.emplace(std::make_pair<std::string, JsonValue>(
         std::string(*name), JsonSerde<TFirst>::serialize(first)));
     JsonSerdeFieldImpl<TOthers...>::serialize(obj, ++name, others...);
   }
-  inline static void deserialize(const JsonObject &obj,
-                                 bool strict,
+  inline static void deserialize(const JsonObject &obj, bool strict,
                                  std::vector<std::string>::const_iterator name,
-                                 TFirst &first,
-                                 TOthers &...others) {
+                                 TFirst &first, TOthers &...others) {
     auto it = obj.inner.find(*name);
     if (it != obj.inner.end()) {
       JsonSerde<TFirst>::deserialize(it->second, first, strict);
@@ -441,43 +431,38 @@ struct JsonSerdeFieldImpl<TFirst, TOthers...> {
     JsonSerdeFieldImpl<TOthers...>::deserialize(obj, strict, ++name, others...);
   }
 };
-template <>
-struct JsonSerdeFieldImpl<> {
+template <> struct JsonSerdeFieldImpl<> {
   inline static void serialize(JsonObject &obj,
-                               std::vector<std::string>::const_iterator name) {
-  }
-  inline static bool deserialize(
-      const JsonObject &obj,
-      bool strict,
-      std::vector<std::string>::const_iterator name) {
+                               std::vector<std::string>::const_iterator name) {}
+  inline static bool
+  deserialize(const JsonObject &obj, bool strict,
+              std::vector<std::string>::const_iterator name) {
     return true;
   }
 };
 template <typename... TArgs>
-inline void json_serialize_field_impl(
-    JsonObject &obj,
-    std::vector<std::string>::const_iterator name,
-    const TArgs &...args) {
+inline void
+json_serialize_field_impl(JsonObject &obj,
+                          std::vector<std::string>::const_iterator name,
+                          const TArgs &...args) {
   JsonSerdeFieldImpl<TArgs...>::serialize(obj, name, args...);
 }
 template <typename... TArgs>
-inline void json_deserialize_field_impl(
-    const JsonObject &obj,
-    bool strict,
-    std::vector<std::string>::const_iterator name,
-    TArgs &...args) {
+inline void
+json_deserialize_field_impl(const JsonObject &obj, bool strict,
+                            std::vector<std::string>::const_iterator name,
+                            TArgs &...args) {
   if (strict && obj.inner.size() != sizeof...(TArgs)) {
     throw ::liong::json::JsonException("unexpected number of fields");
   }
   return JsonSerdeFieldImpl<TArgs...>::deserialize(obj, strict, name, args...);
 }
 
-}  // namespace detail
+} // namespace detail
 
 // Serialize a JSON serde object, turning in-memory representations into JSON
 // text.
-template <typename T>
-JsonValue serialize(const T &x) {
+template <typename T> JsonValue serialize(const T &x) {
   return detail::JsonSerde<T>::serialize(x);
 }
 
@@ -494,30 +479,30 @@ void deserialize(const JsonValue &j, T &out, bool strict = false) {
 // If you need to control the serialization process on your own, you might want
 // to inherit from this.
 struct CustomJsonSerdeBase {
- public:
+public:
   // Serialize the field values into a JSON object.
   virtual JsonObject json_serialize_fields() const = 0;
   // Deserialize the current object with JSON fields.
   virtual void json_deserialize_fields(const JsonObject &j, bool strict) = 0;
 };
 
-}  // namespace json
-}  // namespace liong
+} // namespace json
+} // namespace liong
 
-#define L_JSON_SERDE_FIELDS(...)                                        \
-  const std::vector<std::string> &json_serde_field_names() const {      \
-    static ::liong::json::detail::FieldNameList JSON_SERDE_FIELD_NAMES{ \
-        #__VA_ARGS__};                                                  \
-    return JSON_SERDE_FIELD_NAMES.field_names;                          \
-  }                                                                     \
-  ::liong::json::JsonValue json_serialize_fields() const {              \
-    ::liong::json::JsonObject out{};                                    \
-    ::liong::json::detail::json_serialize_field_impl(                   \
-        out, json_serde_field_names().begin(), __VA_ARGS__);            \
-    return ::liong::json::JsonValue(std::move(out));                    \
-  }                                                                     \
-  void json_deserialize_fields(const ::liong::json::JsonObject &j,      \
-                               bool strict) {                           \
-    ::liong::json::detail::json_deserialize_field_impl(                 \
-        j, strict, json_serde_field_names().begin(), __VA_ARGS__);      \
+#define L_JSON_SERDE_FIELDS(...)                                               \
+  const std::vector<std::string> &json_serde_field_names() const {             \
+    static ::liong::json::detail::FieldNameList JSON_SERDE_FIELD_NAMES{        \
+        #__VA_ARGS__};                                                         \
+    return JSON_SERDE_FIELD_NAMES.field_names;                                 \
+  }                                                                            \
+  ::liong::json::JsonValue json_serialize_fields() const {                     \
+    ::liong::json::JsonObject out{};                                           \
+    ::liong::json::detail::json_serialize_field_impl(                          \
+        out, json_serde_field_names().begin(), __VA_ARGS__);                   \
+    return ::liong::json::JsonValue(std::move(out));                           \
+  }                                                                            \
+  void json_deserialize_fields(const ::liong::json::JsonObject &j,             \
+                               bool strict) {                                  \
+    ::liong::json::detail::json_deserialize_field_impl(                        \
+        j, strict, json_serde_field_names().begin(), __VA_ARGS__);             \
   }

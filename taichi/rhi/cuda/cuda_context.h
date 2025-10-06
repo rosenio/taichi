@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mutex>
-#include <unordered_map>
 #include <thread>
+#include <unordered_map>
 
 #include "taichi/program/kernel_profiler.h"
 #include "taichi/rhi/cuda/cuda_driver.h"
@@ -17,7 +17,7 @@ namespace taichi::lang {
 class CUDADriver;
 
 class CUDAContext {
- private:
+private:
   void *device_;
   void *context_;
   int dev_count_;
@@ -31,61 +31,42 @@ class CUDAContext {
   bool supports_mem_pool_;
   void *stream_;
 
- public:
+public:
   CUDAContext();
 
   std::size_t get_total_memory();
   std::size_t get_free_memory();
   std::string get_device_name();
 
-  bool detected() const {
-    return dev_count_ != 0;
-  }
+  bool detected() const { return dev_count_ != 0; }
 
-  void launch(void *func,
-              const std::string &task_name,
-              std::vector<void *> arg_pointers,
-              std::vector<int> arg_sizes,
-              unsigned grid_dim,
-              unsigned block_dim,
+  void launch(void *func, const std::string &task_name,
+              std::vector<void *> arg_pointers, std::vector<int> arg_sizes,
+              unsigned grid_dim, unsigned block_dim,
               std::size_t dynamic_shared_mem_bytes);
 
-  void set_profiler(KernelProfilerBase *profiler) {
-    profiler_ = profiler;
-  }
+  void set_profiler(KernelProfilerBase *profiler) { profiler_ = profiler; }
 
-  void set_debug(bool debug) {
-    debug_ = debug;
-  }
+  void set_debug(bool debug) { debug_ = debug; }
 
-  std::string get_mcpu() const {
-    return mcpu_;
-  }
+  std::string get_mcpu() const { return mcpu_; }
 
-  void *get_context() {
-    return context_;
-  }
+  void *get_context() { return context_; }
 
-  void make_current() {
-    driver_.context_set_current(context_);
-  }
+  void make_current() { driver_.context_set_current(context_); }
 
-  int get_compute_capability() const {
-    return compute_capability_;
-  }
+  int get_compute_capability() const { return compute_capability_; }
 
-  bool supports_mem_pool() const {
-    return supports_mem_pool_;
-  }
+  bool supports_mem_pool() const { return supports_mem_pool_; }
 
   ~CUDAContext();
 
   class ContextGuard {
-   private:
+  private:
     void *old_ctx_;
     void *new_ctx_;
 
-   public:
+  public:
     explicit ContextGuard(CUDAContext *new_ctx)
         : old_ctx_(nullptr), new_ctx_(new_ctx->context_) {
       CUDADriver::get_instance().context_get_current(&old_ctx_);
@@ -100,9 +81,7 @@ class CUDAContext {
     }
   };
 
-  ContextGuard get_guard() {
-    return ContextGuard(this);
-  }
+  ContextGuard get_guard() { return ContextGuard(this); }
 
   std::unique_lock<std::mutex> get_lock_guard() {
     return std::unique_lock<std::mutex>(lock_);
@@ -110,13 +89,9 @@ class CUDAContext {
 
   static CUDAContext &get_instance();
 
-  void set_stream(void *stream) {
-    stream_ = stream;
-  }
+  void set_stream(void *stream) { stream_ = stream; }
 
-  void *get_stream() const {
-    return stream_;
-  }
+  void *get_stream() const { return stream_; }
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

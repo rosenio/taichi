@@ -11,8 +11,8 @@
 #pragma warning(disable : 4267)
 #endif
 
-#include "pybind11/pybind11.h"
 #include "pybind11/operators.h"
+#include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
 
 #if defined(_MSC_VER)
@@ -37,4 +37,4 @@ void export_visual(py::module &m);
 
 void export_ggui(py::module &m);
 
-}  // namespace taichi
+} // namespace taichi

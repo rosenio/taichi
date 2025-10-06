@@ -15,16 +15,16 @@ class KernelLauncher : public LLVM::KernelLauncher {
     std::vector<std::pair<std::vector<int>, Callable::Parameter>> parameters;
   };
 
- public:
+public:
   using Base::Base;
 
   void launch_llvm_kernel(Handle handle, LaunchContextBuilder &ctx) override;
-  Handle register_llvm_kernel(
-      const LLVM::CompiledKernelData &compiled) override;
+  Handle
+  register_llvm_kernel(const LLVM::CompiledKernelData &compiled) override;
 
- private:
+private:
   std::vector<Context> contexts_;
 };
 
-}  // namespace cpu
-}  // namespace taichi::lang
+} // namespace cpu
+} // namespace taichi::lang

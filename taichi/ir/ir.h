@@ -3,22 +3,22 @@
 #pragma once
 
 #include <atomic>
-#include <unordered_set>
-#include <unordered_map>
-#include <variant>
 #include <tuple>
+#include <unordered_map>
+#include <unordered_set>
+#include <variant>
 
 #include "taichi/common/core.h"
 #include "taichi/common/exceptions.h"
 #include "taichi/common/one_or_more.h"
-#include "taichi/ir/snode.h"
 #include "taichi/ir/mesh.h"
+#include "taichi/ir/snode.h"
 #include "taichi/ir/type_factory.h"
 #include "taichi/util/short_name.h"
 
 #ifdef TI_WITH_LLVM
-#include "llvm/ADT/SmallVector.h"
 #include "llvm/ADT/MapVector.h"
+#include "llvm/ADT/SmallVector.h"
 #endif
 
 namespace taichi::lang {
@@ -38,7 +38,7 @@ enum class SNodeAccessFlag : int { block_local, read_only, mesh_local };
 std::string snode_access_flag_name(SNodeAccessFlag type);
 
 class MemoryAccessOptions {
- public:
+public:
   void add_flag(SNode *snode, SNodeAccessFlag flag) {
     options_[snode].insert(flag);
   }
@@ -60,16 +60,14 @@ class MemoryAccessOptions {
     return snodes;
   }
 
-  void clear() {
-    options_.clear();
-  }
+  void clear() { options_.clear(); }
 
-  std::unordered_map<SNode *, std::unordered_set<SNodeAccessFlag>> get_all()
-      const {
+  std::unordered_map<SNode *, std::unordered_set<SNodeAccessFlag>>
+  get_all() const {
     return options_;
   }
 
- private:
+private:
   std::unordered_map<SNode *, std::unordered_set<SNodeAccessFlag>> options_;
 };
 
@@ -78,7 +76,7 @@ class MemoryAccessOptions {
 #undef PER_STATEMENT
 
 class Identifier {
- public:
+public:
   std::string name_;
   int id{0};
 
@@ -86,22 +84,15 @@ class Identifier {
 
   // Multiple identifiers can share the same name but must have different id's
   explicit Identifier(int id, const std::string &name = "")
-      : name_(name), id(id) {
-  }
+      : name_(name), id(id) {}
 
   std::string raw_name() const;
 
-  std::string name() const {
-    return "@" + raw_name();
-  }
+  std::string name() const { return "@" + raw_name(); }
 
-  bool operator<(const Identifier &o) const {
-    return id < o.id;
-  }
+  bool operator<(const Identifier &o) const { return id < o.id; }
 
-  bool operator==(const Identifier &o) const {
-    return id == o.id;
-  }
+  bool operator==(const Identifier &o) const { return id == o.id; }
 };
 
 #ifdef TI_WITH_LLVM
@@ -113,51 +104,37 @@ using stmt_ref_vector = std::vector<Stmt *>;
 #endif
 
 class VecStatement {
- public:
+public:
   stmt_vector stmts;
 
-  VecStatement() {
-  }
+  VecStatement() {}
 
   // NOLINTNEXTLINE(google-explicit-constructor)
-  VecStatement(pStmt &&stmt) {
-    push_back(std::move(stmt));
-  }
+  VecStatement(pStmt &&stmt) { push_back(std::move(stmt)); }
 
-  VecStatement(VecStatement &&o) {
-    stmts = std::move(o.stmts);
-  }
+  VecStatement(VecStatement &&o) { stmts = std::move(o.stmts); }
 
   // NOLINTNEXTLINE(google-explicit-constructor)
-  VecStatement(stmt_vector &&other_stmts) {
-    stmts = std::move(other_stmts);
-  }
+  VecStatement(stmt_vector &&other_stmts) { stmts = std::move(other_stmts); }
 
   Stmt *push_back(pStmt &&stmt);
 
-  template <typename T, typename... Args>
-  T *push_back(Args &&...args) {
+  template <typename T, typename... Args> T *push_back(Args &&...args) {
     auto up = std::make_unique<T>(std::forward<Args>(args)...);
     auto ptr = up.get();
     stmts.push_back(std::move(up));
     return ptr;
   }
 
-  pStmt &back() {
-    return stmts.back();
-  }
+  pStmt &back() { return stmts.back(); }
 
-  std::size_t size() const {
-    return stmts.size();
-  }
+  std::size_t size() const { return stmts.size(); }
 
-  pStmt &operator[](int i) {
-    return stmts[i];
-  }
+  pStmt &operator[](int i) { return stmts[i]; }
 };
 
 class IRVisitor {
- public:
+public:
   bool allow_undefined_visitor;
   bool invoke_default_visitor;
 
@@ -177,13 +154,13 @@ class IRVisitor {
     }
   }
 
-#define DEFINE_VISIT(T)            \
-  virtual void visit(T *stmt) {    \
-    if (allow_undefined_visitor) { \
-      if (invoke_default_visitor)  \
-        visit((Stmt *)stmt);       \
-    } else                         \
-      TI_NOT_IMPLEMENTED;          \
+#define DEFINE_VISIT(T)                                                        \
+  virtual void visit(T *stmt) {                                                \
+    if (allow_undefined_visitor) {                                             \
+      if (invoke_default_visitor)                                              \
+        visit((Stmt *)stmt);                                                   \
+    } else                                                                     \
+      TI_NOT_IMPLEMENTED;                                                      \
   }
 
   DEFINE_VISIT(Block);
@@ -204,7 +181,7 @@ namespace ir_traits {
 // FIXME: Use C++ 20 concepts to replace `dynamic_cast<T>() != nullptr`
 
 class Store {
- public:
+public:
   virtual ~Store() = default;
 
   // Get the list of sinks/destinations of the store operation
@@ -215,20 +192,18 @@ class Store {
 };
 
 class Load {
- public:
+public:
   virtual ~Load() = default;
 
   // If load_stmt loads some variables or a stack, return the pointers of them.
   virtual stmt_refs get_load_pointers() const = 0;
 };
 
-}  // namespace ir_traits
+} // namespace ir_traits
 
 class IRNode {
- public:
-  virtual void accept(IRVisitor *visitor) {
-    TI_NOT_IMPLEMENTED
-  }
+public:
+  virtual void accept(IRVisitor *visitor) { TI_NOT_IMPLEMENTED }
 
   // * For a Stmt, this returns its enclosing Block
   // * For a Block, this returns its enclosing Stmt
@@ -239,56 +214,47 @@ class IRNode {
 
   virtual ~IRNode() = default;
 
-  template <typename T>
-  bool is() const {
+  template <typename T> bool is() const {
     return dynamic_cast<const T *>(this) != nullptr;
   }
 
-  template <typename T>
-  T *as() {
+  template <typename T> T *as() {
     TI_ASSERT(is<T>());
     return dynamic_cast<T *>(this);
   }
 
-  template <typename T>
-  const T *as() const {
+  template <typename T> const T *as() const {
     TI_ASSERT(is<T>());
     return dynamic_cast<const T *>(this);
   }
 
-  template <typename T>
-  T *cast() {
-    return dynamic_cast<T *>(this);
-  }
+  template <typename T> T *cast() { return dynamic_cast<T *>(this); }
 
-  template <typename T>
-  const T *cast() const {
+  template <typename T> const T *cast() const {
     return dynamic_cast<const T *>(this);
   }
 
   std::unique_ptr<IRNode> clone();
 };
 
-#define TI_DEFINE_ACCEPT                     \
-  void accept(IRVisitor *visitor) override { \
-    visitor->visit(this);                    \
+#define TI_DEFINE_ACCEPT                                                       \
+  void accept(IRVisitor *visitor) override { visitor->visit(this); }
+
+#define TI_DEFINE_CLONE                                                        \
+  std::unique_ptr<Stmt> clone() const override {                               \
+    auto new_stmt =                                                            \
+        std::make_unique<std::decay<decltype(*this)>::type>(*this);            \
+    new_stmt->mark_fields_registered();                                        \
+    new_stmt->io(new_stmt->field_manager);                                     \
+    return new_stmt;                                                           \
   }
 
-#define TI_DEFINE_CLONE                                             \
-  std::unique_ptr<Stmt> clone() const override {                    \
-    auto new_stmt =                                                 \
-        std::make_unique<std::decay<decltype(*this)>::type>(*this); \
-    new_stmt->mark_fields_registered();                             \
-    new_stmt->io(new_stmt->field_manager);                          \
-    return new_stmt;                                                \
-  }
-
-#define TI_DEFINE_ACCEPT_AND_CLONE \
-  TI_DEFINE_ACCEPT                 \
+#define TI_DEFINE_ACCEPT_AND_CLONE                                             \
+  TI_DEFINE_ACCEPT                                                             \
   TI_DEFINE_CLONE
 
 class StmtField {
- public:
+public:
   StmtField() = default;
 
   virtual bool equal(const StmtField *other) const = 0;
@@ -296,17 +262,14 @@ class StmtField {
   virtual ~StmtField() = default;
 };
 
-template <typename T>
-class StmtFieldNumeric final : public StmtField {
- private:
+template <typename T> class StmtFieldNumeric final : public StmtField {
+private:
   std::variant<T *, T> value_;
 
- public:
-  explicit StmtFieldNumeric(T *value) : value_(value) {
-  }
+public:
+  explicit StmtFieldNumeric(T *value) : value_(value) {}
 
-  explicit StmtFieldNumeric(T value) : value_(value) {
-  }
+  explicit StmtFieldNumeric(T value) : value_(value) {}
 
   bool equal(const StmtField *other_generic) const override {
     if (auto other = dynamic_cast<const StmtFieldNumeric *>(other_generic)) {
@@ -330,12 +293,11 @@ class StmtFieldNumeric final : public StmtField {
 };
 
 class StmtFieldSNode final : public StmtField {
- private:
+private:
   SNode *const &snode_;
 
- public:
-  explicit StmtFieldSNode(SNode *const &snode) : snode_(snode) {
-  }
+public:
+  explicit StmtFieldSNode(SNode *const &snode) : snode_(snode) {}
 
   static int get_snode_id(SNode *snode);
 
@@ -343,29 +305,26 @@ class StmtFieldSNode final : public StmtField {
 };
 
 class StmtFieldMemoryAccessOptions final : public StmtField {
- private:
+private:
   MemoryAccessOptions const &opt_;
 
- public:
+public:
   explicit StmtFieldMemoryAccessOptions(MemoryAccessOptions const &opt)
-      : opt_(opt) {
-  }
+      : opt_(opt) {}
 
   bool equal(const StmtField *other_generic) const override;
 };
 
 class StmtFieldManager {
- private:
+private:
   Stmt *stmt_;
 
- public:
+public:
   std::vector<std::unique_ptr<StmtField>> fields;
 
-  explicit StmtFieldManager(Stmt *stmt) : stmt_(stmt) {
-  }
+  explicit StmtFieldManager(Stmt *stmt) : stmt_(stmt) {}
 
-  template <typename T>
-  void operator()(const char *key, T &&value);
+  template <typename T> void operator()(const char *key, T &&value);
 
   template <typename T, typename... Args>
   void operator()(const char *key_, T &&t, Args &&...rest) {
@@ -381,21 +340,18 @@ class StmtFieldManager {
   bool equal(StmtFieldManager &other) const;
 };
 
-#define TI_STMT_DEF_FIELDS(...)  \
-  template <typename S>          \
-  void io(S &serializer) const { \
-    TI_IO(__VA_ARGS__);          \
-  }
-#define TI_STMT_REG_FIELDS  \
-  mark_fields_registered(); \
+#define TI_STMT_DEF_FIELDS(...)                                                \
+  template <typename S> void io(S &serializer) const { TI_IO(__VA_ARGS__); }
+#define TI_STMT_REG_FIELDS                                                     \
+  mark_fields_registered();                                                    \
   io(field_manager)
 
 class Stmt : public IRNode {
- protected:
+protected:
   std::vector<Stmt **> operands;
   explicit Stmt(const DebugInfo &dbg_info);
 
- public:
+public:
   StmtFieldManager field_manager;
   static std::atomic<int> instance_id_counter;
   int instance_id;
@@ -409,35 +365,21 @@ class Stmt : public IRNode {
   Stmt();
   Stmt(const Stmt &stmt);
 
-  virtual bool is_container_statement() const {
-    return false;
-  }
+  virtual bool is_container_statement() const { return false; }
 
-  DataType &element_type() {
-    return ret_type;
-  }
+  DataType &element_type() { return ret_type; }
 
-  std::string ret_data_type_name() const {
-    return ret_type->to_string();
-  }
+  std::string ret_data_type_name() const { return ret_type->to_string(); }
 
   std::string type_hint() const;
 
-  std::string name() const {
-    return fmt::format("${}", id);
-  }
+  std::string name() const { return fmt::format("${}", id); }
 
-  std::string short_name() const {
-    return make_short_name_by_id(id);
-  }
+  std::string short_name() const { return make_short_name_by_id(id); }
 
-  std::string raw_name() const {
-    return fmt::format("tmp{}", id);
-  }
+  std::string raw_name() const { return fmt::format("tmp{}", id); }
 
-  TI_FORCE_INLINE int num_operands() const {
-    return (int)operands.size();
-  }
+  TI_FORCE_INLINE int num_operands() const { return (int)operands.size(); }
 
   TI_FORCE_INLINE Stmt *operand(int i) const {
     // TI_ASSERT(0 <= i && i < (int)operands.size());
@@ -446,13 +388,9 @@ class Stmt : public IRNode {
 
   std::string get_last_tb() const;
 
-  TI_FORCE_INLINE std::string const &get_tb() const {
-    return dbg_info.tb;
-  }
+  TI_FORCE_INLINE std::string const &get_tb() const { return dbg_info.tb; }
 
-  TI_FORCE_INLINE void set_tb(const std::string &tb) {
-    dbg_info.tb = tb;
-  }
+  TI_FORCE_INLINE void set_tb(const std::string &tb) { dbg_info.tb = tb; }
 
   std::vector<Stmt *> get_operands() const;
 
@@ -476,9 +414,7 @@ class Stmt : public IRNode {
   // returns the inserted stmt
   Stmt *insert_after_me(std::unique_ptr<Stmt> &&new_stmt);
 
-  virtual bool has_global_side_effect() const {
-    return true;
-  }
+  virtual bool has_global_side_effect() const { return true; }
 
   virtual bool dead_instruction_eliminable() const {
     return !has_global_side_effect();
@@ -493,26 +429,21 @@ class Stmt : public IRNode {
     return std::make_unique<T>(std::forward<Args>(args)...);
   }
 
-  template <typename T, typename... Args>
-  static pStmt make(Args &&...args) {
+  template <typename T, typename... Args> static pStmt make(Args &&...args) {
     return make_typed<T>(std::forward<Args>(args)...);
   }
 
   std::string type();
 
-  virtual std::unique_ptr<Stmt> clone() const {
-    TI_NOT_IMPLEMENTED
-  }
+  virtual std::unique_ptr<Stmt> clone() const { TI_NOT_IMPLEMENTED }
 
   ~Stmt() override = default;
 
-  static void reset_counter() {
-    instance_id_counter = 0;
-  }
+  static void reset_counter() { instance_id_counter = 0; }
 };
 
 class Block : public IRNode {
- public:
+public:
   std::variant<Stmt *, Callable *> parent_;
   stmt_vector statements;
   stmt_vector trash_bin;
@@ -522,9 +453,7 @@ class Block : public IRNode {
   // variables, and AllocaStmt for other variables.
   std::map<Identifier, Stmt *> local_var_to_stmt;
 
-  explicit Block(Callable *callable = nullptr) {
-    parent_ = callable;
-  }
+  explicit Block(Callable *callable = nullptr) { parent_ = callable; }
 
   Stmt *parent_stmt() const;
 
@@ -557,36 +486,27 @@ class Block : public IRNode {
 
   void replace_statements_in_range(int start, int end, VecStatement &&stmts);
   void set_statements(VecStatement &&stmts);
-  void replace_with(Stmt *old_statement,
-                    std::unique_ptr<Stmt> &&new_statement,
+  void replace_with(Stmt *old_statement, std::unique_ptr<Stmt> &&new_statement,
                     bool replace_usages = true);
   void insert_before(Stmt *old_statement, VecStatement &&new_statements);
   void insert_after(Stmt *old_statement, VecStatement &&new_statements);
-  void replace_with(Stmt *old_statement,
-                    VecStatement &&new_statements,
+  void replace_with(Stmt *old_statement, VecStatement &&new_statements,
                     bool replace_usages = true);
   Stmt *lookup_var(const Identifier &ident) const;
   IRNode *get_parent() const override;
 
-  Stmt *back() const {
-    return statements.back().get();
-  }
+  Stmt *back() const { return statements.back().get(); }
 
-  template <typename T, typename... Args>
-  Stmt *push_back(Args &&...args) {
+  template <typename T, typename... Args> Stmt *push_back(Args &&...args) {
     auto stmt = std::make_unique<T>(std::forward<Args>(args)...);
     stmt->parent = this;
     statements.emplace_back(std::move(stmt));
     return back();
   }
 
-  std::size_t size() const {
-    return statements.size();
-  }
+  std::size_t size() const { return statements.size(); }
 
-  pStmt &operator[](int i) {
-    return statements[i];
-  }
+  pStmt &operator[](int i) { return statements[i]; }
 
   std::unique_ptr<Block> clone() const;
 
@@ -594,7 +514,7 @@ class Block : public IRNode {
 };
 
 class DelayedIRModifier {
- private:
+private:
   std::vector<std::pair<Stmt *, VecStatement>> to_insert_before_;
   std::vector<std::pair<Stmt *, VecStatement>> to_insert_after_;
   std::vector<std::tuple<Stmt *, VecStatement, bool>> to_replace_with_;
@@ -603,15 +523,14 @@ class DelayedIRModifier {
   std::vector<std::pair<IRNode *, CompileConfig>> to_type_check_;
   bool modified_{false};
 
- public:
+public:
   ~DelayedIRModifier();
   void erase(Stmt *stmt);
   void insert_before(Stmt *old_statement, std::unique_ptr<Stmt> new_statement);
   void insert_before(Stmt *old_statement, VecStatement &&new_statements);
   void insert_after(Stmt *old_statement, std::unique_ptr<Stmt> new_statement);
   void insert_after(Stmt *old_statement, VecStatement &&new_statements);
-  void replace_with(Stmt *stmt,
-                    VecStatement &&new_statements,
+  void replace_with(Stmt *stmt, VecStatement &&new_statements,
                     bool replace_usages = true);
   void extract_to_block_front(Stmt *stmt, Block *blk);
   void type_check(IRNode *node, CompileConfig cfg);
@@ -626,10 +545,10 @@ class DelayedIRModifier {
 // associated with a pass, visits the whole tree once at the beginning of that
 // pass, and performs a single replacement with amortized constant time.
 class ImmediateIRModifier {
- private:
+private:
   std::unordered_map<Stmt *, std::vector<std::pair<Stmt *, int>>> stmt_usages_;
 
- public:
+public:
   explicit ImmediateIRModifier(IRNode *root);
   void replace_usages_with(Stmt *old_stmt, Stmt *new_stmt);
 };
@@ -666,4 +585,4 @@ inline void StmtFieldManager::operator()(const char *key, T &&value) {
   }
 }
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

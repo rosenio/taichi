@@ -25,8 +25,7 @@ TI_FORCE_INLINE constexpr bool is_power_of_two(uint64 x) {
   return x != 0 && (x & (x - 1)) == 0;
 }
 
-template <int length>
-struct Bits {
+template <int length> struct Bits {
   static_assert(is_power_of_two(length), "length must be a power of two");
   static_assert(length == 32 || length == 64, "length must be 32/64");
 
@@ -34,57 +33,40 @@ struct Bits {
 
   T data;
 
-  Bits() : data(0) {
-  }
+  Bits() : data(0) {}
 
   // Uninitialized
-  explicit Bits(void *) {
-  }
+  explicit Bits(void *) {}
 
-  template <int start, int bits = 1>
-  static constexpr T mask() {
+  template <int start, int bits = 1> static constexpr T mask() {
     return (((T)1 << bits) - 1) << start;
   }
 
-  template <int start, int bits = 1>
-  TI_FORCE_INLINE T get() const {
+  template <int start, int bits = 1> TI_FORCE_INLINE T get() const {
     return (data >> start) & (((T)1 << bits) - 1);
   }
 
-  template <int start, int bits = 1>
-  TI_FORCE_INLINE void set(T val) {
+  template <int start, int bits = 1> TI_FORCE_INLINE void set(T val) {
     data =
         (data & ~mask<start, bits>()) | ((val << start) & mask<start, bits>());
   }
 
-  TI_FORCE_INLINE T operator()(T) const {
-    return data;
-  }
+  TI_FORCE_INLINE T operator()(T) const { return data; }
 
-  TI_FORCE_INLINE T get() const {
-    return data;
-  }
+  TI_FORCE_INLINE T get() const { return data; }
 
-  TI_FORCE_INLINE void set(const T &data) {
-    this->data = data;
-  }
+  TI_FORCE_INLINE void set(const T &data) { this->data = data; }
 };
 
-template <int length>
-using BitFlags = Bits<length>;
+template <int length> using BitFlags = Bits<length>;
 
-template <typename T>
-constexpr int bit_length() {
+template <typename T> constexpr int bit_length() {
   return std::is_same<T, bool>() ? 1 : sizeof(T) * 8;
 }
 
-#define TI_BIT_FIELD(T, name, start)                    \
-  T get_##name() const {                                \
-    return (T)Base::get<start, bit::bit_length<T>()>(); \
-  }                                                     \
-  void set_##name(const T &val) {                       \
-    Base::set<start, bit::bit_length<T>()>(val);        \
-  }
+#define TI_BIT_FIELD(T, name, start)                                           \
+  T get_##name() const { return (T)Base::get<start, bit::bit_length<T>()>(); } \
+  void set_##name(const T &val) { Base::set<start, bit::bit_length<T>()>(val); }
 
 template <typename T, int N>
 TI_FORCE_INLINE constexpr T product(const std::array<T, N> arr) {
@@ -106,9 +88,7 @@ constexpr std::size_t least_pot_bound(std::size_t v) {
   return ret;
 }
 
-TI_FORCE_INLINE constexpr uint32 pot_mask(int x) {
-  return (1u << x) - 1;
-}
+TI_FORCE_INLINE constexpr uint32 pot_mask(int x) { return (1u << x) - 1; }
 
 TI_FORCE_INLINE constexpr uint32 log2int(uint64 value) {
   int ret = 0;
@@ -125,9 +105,7 @@ TI_FORCE_INLINE constexpr uint32 ceil_log2int(uint64 value) {
   return log2int(value) + ((value & (value - 1)) != 0);
 }
 
-TI_FORCE_INLINE constexpr uint64 lowbit(uint64 x) {
-  return x & (-x);
-}
+TI_FORCE_INLINE constexpr uint64 lowbit(uint64 x) { return x & (-x); }
 
 template <typename G, typename T>
 constexpr TI_FORCE_INLINE copy_refcv_t<T, G> &&reinterpret_bits(T &&t) {
@@ -148,7 +126,7 @@ TI_FORCE_INLINE constexpr std::tuple<float32, float32> extract(float64 x) {
 }
 
 class Bitset {
- public:
+public:
   using value_t = uint64;
   static constexpr std::size_t kBits = sizeof(value_t) * 8;
   // kBits should be a power of two. However, the function is_power_of_two is
@@ -157,7 +135,7 @@ class Bitset {
   static constexpr std::size_t kLogBits = log2int(kBits);
   static constexpr value_t kMask = ((value_t)-1);
   class reference {
-   public:
+  public:
     reference(std::vector<value_t> &vec, int x);
     explicit operator bool() const;
     bool operator~() const;
@@ -165,7 +143,7 @@ class Bitset {
     reference &operator=(const reference &other);
     reference &flip();
 
-   private:
+  private:
     value_t *pos_;
     value_t digit_;
   };
@@ -196,9 +174,9 @@ class Bitset {
   // output from the lowest bit to the highest bit
   friend std::ostream &operator<<(std::ostream &os, const Bitset &b);
 
- private:
+private:
   std::vector<value_t> vec_;
 };
 
-}  // namespace bit
-}  // namespace taichi
+} // namespace bit
+} // namespace taichi

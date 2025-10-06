@@ -1,25 +1,21 @@
 #pragma once
 
 // Codegen for the hierarchical data structure (LLVM)
-#include "taichi/runtime/program_impls/llvm/llvm_program.h"
 #include "taichi/codegen/llvm/llvm_codegen_utils.h"
+#include "taichi/runtime/program_impls/llvm/llvm_program.h"
 #include "taichi/struct/struct.h"
 
 namespace taichi::lang {
 
 class LlvmProgramImpl;
 class StructCompilerLLVM : public StructCompiler, public LLVMModuleBuilder {
- public:
-  StructCompilerLLVM(Arch arch,
-                     const CompileConfig &config,
+public:
+  StructCompilerLLVM(Arch arch, const CompileConfig &config,
                      TaichiLLVMContext *tlctx,
-                     std::unique_ptr<llvm::Module> &&module,
-                     int snode_tree_id);
+                     std::unique_ptr<llvm::Module> &&module, int snode_tree_id);
 
-  StructCompilerLLVM(Arch arch,
-                     LlvmProgramImpl *prog,
-                     std::unique_ptr<llvm::Module> &&module,
-                     int snode_tree_id);
+  StructCompilerLLVM(Arch arch, LlvmProgramImpl *prog,
+                     std::unique_ptr<llvm::Module> &&module, int snode_tree_id);
 
   void generate_types(SNode &snode) override;
 
@@ -44,7 +40,7 @@ class StructCompilerLLVM : public StructCompiler, public LLVMModuleBuilder {
 
   static llvm::Type *get_llvm_element_type(llvm::Module *module, SNode *snode);
 
- private:
+private:
   Arch arch_;
   const CompileConfig &config_;
   TaichiLLVMContext *const tlctx_;
@@ -52,4 +48,4 @@ class StructCompilerLLVM : public StructCompiler, public LLVMModuleBuilder {
   int snode_tree_id_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

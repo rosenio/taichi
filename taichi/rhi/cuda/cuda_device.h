@@ -1,26 +1,24 @@
 #pragma once
-#include <vector>
 #include <set>
+#include <vector>
 
 #include "taichi/common/core.h"
+#include "taichi/rhi/cuda/cuda_context.h"
 #include "taichi/rhi/cuda/cuda_driver.h"
 #include "taichi/rhi/llvm/allocator.h"
-#include "taichi/rhi/cuda/cuda_context.h"
 #include "taichi/rhi/llvm/llvm_device.h"
 
 namespace taichi::lang {
 namespace cuda {
 
 class CudaPipeline : public Pipeline {
- public:
-  ~CudaPipeline() override {
-  }
+public:
+  ~CudaPipeline() override {}
 };
 
 class CudaCommandList : public CommandList {
- public:
-  ~CudaCommandList() override {
-  }
+public:
+  ~CudaCommandList() override {}
 
   void bind_pipeline(Pipeline *p) noexcept override { TI_NOT_IMPLEMENTED };
   RhiResult bind_shader_resources(ShaderResourceSet *res,
@@ -37,33 +35,30 @@ class CudaCommandList : public CommandList {
     TI_NOT_IMPLEMENTED
   };
   void memory_barrier() noexcept override { TI_NOT_IMPLEMENTED };
-  void buffer_copy(DevicePtr dst,
-                   DevicePtr src,
+  void buffer_copy(DevicePtr dst, DevicePtr src,
                    size_t size) noexcept override {
     TI_NOT_IMPLEMENTED
   };
-  void buffer_fill(DevicePtr ptr,
-                   size_t size,
+  void buffer_fill(DevicePtr ptr, size_t size,
                    uint32_t data) noexcept override {
     TI_NOT_IMPLEMENTED
   };
-  RhiResult dispatch(uint32_t x,
-                     uint32_t y = 1,
+  RhiResult dispatch(uint32_t x, uint32_t y = 1,
                      uint32_t z = 1) noexcept override {
     TI_NOT_IMPLEMENTED
   };
 };
 
 class CudaStream : public Stream {
- public:
+public:
   ~CudaStream() override {};
 
   RhiResult new_command_list(CommandList **out_cmdlist) noexcept final {
     TI_NOT_IMPLEMENTED
   };
-  StreamSemaphore submit(
-      CommandList *cmdlist,
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) override {
+  StreamSemaphore
+  submit(CommandList *cmdlist,
+         const std::vector<StreamSemaphore> &wait_semaphores = {}) override {
     TI_NOT_IMPLEMENTED
   };
   StreamSemaphore submit_synced(
@@ -76,7 +71,7 @@ class CudaStream : public Stream {
 };
 
 class CudaDevice : public LlvmDevice {
- public:
+public:
   struct AllocInfo {
     void *ptr{nullptr};
     size_t size{0};
@@ -104,30 +99,24 @@ class CudaDevice : public LlvmDevice {
 
   RhiResult allocate_memory(const AllocParams &params,
                             DeviceAllocation *out_devalloc) override;
-  DeviceAllocation allocate_memory_runtime(
-      const LlvmRuntimeAllocParams &params) override;
+  DeviceAllocation
+  allocate_memory_runtime(const LlvmRuntimeAllocParams &params) override;
   void dealloc_memory(DeviceAllocation handle) override;
 
   uint64_t *allocate_llvm_runtime_memory_jit(
       const LlvmRuntimeAllocParams &params) override;
 
-  RhiResult upload_data(DevicePtr *device_ptr,
-                        const void **data,
-                        size_t *size,
+  RhiResult upload_data(DevicePtr *device_ptr, const void **data, size_t *size,
                         int num_alloc = 1) noexcept override;
 
   RhiResult readback_data(
-      DevicePtr *device_ptr,
-      void **data,
-      size_t *size,
-      int num_alloc = 1,
+      DevicePtr *device_ptr, void **data, size_t *size, int num_alloc = 1,
       const std::vector<StreamSemaphore> &wait_sema = {}) noexcept override;
 
   ShaderResourceSet *create_resource_set() final { TI_NOT_IMPLEMENTED };
 
   RhiResult create_pipeline(Pipeline **out_pipeline,
-                            const PipelineSourceDesc &src,
-                            std::string name,
+                            const PipelineSourceDesc &src, std::string name,
                             PipelineCache *cache) noexcept final {
     TI_NOT_IMPLEMENTED;
   }
@@ -156,11 +145,9 @@ class CudaDevice : public LlvmDevice {
 
   void wait_idle() override { TI_NOT_IMPLEMENTED };
 
-  void clear() override {
-    allocations_.clear();
-  }
+  void clear() override { allocations_.clear(); }
 
- private:
+private:
   std::vector<AllocInfo> allocations_;
   void validate_device_alloc(const DeviceAllocation alloc) {
     if (allocations_.size() <= alloc.alloc_id) {
@@ -169,6 +156,6 @@ class CudaDevice : public LlvmDevice {
   }
 };
 
-}  // namespace cuda
+} // namespace cuda
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

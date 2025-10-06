@@ -5,7 +5,7 @@
 namespace taichi::lang {
 
 class FullSimplifyPass : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Args {
@@ -18,4 +18,4 @@ class FullSimplifyPass : public Pass {
   };
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

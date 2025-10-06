@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <memory>
+#include <vector>
 
 namespace taichi::lang {
 
@@ -17,7 +17,7 @@ class Program;
  * Not thread safe.
  */
 class SNodeRegistry {
- public:
+public:
   /**
    * Create a new root SNode.
    *
@@ -35,8 +35,8 @@ class SNodeRegistry {
    */
   std::unique_ptr<SNode> finalize(const SNode *snode);
 
- private:
+private:
   std::vector<std::unique_ptr<SNode>> snodes_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

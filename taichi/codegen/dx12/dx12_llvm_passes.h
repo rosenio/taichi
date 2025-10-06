@@ -9,7 +9,7 @@ class Function;
 class Module;
 class Type;
 class GlobalVariable;
-}  // namespace llvm
+} // namespace llvm
 
 namespace taichi::lang {
 struct CompileConfig;
@@ -28,8 +28,8 @@ std::vector<uint8_t> global_optimize_module(llvm::Module *module,
 
 extern const char *NumWorkGroupsCBName;
 
-}  // namespace directx12
-}  // namespace taichi::lang
+} // namespace directx12
+} // namespace taichi::lang
 
 namespace llvm {
 class ModulePass;
@@ -46,7 +46,7 @@ ModulePass *createTaichiRuntimeContextLowerPass();
 void initializeTaichiIntrinsicLowerPass(PassRegistry &);
 
 /// Pass to lower taichi intrinsic into DXIL intrinsic.
-ModulePass *createTaichiIntrinsicLowerPass(
-    const taichi::lang::CompileConfig *config);
+ModulePass *
+createTaichiIntrinsicLowerPass(const taichi::lang::CompileConfig *config);
 
-}  // namespace llvm
+} // namespace llvm

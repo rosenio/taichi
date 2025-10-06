@@ -5,7 +5,7 @@
 namespace taichi::lang {
 
 class MakeBlockLocalPass : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Args {
@@ -14,4 +14,4 @@ class MakeBlockLocalPass : public Pass {
   };
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

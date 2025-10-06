@@ -15,17 +15,17 @@ class KernelLauncher : public LLVM::KernelLauncher {
     std::vector<OffloadedTask> offloaded_tasks;
   };
 
- public:
+public:
   using Base::Base;
 
   void launch_llvm_kernel(Handle handle, LaunchContextBuilder &ctx) override;
-  Handle register_llvm_kernel(
-      const LLVM::CompiledKernelData &compiled) override;
+  Handle
+  register_llvm_kernel(const LLVM::CompiledKernelData &compiled) override;
 
- private:
+private:
   bool on_cuda_device(void *ptr);
   std::vector<Context> contexts_;
 };
 
-}  // namespace cuda
-}  // namespace taichi::lang
+} // namespace cuda
+} // namespace taichi::lang

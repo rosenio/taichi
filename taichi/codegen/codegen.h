@@ -1,13 +1,13 @@
 // Driver class for kernel code generators.
 
 #pragma once
-#include <taichi/runtime/llvm/llvm_runtime_executor.h>
 #include "taichi/ir/ir.h"
 #include "taichi/program/program.h"
+#include <taichi/runtime/llvm/llvm_runtime_executor.h>
 #ifdef TI_WITH_LLVM
-#include "llvm/IR/Module.h"
 #include "taichi/codegen/llvm/codegen_llvm.h"
 #include "taichi/codegen/llvm/llvm_codegen_utils.h"
+#include "llvm/IR/Module.h"
 #endif
 namespace taichi::lang {
 class TaichiLLVMContext;
@@ -36,52 +36,43 @@ class TaichiLLVMContext;
  * module and the extra information are stored in the returned LLVMCompiledTask.
  */
 class KernelCodeGen {
- protected:
+protected:
   Program *prog;
   const Kernel *kernel;
   IRNode *ir;
 
- public:
+public:
   explicit KernelCodeGen(const CompileConfig &compile_config,
-                         const Kernel *kernel,
-                         IRNode *ir,
+                         const Kernel *kernel, IRNode *ir,
                          TaichiLLVMContext &tlctx);
 
   virtual ~KernelCodeGen() = default;
 
-  static std::unique_ptr<KernelCodeGen> create(
-      const CompileConfig &compile_config,
-      const Kernel *kernel,
-      IRNode *ir,
-      TaichiLLVMContext &tlctx);
+  static std::unique_ptr<KernelCodeGen>
+  create(const CompileConfig &compile_config, const Kernel *kernel, IRNode *ir,
+         TaichiLLVMContext &tlctx);
 
 #ifdef TI_WITH_LLVM
   virtual LLVMCompiledKernel compile_kernel_to_module();
 
-  virtual LLVMCompiledTask compile_task(
-      int task_codegen_id,
-      const CompileConfig &config,
-      std::unique_ptr<llvm::Module> &&module = nullptr,
-      IRNode *block = nullptr) {
+  virtual LLVMCompiledTask
+  compile_task(int task_codegen_id, const CompileConfig &config,
+               std::unique_ptr<llvm::Module> &&module = nullptr,
+               IRNode *block = nullptr) {
     TI_NOT_IMPLEMENTED
   }
 
- protected:
-  virtual void optimize_module(llvm::Module *module) {
-  }
+protected:
+  virtual void optimize_module(llvm::Module *module) {}
 #endif
 
-  const CompileConfig &get_compile_config() const {
-    return compile_config_;
-  }
+  const CompileConfig &get_compile_config() const { return compile_config_; }
 
-  TaichiLLVMContext &get_taichi_llvm_context() {
-    return tlctx_;
-  }
+  TaichiLLVMContext &get_taichi_llvm_context() { return tlctx_; }
 
- private:
+private:
   const CompileConfig &compile_config_;
   TaichiLLVMContext &tlctx_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

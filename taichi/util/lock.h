@@ -5,12 +5,12 @@
 #include <thread>
 
 #if defined(TI_PLATFORM_WINDOWS)
+#include <fcntl.h>
 #include <io.h>
+#else // POSIX
 #include <fcntl.h>
-#else  // POSIX
-#include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
+#include <sys/types.h>
 #include <unistd.h>
 #endif
 
@@ -39,8 +39,7 @@ inline bool unlock_with_file(const std::string &path) {
   return std::remove(path.c_str()) == 0;
 }
 
-inline bool lock_with_file(const std::string &path,
-                           int ms_delay = 50,
+inline bool lock_with_file(const std::string &path, int ms_delay = 50,
                            int try_count = 5) {
   if (try_lock_with_file(path)) {
     return true;
@@ -66,4 +65,4 @@ inline RaiiCleanup make_unlocker(const std::string &path) {
   });
 }
 
-}  // namespace taichi
+} // namespace taichi

@@ -6,7 +6,7 @@
 namespace taichi::lang {
 
 class KernelLauncher {
- public:
+public:
   using Handle = KernelLaunchHandle;
 
   virtual void launch_kernel(const CompiledKernelData &compiled_kernel_data,
@@ -15,4 +15,4 @@ class KernelLauncher {
   virtual ~KernelLauncher() = default;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

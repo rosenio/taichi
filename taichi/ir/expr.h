@@ -1,7 +1,7 @@
 #pragma once
 
-#include "taichi/util/str.h"
 #include "taichi/ir/type_utils.h"
+#include "taichi/util/str.h"
 
 namespace taichi::lang {
 
@@ -13,7 +13,7 @@ class SNode;
 class ASTBuilder;
 
 class Expr {
- public:
+public:
   std::shared_ptr<Expression> expr;
   bool const_value;
   bool atomic;
@@ -52,41 +52,28 @@ class Expr {
 
   explicit Expr(const Identifier &id);
 
-  void set(const Expr &o) {
-    expr = o.expr;
-  }
+  void set(const Expr &o) { expr = o.expr; }
 
   // NOLINTNEXTLINE(google-explicit-constructor)
-  operator bool() const {
-    return expr.get() != nullptr;
-  }
+  operator bool() const { return expr.get() != nullptr; }
 
-  Expression *operator->() {
-    return expr.get();
-  }
+  Expression *operator->() { return expr.get(); }
 
-  Expression const *operator->() const {
-    return expr.get();
-  }
+  Expression const *operator->() const { return expr.get(); }
 
-  template <typename T>
-  std::shared_ptr<T> cast() const {
+  template <typename T> std::shared_ptr<T> cast() const {
     TI_ASSERT(expr != nullptr);
     return std::dynamic_pointer_cast<T>(expr);
   }
 
-  template <typename T>
-  bool is() const {
-    return cast<T>() != nullptr;
-  }
+  template <typename T> bool is() const { return cast<T>() != nullptr; }
 
   // FIXME: We really should disable it completely,
   // but we can't. This is because the usage of
   // std::variant<Expr, std::string> in FrontendPrintStmt.
   Expr &operator=(const Expr &o);
 
-  template <typename T, typename... Args>
-  static Expr make(Args &&...args) {
+  template <typename T, typename... Args> static Expr make(Args &&...args) {
     return Expr(std::make_shared<T>(std::forward<Args>(args)...));
   }
 
@@ -113,39 +100,29 @@ class Expr {
 // Value cast
 Expr cast(const Expr &input, DataType dt);
 
-template <typename T>
-Expr cast(const Expr &input) {
+template <typename T> Expr cast(const Expr &input) {
   return taichi::lang::cast(input, get_data_type<T>());
 }
 
 Expr bit_cast(const Expr &input, DataType dt);
 
-template <typename T>
-Expr bit_cast(const Expr &input) {
+template <typename T> Expr bit_cast(const Expr &input) {
   return taichi::lang::bit_cast(input, get_data_type<T>());
 }
 
 // like Expr::Expr, but allows to explicitly specify the type
-template <typename T>
-Expr value(const T &val) {
-  return Expr(val);
-}
+template <typename T> Expr value(const T &val) { return Expr(val); }
 
 Expr expr_rand(DataType dt);
 
-template <typename T>
-Expr expr_rand() {
+template <typename T> Expr expr_rand() {
   return taichi::lang::expr_rand(get_data_type<T>());
 }
 
-Expr assume_range(const Expr &expr,
-                  const Expr &base,
-                  int low,
-                  int high,
+Expr assume_range(const Expr &expr, const Expr &base, int low, int high,
                   const DebugInfo &dbg_info = DebugInfo());
 
-Expr loop_unique(const Expr &input,
-                 const std::vector<SNode *> &covers,
+Expr loop_unique(const Expr &input, const std::vector<SNode *> &covers,
                  const DebugInfo &dbg_info = DebugInfo());
 
 Expr expr_field(Expr id_expr, DataType dt);
@@ -153,4 +130,4 @@ Expr expr_field(Expr id_expr, DataType dt);
 Expr expr_matrix_field(const std::vector<Expr> &fields,
                        const std::vector<int> &element_shape);
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

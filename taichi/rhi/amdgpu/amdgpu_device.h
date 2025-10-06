@@ -1,12 +1,12 @@
 #pragma once
-#include <vector>
 #include <set>
+#include <vector>
 
 #include "taichi/common/core.h"
-#include "taichi/rhi/amdgpu/amdgpu_driver.h"
 #include "taichi/rhi/amdgpu/amdgpu_context.h"
-#include "taichi/rhi/llvm/llvm_device.h"
+#include "taichi/rhi/amdgpu/amdgpu_driver.h"
 #include "taichi/rhi/llvm/allocator.h"
+#include "taichi/rhi/llvm/llvm_device.h"
 
 namespace taichi {
 namespace lang {
@@ -14,9 +14,8 @@ namespace lang {
 namespace amdgpu {
 
 class AmdgpuCommandList : public CommandList {
- public:
-  ~AmdgpuCommandList() override {
-  }
+public:
+  ~AmdgpuCommandList() override {}
 
   void bind_pipeline(Pipeline *p) noexcept final { TI_NOT_IMPLEMENTED };
   RhiResult bind_shader_resources(ShaderResourceSet *res,
@@ -39,23 +38,22 @@ class AmdgpuCommandList : public CommandList {
   void buffer_fill(DevicePtr ptr, size_t size, uint32_t data) noexcept final {
     TI_NOT_IMPLEMENTED
   };
-  RhiResult dispatch(uint32_t x,
-                     uint32_t y = 1,
+  RhiResult dispatch(uint32_t x, uint32_t y = 1,
                      uint32_t z = 1) noexcept override {
     TI_NOT_IMPLEMENTED
   };
 };
 
 class AmdgpuStream : public Stream {
- public:
+public:
   ~AmdgpuStream() override {};
 
   RhiResult new_command_list(CommandList **out_cmdlist) noexcept final {
     TI_NOT_IMPLEMENTED
   };
-  StreamSemaphore submit(
-      CommandList *cmdlist,
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) override {
+  StreamSemaphore
+  submit(CommandList *cmdlist,
+         const std::vector<StreamSemaphore> &wait_semaphores = {}) override {
     TI_NOT_IMPLEMENTED
   };
   StreamSemaphore submit_synced(
@@ -68,7 +66,7 @@ class AmdgpuStream : public Stream {
 };
 
 class AmdgpuDevice : public LlvmDevice {
- public:
+public:
   struct AllocInfo {
     void *ptr{nullptr};
     size_t size{0};
@@ -85,8 +83,8 @@ class AmdgpuDevice : public LlvmDevice {
 
   RhiResult allocate_memory(const AllocParams &params,
                             DeviceAllocation *out_devalloc) override;
-  DeviceAllocation allocate_memory_runtime(
-      const LlvmRuntimeAllocParams &params) override;
+  DeviceAllocation
+  allocate_memory_runtime(const LlvmRuntimeAllocParams &params) override;
   void dealloc_memory(DeviceAllocation handle) override;
 
   uint64_t *allocate_llvm_runtime_memory_jit(
@@ -95,8 +93,7 @@ class AmdgpuDevice : public LlvmDevice {
   ShaderResourceSet *create_resource_set() final { TI_NOT_IMPLEMENTED };
 
   RhiResult create_pipeline(Pipeline **out_pipeline,
-                            const PipelineSourceDesc &src,
-                            std::string name,
+                            const PipelineSourceDesc &src, std::string name,
                             PipelineCache *cache) noexcept final {
     TI_NOT_IMPLEMENTED;
   }
@@ -125,11 +122,9 @@ class AmdgpuDevice : public LlvmDevice {
 
   void wait_idle() override { TI_NOT_IMPLEMENTED };
 
-  void clear() override {
-    allocations_.clear();
-  }
+  void clear() override { allocations_.clear(); }
 
- private:
+private:
   std::vector<AllocInfo> allocations_;
   void validate_device_alloc(const DeviceAllocation alloc) {
     if (allocations_.size() <= alloc.alloc_id) {
@@ -138,8 +133,8 @@ class AmdgpuDevice : public LlvmDevice {
   }
 };
 
-}  // namespace amdgpu
+} // namespace amdgpu
 
-}  // namespace lang
+} // namespace lang
 
-}  // namespace taichi
+} // namespace taichi

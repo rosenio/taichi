@@ -5,10 +5,10 @@
 namespace taichi::lang {
 
 class InliningPass : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Args {};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

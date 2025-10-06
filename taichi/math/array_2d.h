@@ -5,23 +5,22 @@
 
 #pragma once
 
-#include <cstring>
 #include <cstdio>
+#include <cstring>
+#include <iterator>
 #include <string>
 #include <vector>
-#include <iterator>
 
 #include "array_fwd.h"
 #include "linalg.h"
 
 namespace taichi {
 
-template <>
-class IndexND<2> {
- private:
+template <> class IndexND<2> {
+private:
   int x_[2], y_[2];
 
- public:
+public:
   using Index = IndexND<2>;
 
   int i, j;
@@ -29,13 +28,9 @@ class IndexND<2> {
   int stride;
   Vector2 storage_offset;
 
-  IndexND() {
-  }
+  IndexND() {}
 
-  IndexND(int x0,
-          int x1,
-          int y0,
-          int y1,
+  IndexND(int x0, int x1, int y0, int y1,
           Vector2 storage_offset = Vector2(0.5f, 0.5f)) {
     x_[0] = x0;
     x_[1] = x1;
@@ -48,8 +43,7 @@ class IndexND<2> {
     this->storage_offset = storage_offset;
   }
 
-  IndexND(Vector2i start,
-          Vector2i end,
+  IndexND(Vector2i start, Vector2i end,
           Vector2 storage_offset = Vector2(0.5f, 0.5f)) {
     x_[0] = start[0];
     x_[1] = end[0];
@@ -83,13 +77,9 @@ class IndexND<2> {
     return *this;
   }
 
-  bool operator==(const IndexND<2> &o) const {
-    return (i == o.i && j == o.j);
-  }
+  bool operator==(const IndexND<2> &o) const { return (i == o.i && j == o.j); }
 
-  bool operator!=(const IndexND<2> &o) const {
-    return !(i == o.i && j == o.j);
-  }
+  bool operator!=(const IndexND<2> &o) const { return !(i == o.i && j == o.j); }
 
   Index &to_end() {
     i = x_[1];
@@ -98,21 +88,13 @@ class IndexND<2> {
     return *this;
   }
 
-  const Index &operator*() const {
-    return *this;
-  }
+  const Index &operator*() const { return *this; }
 
-  Index &operator*() {
-    return *this;
-  }
+  Index &operator*() { return *this; }
 
-  int operator[](int c) {
-    return *(&i + c);
-  }
+  int operator[](int c) { return *(&i + c); }
 
-  int operator[](int c) const {
-    return *(&i + c);
-  }
+  int operator[](int c) const { return *(&i + c); }
 
   Index neighbour(int di, int dj) const {
     Index i = *this;
@@ -128,39 +110,30 @@ class IndexND<2> {
     return i;
   }
 
-  Index operator+(Vector2i d) const {
-    return neighbour(d);
-  }
+  Index operator+(Vector2i d) const { return neighbour(d); }
 
   Vector2 get_pos() const {
     return Vector2((real)i + storage_offset.x, (real)j + storage_offset.y);
   }
 
-  Vector2i get_ipos() const {
-    return Vector2i(i, j);
-  }
+  Vector2i get_ipos() const { return Vector2i(i, j); }
 };
 
 typedef IndexND<2> Index2D;
 
-template <>
-class RegionND<2> {
- private:
+template <> class RegionND<2> {
+private:
   int x_[2], y_[2];
   Index2D index_begin_;
   Index2D index_end_;
   Vector2 storage_offset_;
 
- public:
+public:
   using Region = RegionND<2>;
 
-  RegionND() {
-  }
+  RegionND() {}
 
-  RegionND(int x0,
-           int x1,
-           int y0,
-           int y1,
+  RegionND(int x0, int x1, int y0, int y1,
            Vector2 storage_offset = Vector2(0.5f, 0.5f)) {
     x_[0] = x0;
     x_[1] = x1;
@@ -171,8 +144,7 @@ class RegionND<2> {
     this->storage_offset_ = storage_offset;
   }
 
-  RegionND(Vector2i start,
-           Vector2i end,
+  RegionND(Vector2i start, Vector2i end,
            Vector2 storage_offset = Vector2(0.5f, 0.5f)) {
     x_[0] = start[0];
     x_[1] = end[0];
@@ -183,57 +155,41 @@ class RegionND<2> {
     this->storage_offset_ = storage_offset;
   }
 
-  const Index2D begin() const {
-    return index_begin_;
-  }
+  const Index2D begin() const { return index_begin_; }
 
-  Index2D begin() {
-    return index_begin_;
-  }
+  Index2D begin() { return index_begin_; }
 
-  const Index2D end() const {
-    return index_end_;
-  }
+  const Index2D end() const { return index_end_; }
 
-  Index2D end() {
-    return index_end_;
-  }
+  Index2D end() { return index_end_; }
 };
 
 typedef RegionND<2> Region2D;
 
-template <typename T>
-class ArrayND<2, T> {
- protected:
+template <typename T> class ArrayND<2, T> {
+protected:
   Region2D region;
   typedef typename std::vector<T>::iterator iterator;
   int size;
   Vector2i res;
-  Vector2 storage_offset = Vector2(0.5f, 0.5f);  // default : center storage
- public:
+  Vector2 storage_offset = Vector2(0.5f, 0.5f); // default : center storage
+public:
   std::vector<T> data;
-  template <typename S>
-  using Array2D = ArrayND<2, S>;
+  template <typename S> using Array2D = ArrayND<2, S>;
 
   template <typename P>
   friend Array2D<T> operator*(const P &b, const Array2D<T> &a);
 
-  int get_size() const {
-    return size;
-  }
+  int get_size() const { return size; }
 
-  const Region2D &get_region() const {
-    return region;
-  }
+  const Region2D &get_region() const { return region; }
 
-  explicit ArrayND(const Vector2i &res,
-                   T init = T(0),
+  explicit ArrayND(const Vector2i &res, T init = T(0),
                    Vector2 storage_offset = Vector2(0.5f)) {
     initialize(res, init, storage_offset);
   }
 
-  void initialize(const Vector2i &res,
-                  T init = T(0),
+  void initialize(const Vector2i &res, T init = T(0),
                   Vector2 storage_offset = Vector2(0.5f)) {
     this->res = res;
     region = Region2D(0, res[0], 0, res[1], storage_offset);
@@ -246,17 +202,14 @@ class ArrayND<2, T> {
     return ArrayND<2, T>(res, init, storage_offset);
   }
 
-  Array2D<T> same_shape() const {
-    return ArrayND<2, T>(res);
-  }
+  Array2D<T> same_shape() const { return ArrayND<2, T>(res); }
 
   ArrayND(const Array2D<T> &arr) : ArrayND(arr.res) {
     this->data = arr.data;
     this->storage_offset = arr.storage_offset;
   }
 
-  template <typename P>
-  Array2D<T> operator*(const P &b) const {
+  template <typename P> Array2D<T> operator*(const P &b) const {
     Array2D<T> o(res);
     for (int i = 0; i < size; i++) {
       o.data[i] = b * data[i];
@@ -264,8 +217,7 @@ class ArrayND<2, T> {
     return o;
   }
 
-  template <typename P>
-  Array2D<T> operator/(const P &b) const {
+  template <typename P> Array2D<T> operator/(const P &b) const {
     b = T(1) / b;
     return b * (*this);
   }
@@ -324,8 +276,7 @@ class ArrayND<2, T> {
     data.resize(0);
   }
 
-  ~ArrayND() {
-  }
+  ~ArrayND() {}
 
   void reset(T a) {
     for (int i = 0; i < size; i++) {
@@ -333,13 +284,9 @@ class ArrayND<2, T> {
     }
   }
 
-  void reset_zero() {
-    memset(&data[0], 0, sizeof(T) * data.size());
-  }
+  void reset_zero() { memset(&data[0], 0, sizeof(T) * data.size()); }
 
-  bool same_dim(const Array2D<T> &arr) const {
-    return res == arr.res;
-  }
+  bool same_dim(const Array2D<T> &arr) const { return res == arr.res; }
 
   T dot(const Array2D<T> &b) const {
     T sum = 0;
@@ -374,33 +321,19 @@ class ArrayND<2, T> {
     }
   }
 
-  T *operator[](int i) {
-    return &data[0] + i * res[1];
-  }
+  T *operator[](int i) { return &data[0] + i * res[1]; }
 
-  const T *operator[](int i) const {
-    return &data[0] + i * res[1];
-  }
+  const T *operator[](int i) const { return &data[0] + i * res[1]; }
 
-  const T &get(int i, int j) const {
-    return (*this)[i][j];
-  }
+  const T &get(int i, int j) const { return (*this)[i][j]; }
 
-  const T &get(const Index2D &ind) const {
-    return get(ind.i, ind.j);
-  }
+  const T &get(const Index2D &ind) const { return get(ind.i, ind.j); }
 
-  T get_copy(int i, int j) const {
-    return (*this)[i][j];
-  }
+  T get_copy(int i, int j) const { return (*this)[i][j]; }
 
-  void set(int i, int j, const T &t) {
-    (*this)[i][j] = t;
-  }
+  void set(int i, int j, const T &t) { (*this)[i][j] = t; }
 
-  void set(const Index2D &ind, const T &t) {
-    (*this)[ind] = t;
-  }
+  void set(const Index2D &ind, const T &t) { (*this)[ind] = t; }
 
   T abs_sum() const {
     T ret = 0;
@@ -499,9 +432,7 @@ class ArrayND<2, T> {
     printf("\n");
   }
 
-  size_t get_data_size() const {
-    return size * sizeof(T);
-  }
+  size_t get_data_size() const { return size * sizeof(T); }
 
   void set_pattern(int s) {
     for (int i = 0; i < size; i++) {
@@ -513,13 +444,9 @@ class ArrayND<2, T> {
     return 0 <= i && i < res[0] && 0 <= j && j < res[1];
   }
 
-  bool inside(const Vector2i &pos) const {
-    return inside(pos[0], pos[1]);
-  }
+  bool inside(const Vector2i &pos) const { return inside(pos[0], pos[1]); }
 
-  bool inside(const Index2D &index) const {
-    return inside(index.i, index.j);
-  }
+  bool inside(const Index2D &index) const { return inside(index.i, index.j); }
 
   T sample(real x, real y) const {
     x = clamp(x - storage_offset.x, 0.0_f, res[0] - 1.0_f - eps);
@@ -532,17 +459,11 @@ class ArrayND<2, T> {
                 lerp(y_r, get(x_i + 1, y_i), get(x_i + 1, y_i + 1)));
   }
 
-  T sample(const Vector2 &v) const {
-    return sample(v.x, v.y);
-  }
+  T sample(const Vector2 &v) const { return sample(v.x, v.y); }
 
-  T sample(const Index2D &v) const {
-    return sample(v.get_pos());
-  }
+  T sample(const Index2D &v) const { return sample(v.get_pos()); }
 
-  Vector2 get_storage_offset() const {
-    return storage_offset;
-  }
+  Vector2 get_storage_offset() const { return storage_offset; }
 
   T sample_relative_coord(real x, real y) const {
     x = x * res[0];
@@ -556,53 +477,33 @@ class ArrayND<2, T> {
     return sample(x, y);
   }
 
-  auto begin() const {
-    return data.cbegin();
-  }
+  auto begin() const { return data.cbegin(); }
 
-  auto end() const {
-    return data.cend();
-  }
+  auto end() const { return data.cend(); }
 
-  auto begin() {
-    return data.begin();
-  }
+  auto begin() { return data.begin(); }
 
-  auto end() {
-    return data.end();
-  }
+  auto end() { return data.end(); }
 
-  T &operator[](const Vector2i &pos) {
-    return (*this)[pos.x][pos.y];
-  }
+  T &operator[](const Vector2i &pos) { return (*this)[pos.x][pos.y]; }
 
   const T &operator[](const Vector2i &pos) const {
     return (*this)[pos.x][pos.y];
   }
 
-  T &operator[](const Index2D &index) {
-    return (*this)[index.i][index.j];
-  }
+  T &operator[](const Index2D &index) { return (*this)[index.i][index.j]; }
 
   const T &operator[](const Index2D &index) const {
     return (*this)[index.i][index.j];
   }
 
-  Vector2i get_res() const {
-    return res;
-  }
+  Vector2i get_res() const { return res; }
 
-  int get_width() const {
-    return res[0];
-  }
+  int get_width() const { return res[0]; }
 
-  int get_height() const {
-    return res[1];
-  }
+  int get_height() const { return res[1]; }
 
-  bool empty() const {
-    return !(res[0] > 0 && res[1] > 0);
-  }
+  bool empty() const { return !(res[0] > 0 && res[1] > 0); }
 
   T get_average() const {
     T sum(0);
@@ -663,13 +564,9 @@ class ArrayND<2, T> {
     return out;
   }
 
-  const std::vector<T> &get_data() const {
-    return this->data;
-  }
+  const std::vector<T> &get_data() const { return this->data; }
 
-  static constexpr int get_dim() {
-    return 2;
-  }
+  static constexpr int get_dim() { return 2; }
 
   void flip(int axis) {
     if (axis == 0) {
@@ -730,9 +627,7 @@ class ArrayND<2, T> {
     return true;
   }
 
-  explicit ArrayND(const std::string &filename) {
-    load_image(filename);
-  }
+  explicit ArrayND(const std::string &filename) { load_image(filename); }
 
   void load_image(const std::string &filename, bool linearize = true);
 
@@ -769,16 +664,11 @@ class ArrayND<2, T> {
 
   void write_as_image(const std::string &filename);
 
-  void write_text(const std::string &font_fn,
-                  const std::string &content,
-                  real size,
-                  int dx,
-                  int dy,
-                  T color = T(1.0_f));
+  void write_text(const std::string &font_fn, const std::string &content,
+                  real size, int dx, int dy, T color = T(1.0_f));
 };
 
-template <typename T>
-using Array2D = ArrayND<2, T>;
+template <typename T> using Array2D = ArrayND<2, T>;
 
 template <typename T, typename P>
 inline Array2D<T> operator*(const P &b, const Array2D<T> &a) {
@@ -789,9 +679,8 @@ inline Array2D<T> operator*(const P &b, const Array2D<T> &a) {
   return o;
 }
 
-template <typename T>
-inline void print(const Array2D<T> &arr) {
+template <typename T> inline void print(const Array2D<T> &arr) {
   arr.print("");
 }
 
-}  // namespace taichi
+} // namespace taichi

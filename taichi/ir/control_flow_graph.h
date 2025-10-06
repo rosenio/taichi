@@ -17,7 +17,7 @@ class Function;
  * from this node to any node in |next|.
  */
 class CFGNode {
- public:
+public:
   // Used for TensorType'd aliasing analysis.
   // Marks whether a TensorType'd address is modified partially or
   // fully in this node
@@ -27,11 +27,11 @@ class CFGNode {
     NONE = 2,
   };
 
- private:
+private:
   // For accelerating get_store_forwarding_data()
   std::unordered_set<Block *> parent_blocks_;
 
- public:
+public:
   // This node corresponds to block->statements[i]
   // for i in [begin_location, end_location).
   Block *block;
@@ -54,11 +54,8 @@ class CFGNode {
   // https://en.wikipedia.org/wiki/Live_variable_analysis
   std::unordered_set<Stmt *> live_gen, live_kill, live_in, live_out;
 
-  CFGNode(Block *block,
-          int begin_location,
-          int end_location,
-          bool is_parallel_executed,
-          CFGNode *prev_node_in_same_block);
+  CFGNode(Block *block, int begin_location, int end_location,
+          bool is_parallel_executed, CFGNode *prev_node_in_same_block);
 
   // An empty node
   CFGNode();
@@ -72,21 +69,19 @@ class CFGNode {
   // Methods for modifying the underlying CHI IR.
   void erase(int location);
   void insert(std::unique_ptr<Stmt> &&new_stmt, int location);
-  void replace_with(int location,
-                    std::unique_ptr<Stmt> &&new_stmt,
+  void replace_with(int location, std::unique_ptr<Stmt> &&new_stmt,
                     bool replace_usages = true) const;
 
   // Utility methods.
   static bool contain_variable(const std::unordered_set<Stmt *> &var_set,
                                Stmt *var);
-  static bool contain_variable(
-      const std::unordered_map<Stmt *, UseDefineStatus> &var_set,
-      Stmt *var);
+  static bool
+  contain_variable(const std::unordered_map<Stmt *, UseDefineStatus> &var_set,
+                   Stmt *var);
   static bool may_contain_variable(const std::unordered_set<Stmt *> &var_set,
                                    Stmt *var);
   static bool may_contain_variable(
-      const std::unordered_map<Stmt *, UseDefineStatus> &var_set,
-      Stmt *var);
+      const std::unordered_map<Stmt *, UseDefineStatus> &var_set, Stmt *var);
   bool reach_kill_variable(Stmt *var) const;
   Stmt *get_store_forwarding_data(Stmt *var, int position) const;
 
@@ -99,11 +94,11 @@ class CFGNode {
 };
 
 class ControlFlowGraph {
- private:
+private:
   // Erase an empty node.
   void erase(int node_id);
 
- public:
+public:
   struct LiveVarAnalysisConfig {
     // This is mostly useful for SFG task-level dead store elimination. SFG may
     // detect certain cases where writes to one or more SNodes in a task are
@@ -116,8 +111,7 @@ class ControlFlowGraph {
 
   std::unordered_map<Function *, std::unordered_set<Stmt *>> func_store_dests;
 
-  template <typename... Args>
-  CFGNode *push_back(Args &&...args) {
+  template <typename... Args> CFGNode *push_back(Args &&...args) {
     nodes.emplace_back(std::make_unique<CFGNode>(std::forward<Args>(args)...));
     return nodes.back().get();
   }
@@ -186,4 +180,4 @@ class ControlFlowGraph {
   void determine_ad_stack_size(int default_ad_stack_size);
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

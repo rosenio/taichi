@@ -1,14 +1,14 @@
 #pragma once
 
-#include "taichi/codegen/kernel_compiler.h"
 #include "taichi/codegen/compiled_kernel_data.h"
+#include "taichi/codegen/kernel_compiler.h"
 #include "taichi/runtime/llvm/llvm_context.h"
 
 namespace taichi::lang {
 namespace LLVM {
 
 class KernelCompiler : public lang::KernelCompiler {
- public:
+public:
   struct Config {
     TaichiLLVMContext *tlctx{nullptr};
   };
@@ -20,12 +20,11 @@ class KernelCompiler : public lang::KernelCompiler {
 
   CKDPtr compile(const CompileConfig &compile_config,
                  const DeviceCapabilityConfig &device_caps,
-                 const Kernel &kernel_def,
-                 IRNode &chi_ir) const override;
+                 const Kernel &kernel_def, IRNode &chi_ir) const override;
 
- private:
+private:
   Config config_;
 };
 
-}  // namespace LLVM
-}  // namespace taichi::lang
+} // namespace LLVM
+} // namespace taichi::lang

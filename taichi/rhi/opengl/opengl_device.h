@@ -2,8 +2,8 @@
 
 #include "taichi/rhi/device.h"
 
-#include "glad/gl.h"
 #include "GLFW/glfw3.h"
+#include "glad/gl.h"
 
 namespace taichi::lang {
 namespace opengl {
@@ -12,23 +12,23 @@ class GLDevice;
 
 std::string get_opengl_error_string(GLenum err);
 
-#define check_opengl_error(msg)                                      \
-  {                                                                  \
-    auto err = glGetError();                                         \
-    if (err != GL_NO_ERROR) {                                        \
-      auto estr = get_opengl_error_string(err);                      \
-      char msgbuf[1024];                                             \
-      snprintf(msgbuf, sizeof(msgbuf), "%s: %s", msg, estr.c_str()); \
-      RHI_LOG_ERROR(msgbuf);                                         \
-      assert(false);                                                 \
-    }                                                                \
+#define check_opengl_error(msg)                                                \
+  {                                                                            \
+    auto err = glGetError();                                                   \
+    if (err != GL_NO_ERROR) {                                                  \
+      auto estr = get_opengl_error_string(err);                                \
+      char msgbuf[1024];                                                       \
+      snprintf(msgbuf, sizeof(msgbuf), "%s: %s", msg, estr.c_str());           \
+      RHI_LOG_ERROR(msgbuf);                                                   \
+      assert(false);                                                           \
+    }                                                                          \
   }
 
 extern std::optional<void *> kGetOpenglProcAddr;
 extern std::optional<void *> imported_process_address;
 
 class GLResourceSet : public ShaderResourceSet {
- public:
+public:
   GLResourceSet() = default;
   GLResourceSet(const GLResourceSet &other) = default;
 
@@ -40,11 +40,9 @@ class GLResourceSet : public ShaderResourceSet {
   GLResourceSet &buffer(uint32_t binding, DevicePtr ptr, size_t size) final;
   GLResourceSet &buffer(uint32_t binding, DeviceAllocation alloc) final;
 
-  GLResourceSet &image(uint32_t binding,
-                       DeviceAllocation alloc,
+  GLResourceSet &image(uint32_t binding, DeviceAllocation alloc,
                        ImageSamplerConfig sampler_config) final;
-  GLResourceSet &rw_image(uint32_t binding,
-                          DeviceAllocation alloc,
+  GLResourceSet &rw_image(uint32_t binding, DeviceAllocation alloc,
                           int lod) final;
 
   struct BufferBinding {
@@ -69,7 +67,7 @@ class GLResourceSet : public ShaderResourceSet {
     return rw_image_binding_map_;
   }
 
- private:
+private:
   std::unordered_map<uint32_t, BufferBinding> ssbo_binding_map_;
   std::unordered_map<uint32_t, BufferBinding> ubo_binding_map_;
   std::unordered_map<uint32_t, GLuint> texture_binding_map_;
@@ -77,22 +75,19 @@ class GLResourceSet : public ShaderResourceSet {
 };
 
 class GLPipeline : public Pipeline {
- public:
+public:
   GLPipeline(const PipelineSourceDesc &desc, const std::string &name);
   ~GLPipeline() override;
 
-  GLuint get_program() {
-    return program_id_;
-  }
+  GLuint get_program() { return program_id_; }
 
- private:
+private:
   GLuint program_id_;
 };
 
 class GLCommandList : public CommandList {
- public:
-  explicit GLCommandList(GLDevice *device) : device_(device) {
-  }
+public:
+  explicit GLCommandList(GLDevice *device) : device_(device) {}
   ~GLCommandList() override;
 
   void bind_pipeline(Pipeline *p) noexcept final;
@@ -107,43 +102,33 @@ class GLCommandList : public CommandList {
   RhiResult dispatch(uint32_t x, uint32_t y = 1, uint32_t z = 1) noexcept final;
 
   // These are not implemented in compute only device
-  void begin_renderpass(int x0,
-                        int y0,
-                        int x1,
-                        int y1,
+  void begin_renderpass(int x0, int y0, int x1, int y1,
                         uint32_t num_color_attachments,
-                        DeviceAllocation *color_attachments,
-                        bool *color_clear,
+                        DeviceAllocation *color_attachments, bool *color_clear,
                         std::vector<float> *clear_colors,
                         DeviceAllocation *depth_attachment,
                         bool depth_clear) override;
   void end_renderpass() override;
   void draw(uint32_t num_verticies, uint32_t start_vertex = 0) override;
   void set_line_width(float width) override;
-  void draw_indexed(uint32_t num_indicies,
-                    uint32_t start_vertex = 0,
+  void draw_indexed(uint32_t num_indicies, uint32_t start_vertex = 0,
                     uint32_t start_index = 0) override;
-  void image_transition(DeviceAllocation img,
-                        ImageLayout old_layout,
+  void image_transition(DeviceAllocation img, ImageLayout old_layout,
                         ImageLayout new_layout) override;
-  void buffer_to_image(DeviceAllocation dst_img,
-                       DevicePtr src_buf,
+  void buffer_to_image(DeviceAllocation dst_img, DevicePtr src_buf,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
-  void image_to_buffer(DevicePtr dst_buf,
-                       DeviceAllocation src_img,
+  void image_to_buffer(DevicePtr dst_buf, DeviceAllocation src_img,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
 
   // GL only stuff
   void run_commands();
 
- private:
+private:
   struct Cmd {
-    virtual void execute() {
-    }
-    virtual ~Cmd() {
-    }
+    virtual void execute() {}
+    virtual ~Cmd() {}
   };
 
   struct CmdBindPipeline : public Cmd {
@@ -224,22 +209,21 @@ class GLCommandList : public CommandList {
 };
 
 class GLStream : public Stream {
- public:
-  explicit GLStream(GLDevice *device) : device_(device) {
-  }
+public:
+  explicit GLStream(GLDevice *device) : device_(device) {}
   ~GLStream() override;
 
   RhiResult new_command_list(CommandList **out_cmdlist) noexcept final;
-  StreamSemaphore submit(
-      CommandList *cmdlist,
-      const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
+  StreamSemaphore
+  submit(CommandList *cmdlist,
+         const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
   StreamSemaphore submit_synced(
       CommandList *cmdlist,
       const std::vector<StreamSemaphore> &wait_semaphores = {}) override;
 
   void command_sync() override;
 
- private:
+private:
   GLDevice *device_{nullptr};
 };
 
@@ -254,13 +238,11 @@ struct GLImageAllocation {
 };
 
 class GLDevice : public GraphicsDevice {
- public:
+public:
   GLDevice();
   ~GLDevice() override;
 
-  Arch arch() const override {
-    return Arch::opengl;
-  }
+  Arch arch() const override { return Arch::opengl; }
 
   RhiResult allocate_memory(const AllocParams &params,
                             DeviceAllocation *out_devalloc) override;
@@ -268,30 +250,20 @@ class GLDevice : public GraphicsDevice {
 
   GLint get_devalloc_size(DeviceAllocation handle);
 
-  RhiResult upload_data(DevicePtr *device_ptr,
-                        const void **data,
-                        size_t *size,
+  RhiResult upload_data(DevicePtr *device_ptr, const void **data, size_t *size,
                         int num_alloc = 1) noexcept final;
 
   RhiResult readback_data(
-      DevicePtr *device_ptr,
-      void **data,
-      size_t *size,
-      int num_alloc = 1,
+      DevicePtr *device_ptr, void **data, size_t *size, int num_alloc = 1,
       const std::vector<StreamSemaphore> &wait_sema = {}) noexcept final;
 
   RhiResult create_pipeline(Pipeline **out_pipeline,
-                            const PipelineSourceDesc &src,
-                            std::string name,
+                            const PipelineSourceDesc &src, std::string name,
                             PipelineCache *cache) noexcept final;
 
-  ShaderResourceSet *create_resource_set() final {
-    return new GLResourceSet;
-  }
+  ShaderResourceSet *create_resource_set() final { return new GLResourceSet; }
 
-  RasterResources *create_raster_resources() final {
-    TI_NOT_IMPLEMENTED;
-  }
+  RasterResources *create_raster_resources() final { TI_NOT_IMPLEMENTED; }
 
   // Mapping can fail and will return nullptr
   RhiResult map_range(DevicePtr ptr, uint64_t size, void **mapped_ptr) final;
@@ -306,12 +278,12 @@ class GLDevice : public GraphicsDevice {
   // Each thraed will acquire its own stream
   Stream *get_compute_stream() override;
 
-  std::unique_ptr<Pipeline> create_raster_pipeline(
-      const std::vector<PipelineSourceDesc> &src,
-      const RasterParams &raster_params,
-      const std::vector<VertexInputBinding> &vertex_inputs,
-      const std::vector<VertexInputAttribute> &vertex_attrs,
-      std::string name = "Pipeline") override;
+  std::unique_ptr<Pipeline>
+  create_raster_pipeline(const std::vector<PipelineSourceDesc> &src,
+                         const RasterParams &raster_params,
+                         const std::vector<VertexInputBinding> &vertex_inputs,
+                         const std::vector<VertexInputAttribute> &vertex_attrs,
+                         std::string name = "Pipeline") override;
 
   Stream *get_graphics_stream() override;
 
@@ -323,15 +295,12 @@ class GLDevice : public GraphicsDevice {
 
   DeviceAllocation import_image(GLuint texture, GLImageAllocation &&gl_image);
 
-  void image_transition(DeviceAllocation img,
-                        ImageLayout old_layout,
+  void image_transition(DeviceAllocation img, ImageLayout old_layout,
                         ImageLayout new_layout) override;
-  void buffer_to_image(DeviceAllocation dst_img,
-                       DevicePtr src_buf,
+  void buffer_to_image(DeviceAllocation dst_img, DevicePtr src_buf,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
-  void image_to_buffer(DevicePtr dst_buf,
-                       DeviceAllocation src_img,
+  void image_to_buffer(DevicePtr dst_buf, DeviceAllocation src_img,
                        ImageLayout img_layout,
                        const BufferImageCopyParams &params) override;
 
@@ -339,14 +308,14 @@ class GLDevice : public GraphicsDevice {
     return image_allocs_.at(image);
   }
 
- private:
+private:
   GLStream stream_;
   std::unordered_map<GLuint, GLbitfield> buffer_to_access_;
   std::unordered_map<GLuint, GLImageAllocation> image_allocs_;
 };
 
 class GLSurface : public Surface {
- public:
+public:
   ~GLSurface() override;
 
   StreamSemaphore acquire_next_image() override;
@@ -358,5 +327,5 @@ class GLSurface : public Surface {
   void resize(uint32_t width, uint32_t height) override;
 };
 
-}  // namespace opengl
-}  // namespace taichi::lang
+} // namespace opengl
+} // namespace taichi::lang

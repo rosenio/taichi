@@ -5,7 +5,7 @@
 namespace taichi::lang {
 
 class LowerAccessPass : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Args {
@@ -14,4 +14,4 @@ class LowerAccessPass : public Pass {
   };
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

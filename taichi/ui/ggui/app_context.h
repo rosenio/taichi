@@ -1,9 +1,9 @@
 #pragma once
-#include "taichi/ui/common/app_config.h"
-#include <memory>
+#include "taichi/rhi/vulkan/vulkan_device.h"
 #include "taichi/rhi/vulkan/vulkan_device_creator.h"
 #include "taichi/rhi/vulkan/vulkan_loader.h"
-#include "taichi/rhi/vulkan/vulkan_device.h"
+#include "taichi/ui/common/app_config.h"
+#include <memory>
 #ifdef TI_WITH_METAL
 #include "taichi/rhi/metal/metal_device.h"
 #endif
@@ -14,7 +14,7 @@
 
 namespace taichi::lang {
 class Program;
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace taichi::ui {
 
@@ -27,12 +27,10 @@ using TaichiWindow = GLFWwindow;
 namespace vulkan {
 
 class TI_DLL_EXPORT AppContext {
- public:
-  void init_with_vulkan(lang::Program *prog,
-                        TaichiWindow *window,
+public:
+  void init_with_vulkan(lang::Program *prog, TaichiWindow *window,
                         const AppConfig &config);
-  void init_with_metal(lang::Program *prog,
-                       TaichiWindow *window,
+  void init_with_metal(lang::Program *prog, TaichiWindow *window,
                        const AppConfig &config);
   ~AppContext();
 
@@ -60,8 +58,8 @@ class TI_DLL_EXPORT AppContext {
   // options.
   // - This function will cache the pipeline for future use.
   // - This function will use the default GGUI vertex input format
-  taichi::lang::Pipeline *get_raster_pipeline(
-      const RasterPipelineConfig &config);
+  taichi::lang::Pipeline *
+  get_raster_pipeline(const RasterPipelineConfig &config);
 
   // Get a raster pipeline with the given fragment shader and vertex shader &
   // options.
@@ -76,11 +74,9 @@ class TI_DLL_EXPORT AppContext {
   // - This function will cache the pipeline for future use
   taichi::lang::Pipeline *get_compute_pipeline(const std::string &shader_path);
 
-  VkSurfaceKHR get_native_surface() const {
-    return native_surface_;
-  }
+  VkSurfaceKHR get_native_surface() const { return native_surface_; }
 
- private:
+private:
   std::unique_ptr<taichi::lang::vulkan::VulkanDeviceCreator>
       embedded_vulkan_device_{nullptr};
 
@@ -96,6 +92,6 @@ class TI_DLL_EXPORT AppContext {
   lang::Program *prog_{nullptr};
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

@@ -1,9 +1,9 @@
 #pragma once
 
-#include "taichi/rhi/vulkan/vulkan_device.h"
 #include "taichi/rhi/vulkan/vulkan_common.h"
-#include "taichi/rhi/vulkan/vulkan_loader.h"
+#include "taichi/rhi/vulkan/vulkan_device.h"
 #include "taichi/rhi/vulkan/vulkan_device_creator.h"
+#include "taichi/rhi/vulkan/vulkan_loader.h"
 
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
@@ -40,7 +40,7 @@ std::vector<std::string> get_required_device_extensions() {
 }
 
 class App {
- public:
+public:
   App(int width, int height, const std::string &title) {
     TI_INFO("Creating App '{}' of {}x{}", title, width, height);
 
@@ -111,8 +111,8 @@ class App {
     glfwTerminate();
   }
 
-  virtual std::vector<StreamSemaphore> render_loop(
-      StreamSemaphore image_available_semaphore) {
+  virtual std::vector<StreamSemaphore>
+  render_loop(StreamSemaphore image_available_semaphore) {
     return {};
   }
 
@@ -126,7 +126,7 @@ class App {
     }
   }
 
- public:
+public:
   // Owned
   GLFWwindow *glfw_window;
   std::unique_ptr<vulkan::VulkanDeviceCreator> device_creator;

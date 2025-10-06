@@ -3,11 +3,11 @@
 #include <cstddef>
 #include <memory>
 
-#include "taichi/runtime/llvm/llvm_offline_cache.h"
 #include "taichi/program/compile_config.h"
-#include "taichi/runtime/llvm/llvm_runtime_executor.h"
-#include "taichi/program/program_impl.h"
 #include "taichi/program/parallel_executor.h"
+#include "taichi/program/program_impl.h"
+#include "taichi/runtime/llvm/llvm_offline_cache.h"
+#include "taichi/runtime/llvm/llvm_runtime_executor.h"
 #include "taichi/util/bit.h"
 #define TI_RUNTIME_HOST
 #include "taichi/program/context.h"
@@ -15,7 +15,7 @@
 
 namespace llvm {
 class Module;
-}  // namespace llvm
+} // namespace llvm
 
 namespace taichi::lang {
 
@@ -24,18 +24,18 @@ class Program;
 
 namespace cuda {
 class CudaDevice;
-}  // namespace cuda
+} // namespace cuda
 
 namespace amdgpu {
 class AmdgpuDevice;
-}  // namespace amdgpu
+} // namespace amdgpu
 
 namespace cpu {
 class CpuDevice;
-}  // namespace cpu
+} // namespace cpu
 
 class LlvmProgramImpl : public ProgramImpl {
- public:
+public:
   LlvmProgramImpl(CompileConfig &config, KernelProfilerBase *profiler);
 
   /* ------------------------------------ */
@@ -49,8 +49,7 @@ class LlvmProgramImpl : public ProgramImpl {
   // initialize_llvm_runtime_snodes It's a 2-in-1 interface
   void materialize_snode_tree(SNodeTree *tree, uint64 *result_buffer) override;
 
-  void cache_field(int snode_tree_id,
-                   int root_id,
+  void cache_field(int snode_tree_id, int root_id,
                    const StructCompiler &struct_compiler);
 
   LlvmOfflineCache::FieldCacheData get_cached_field(int snode_tree_id) const {
@@ -59,12 +58,12 @@ class LlvmProgramImpl : public ProgramImpl {
     return cache_data_->fields.at(snode_tree_id);
   }
 
- private:
-  std::unique_ptr<StructCompiler> compile_snode_tree_types_impl(
-      SNodeTree *tree);
+private:
+  std::unique_ptr<StructCompiler>
+  compile_snode_tree_types_impl(SNodeTree *tree);
 
-  std::unique_ptr<AotModuleBuilder> make_aot_module_builder(
-      const DeviceCapabilityConfig &caps) override;
+  std::unique_ptr<AotModuleBuilder>
+  make_aot_module_builder(const DeviceCapabilityConfig &caps) override;
 
   /* -------------------------------- */
   /* ---- JIT-Runtime Interfaces ---- */
@@ -85,7 +84,7 @@ class LlvmProgramImpl : public ProgramImpl {
   // wrapper. The one with actual implementation should go inside
   // LlvmRuntimeExecutor class.
 
- public:
+public:
   /**
    * Initializes the runtime system for LLVM based backends.
    */
@@ -102,21 +101,17 @@ class LlvmProgramImpl : public ProgramImpl {
     return runtime_exec_->destroy_snode_tree(snode_tree);
   }
 
-  template <typename T>
-  T fetch_result(int i, uint64 *result_buffer) {
+  template <typename T> T fetch_result(int i, uint64 *result_buffer) {
     return runtime_exec_->fetch_result<T>(i, result_buffer);
   }
 
-  void finalize() override {
-    runtime_exec_->finalize();
-  }
+  void finalize() override { runtime_exec_->finalize(); }
 
   uint64_t *get_device_alloc_info_ptr(const DeviceAllocation &alloc) override {
     return runtime_exec_->get_device_alloc_info_ptr(alloc);
   }
 
-  void fill_ndarray(const DeviceAllocation &alloc,
-                    std::size_t size,
+  void fill_ndarray(const DeviceAllocation &alloc, std::size_t size,
                     uint32_t data) override {
     return runtime_exec_->fill_ndarray(alloc, size, data);
   }
@@ -145,8 +140,7 @@ class LlvmProgramImpl : public ProgramImpl {
   }
 
   template <typename T, typename... Args>
-  T runtime_query(const std::string &key,
-                  uint64 *result_buffer,
+  T runtime_query(const std::string &key, uint64 *result_buffer,
                   Args &&...args) {
     return runtime_exec_->runtime_query<T>(key, result_buffer,
                                            std::forward<Args>(args)...);
@@ -166,17 +160,13 @@ class LlvmProgramImpl : public ProgramImpl {
     return runtime_exec_->get_llvm_context();
   }
 
-  void synchronize() override {
-    runtime_exec_->synchronize();
-  }
+  void synchronize() override { runtime_exec_->synchronize(); }
 
-  LLVMRuntime *get_llvm_runtime() {
-    return runtime_exec_->get_llvm_runtime();
-  }
+  LLVMRuntime *get_llvm_runtime() { return runtime_exec_->get_llvm_runtime(); }
 
-  std::size_t get_snode_num_dynamically_allocated(
-      SNode *snode,
-      uint64 *result_buffer) override {
+  std::size_t
+  get_snode_num_dynamically_allocated(SNode *snode,
+                                      uint64 *result_buffer) override {
     return runtime_exec_->get_snode_num_dynamically_allocated(snode,
                                                               result_buffer);
   }
@@ -206,13 +196,9 @@ class LlvmProgramImpl : public ProgramImpl {
     return runtime_exec_->get_snode_tree_device_ptr(tree_id);
   }
 
-  LlvmDevice *llvm_device() {
-    return runtime_exec_->llvm_device();
-  }
+  LlvmDevice *llvm_device() { return runtime_exec_->llvm_device(); }
 
-  LlvmRuntimeExecutor *get_runtime_executor() {
-    return runtime_exec_.get();
-  }
+  LlvmRuntimeExecutor *get_runtime_executor() { return runtime_exec_.get(); }
 
   std::string get_kernel_return_data_layout() override {
     return get_llvm_context()->get_data_layout_string();
@@ -222,9 +208,9 @@ class LlvmProgramImpl : public ProgramImpl {
     return get_llvm_context()->get_data_layout_string();
   };
 
-  std::pair<const StructType *, size_t> get_struct_type_with_data_layout(
-      const StructType *old_ty,
-      const std::string &layout) override {
+  std::pair<const StructType *, size_t>
+  get_struct_type_with_data_layout(const StructType *old_ty,
+                                   const std::string &layout) override {
     return get_llvm_context()->get_struct_type_with_data_layout(old_ty, layout);
   }
 
@@ -268,13 +254,13 @@ class LlvmProgramImpl : public ProgramImpl {
     // 2. Destructs runtime_exec_
     runtime_exec_.reset();
   }
-  ParallelExecutor compilation_workers;  // parallel compilation
+  ParallelExecutor compilation_workers; // parallel compilation
 
- protected:
+protected:
   std::unique_ptr<KernelCompiler> make_kernel_compiler() override;
   std::unique_ptr<KernelLauncher> make_kernel_launcher() override;
 
- private:
+private:
   std::size_t num_snode_trees_processed_{0};
   std::unique_ptr<LlvmRuntimeExecutor> runtime_exec_;
   std::unique_ptr<LlvmOfflineCache> cache_data_;
@@ -282,4 +268,4 @@ class LlvmProgramImpl : public ProgramImpl {
 
 LlvmProgramImpl *get_llvm_program(Program *prog);
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

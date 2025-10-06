@@ -27,10 +27,9 @@ namespace taichi {
    René Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
 
-static const std::string base64_chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-    "abcdefghijklmnopqrstuvwxyz"
-    "0123456789+/";
+static const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                        "abcdefghijklmnopqrstuvwxyz"
+                                        "0123456789+/";
 
 static inline bool is_base64(unsigned char c) {
   return (isalnum(c) || (c == '+') || (c == '/'));
@@ -129,4 +128,4 @@ inline std::string base64_decode(std::string const &encoded_string) {
   return ret;
 }
 
-}  // namespace taichi
+} // namespace taichi

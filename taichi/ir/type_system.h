@@ -15,7 +15,7 @@ namespace taichi::lang {
 
 // Type errors that arise in the typechecking process.
 class TypeSystemError {
- public:
+public:
   virtual ~TypeSystemError() = default;
   virtual std::string to_string() const = 0;
 };
@@ -26,7 +26,7 @@ class TyVar;
 // signatures. They may contain type variables, "common type" of two type
 // expressions, or the "compute type" of a certain type expression.
 class TypeExpression {
- public:
+public:
   virtual ~TypeExpression() = default;
   // In the typechecking process, we will match the type of argument
   // (a DataType) against the type of parameter (a TypeExpression).
@@ -53,9 +53,8 @@ using TypeExpr = std::shared_ptr<TypeExpression>;
 class TyVar : public TypeExpression {
   const Identifier name_;
 
- public:
-  explicit TyVar(const Identifier &id) : name_(id) {
-  }
+public:
+  explicit TyVar(const Identifier &id) : name_(id) {}
   void unify(int pos, DataType dt, Solutions &solutions) const override;
   DataType resolve(Solutions const &solutions) const override;
   std::string to_string() const override;
@@ -74,9 +73,8 @@ class TyVar : public TypeExpression {
 class TyLub : public TypeExpression {
   const TypeExpr lhs_, rhs_;
 
- public:
-  explicit TyLub(TypeExpr lhs, TypeExpr rhs) : lhs_(lhs), rhs_(rhs) {
-  }
+public:
+  explicit TyLub(TypeExpr lhs, TypeExpr rhs) : lhs_(lhs), rhs_(rhs) {}
   void unify(int pos, DataType dt, Solutions &solutions) const override;
   DataType resolve(Solutions const &solutions) const override;
   std::string to_string() const override;
@@ -95,9 +93,8 @@ class TyLub : public TypeExpression {
 class TyCompute : public TypeExpression {
   const TypeExpr exp_;
 
- public:
-  explicit TyCompute(TypeExpr exp) : exp_(exp) {
-  }
+public:
+  explicit TyCompute(TypeExpr exp) : exp_(exp) {}
   void unify(int pos, DataType dt, Solutions &solutions) const override;
   DataType resolve(Solutions const &solutions) const override;
   std::string to_string() const override;
@@ -108,9 +105,8 @@ class TyCompute : public TypeExpression {
 class TyMono : public TypeExpression {
   const DataType monotype_;
 
- public:
-  explicit TyMono(DataType dt) : monotype_(dt) {
-  }
+public:
+  explicit TyMono(DataType dt) : monotype_(dt) {}
   void unify(int pos, DataType dt, Solutions &solutions) const override;
   DataType resolve(Solutions const &solutions) const override;
   std::string to_string() const override;
@@ -122,16 +118,11 @@ class TyVarMismatch : public TypeSystemError {
   const int solved_position_, current_position_;
   const DataType original_, conflicting_;
 
- public:
-  explicit TyVarMismatch(int solved_position,
-                         int current_position,
-                         DataType original,
-                         DataType conflicting)
-      : solved_position_(solved_position),
-        current_position_(current_position),
-        original_(original),
-        conflicting_(conflicting) {
-  }
+public:
+  explicit TyVarMismatch(int solved_position, int current_position,
+                         DataType original, DataType conflicting)
+      : solved_position_(solved_position), current_position_(current_position),
+        original_(original), conflicting_(conflicting) {}
   std::string to_string() const override;
 };
 
@@ -140,10 +131,9 @@ class TypeMismatch : public TypeSystemError {
   const int position_;
   const DataType param_, arg_;
 
- public:
+public:
   explicit TypeMismatch(int pos, DataType param, DataType arg)
-      : position_(pos), param_(param), arg_(arg) {
-  }
+      : position_(pos), param_(param), arg_(arg) {}
   std::string to_string() const override;
 };
 
@@ -152,16 +142,15 @@ class TypeMismatch : public TypeSystemError {
 class TyVarUnsolved : public TypeSystemError {
   const Identifier var_;
 
- public:
-  explicit TyVarUnsolved(const Identifier &var) : var_(var) {
-  }
+public:
+  explicit TyVarUnsolved(const Identifier &var) : var_(var) {}
   std::string to_string() const override;
 };
 
 // A trait i.e. a predicate over types. This can be used to constrain type
 // variables in type signatures.
 class Trait {
- public:
+public:
   virtual ~Trait() = default;
   virtual bool validate(DataType dt) const = 0;
   virtual std::string to_string() const = 0;
@@ -169,15 +158,14 @@ class Trait {
 
 // You can construct a trait via a function (DataType) -> bool.
 class DynamicTrait : public Trait {
- private:
+private:
   const std::string name_;
   const std::function<bool(DataType dt)> impl_;
 
- public:
+public:
   explicit DynamicTrait(const std::string &name,
                         const std::function<bool(DataType dt)> &impl)
-      : name_(name), impl_(impl) {
-  }
+      : name_(name), impl_(impl) {}
   bool validate(DataType dt) const override;
   std::string to_string() const override;
 };
@@ -185,12 +173,11 @@ class DynamicTrait : public Trait {
 // A constraint on a type variable. This states that the DataType that the
 // variable is resolved to must satisfy a certain trait.
 class Constraint {
- public:
+public:
   const std::shared_ptr<TyVar> tyvar;
   Trait *const trait;
   explicit Constraint(std::shared_ptr<TyVar> tyvar, Trait *trait)
-      : tyvar(tyvar), trait(trait) {
-  }
+      : tyvar(tyvar), trait(trait) {}
 };
 
 // Type error: the type of argument does not satisfy the trait required. E.g.
@@ -200,10 +187,9 @@ class TraitMismatch : public TypeSystemError {
   const DataType dt_;
   const Constraint constraint_;
 
- public:
+public:
   explicit TraitMismatch(int occurrence, DataType dt, Constraint constraint)
-      : occurrence_(occurrence), dt_(dt), constraint_(constraint) {
-  }
+      : occurrence_(occurrence), dt_(dt), constraint_(constraint) {}
   std::string to_string() const override;
 };
 
@@ -212,9 +198,8 @@ class TraitMismatch : public TypeSystemError {
 class ArgLengthMismatch : public TypeSystemError {
   const int param_, arg_;
 
- public:
-  explicit ArgLengthMismatch(int param, int arg) : param_(param), arg_(arg) {
-  }
+public:
+  explicit ArgLengthMismatch(int param, int arg) : param_(param), arg_(arg) {}
   std::string to_string() const override;
 };
 
@@ -228,38 +213,33 @@ class Signature {
   const std::vector<TypeExpr> parameters_;
   const TypeExpr ret_type_;
 
- public:
+public:
   explicit Signature(const std::vector<Constraint> &constraints,
-                     const std::vector<TypeExpr> &parameters,
-                     TypeExpr ret_type)
-      : constraints_(constraints),
-        parameters_(parameters),
-        ret_type_(ret_type) {
-  }
+                     const std::vector<TypeExpr> &parameters, TypeExpr ret_type)
+      : constraints_(constraints), parameters_(parameters),
+        ret_type_(ret_type) {}
   explicit Signature(const std::vector<TypeExpr> &parameters, TypeExpr ret_type)
-      : parameters_(parameters), ret_type_(ret_type) {
-  }
-  explicit Signature(TypeExpr ret_type) : ret_type_(ret_type) {
-  }
+      : parameters_(parameters), ret_type_(ret_type) {}
+  explicit Signature(TypeExpr ret_type) : ret_type_(ret_type) {}
   // Check a list of argument types against the type expression. If this fails,
   // some TypeSystemError will be raised.
   DataType type_check(const std::vector<DataType> &arguments) const;
 };
 
 enum class StaticTraitID {
-  real,       // Real number types, i.e. all float types.
-  integral,   // Integer types, including the custom integer types.
-  primitive,  // Primitive types. Only ixx, uxx, and fxx types are included.
-  scalar,     // Scalar types. This includes all real and integral types.
+  real,      // Real number types, i.e. all float types.
+  integral,  // Integer types, including the custom integer types.
+  primitive, // Primitive types. Only ixx, uxx, and fxx types are included.
+  scalar,    // Scalar types. This includes all real and integral types.
 };
 
 // Static traits are a set of predefined traits that are often used.
 class StaticTraits {
- public:
+public:
   // Get a certain static trait from its ID.
   static Trait *get(StaticTraitID traitId);
 
- private:
+private:
   inline static std::map<StaticTraitID, std::unique_ptr<Trait>> traits_;
   static void init_traits();
 };
@@ -268,13 +248,12 @@ class StaticTraits {
 // and error messages), a type signature, and a flattening function used in
 // frontend-to-IR passes.
 class Operation {
- public:
+public:
   const std::string name;
   const Signature sig;
 
   explicit Operation(const std::string &name, const Signature &sig)
-      : name(name), sig(sig) {
-  }
+      : name(name), sig(sig) {}
   virtual ~Operation() = default;
 
   DataType type_check(const std::vector<DataType> &arg_types) const;
@@ -292,13 +271,13 @@ enum class InternalOp {
 
 // The set of internal operations. Any new operation should be defined here.
 class Operations {
- public:
+public:
   // Get an internal operation from its ID.
   static Operation *get(InternalOp opcode);
 
- private:
+private:
   inline static std::map<InternalOp, std::unique_ptr<Operation>> internals_;
   static void init_internals();
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

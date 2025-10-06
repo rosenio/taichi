@@ -28,15 +28,13 @@ inline AccessFlag operator|=(AccessFlag &a, AccessFlag &b) {
 }
 
 class ScratchPad {
- public:
+public:
   // The lowest and highest index in each dimension.
   struct BoundRange {
     int low{0};
     int high{0};
 
-    int range() const {
-      return high - low;
-    }
+    int range() const { return high - low; }
 
     TI_IO_DEF(low, high);
   };
@@ -78,8 +76,7 @@ class ScratchPad {
     empty = false;
   }
 
-  void access(const std::vector<int> &coeffs,
-              const std::vector<int> &indices,
+  void access(const std::vector<int> &coeffs, const std::vector<int> &indices,
               AccessFlag flags) {
     TI_ASSERT(!finalized);
     empty = true;
@@ -117,16 +114,11 @@ class ScratchPad {
     }
   }
 
-  void codegen_cpu() {
-  }
+  void codegen_cpu() {}
 
-  std::string name() {
-    return snode->node_type_name + "_scratch_pad";
-  }
+  std::string name() { return snode->node_type_name + "_scratch_pad"; }
 
-  bool is_pure() const {
-    return bit::is_power_of_two((unsigned)total_flags);
-  }
+  bool is_pure() const { return bit::is_power_of_two((unsigned)total_flags); }
 
   int pad_size_linear() {
     TI_ASSERT(finalized);
@@ -179,12 +171,10 @@ class ScratchPad {
                                          const std::vector<Stmt *> &indices);
 };
 
-inline int div_floor(int a, int b) {
-  return a >= 0 ? a / b : (a - b + 1) / b;
-}
+inline int div_floor(int a, int b) { return a >= 0 ? a / b : (a - b + 1) / b; }
 
 class ScratchPads {
- public:
+public:
   std::map<SNode *, ScratchPad> pads;
 
   using AccessFlag = ScratchPad::AccessFlag;
@@ -198,10 +188,8 @@ class ScratchPads {
     }
   }
 
-  void access(SNode *snode,
-              const std::vector<int> &coeffs,
-              const std::vector<int> &indices,
-              AccessFlag flags) {
+  void access(SNode *snode, const std::vector<int> &coeffs,
+              const std::vector<int> &indices, AccessFlag flags) {
     TI_ASSERT(snode != nullptr);
     if (pads.find(snode) == pads.end())
       return;
@@ -248,9 +236,7 @@ class ScratchPads {
     }
   }
 
-  bool has(SNode *snode) {
-    return pads.find(snode) != pads.end();
-  }
+  bool has(SNode *snode) { return pads.find(snode) != pads.end(); }
 
   ScratchPad &get(SNode *snode) {
     TI_ASSERT(pads.find(snode) != pads.end());
@@ -258,4 +244,4 @@ class ScratchPads {
   }
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

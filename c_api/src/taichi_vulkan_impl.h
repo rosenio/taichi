@@ -1,11 +1,11 @@
 #pragma once
 #ifdef TI_WITH_VULKAN
 
-#include "taichi_core_impl.h"
-#include "taichi_gfx_impl.h"
-#include "taichi/rhi/vulkan/vulkan_loader.h"
 #include "taichi/rhi/vulkan/vulkan_device.h"
 #include "taichi/rhi/vulkan/vulkan_device_creator.h"
+#include "taichi/rhi/vulkan/vulkan_loader.h"
+#include "taichi_core_impl.h"
+#include "taichi_gfx_impl.h"
 
 class VulkanRuntime;
 class VulkanRuntimeImported;
@@ -13,12 +13,12 @@ class VulkanRuntimeOwned;
 class VulkanContext;
 
 class VulkanRuntime : public GfxRuntime {
- public:
+public:
   VulkanRuntime();
 
   taichi::lang::vulkan::VulkanDevice &get_vk();
-  virtual TiImage allocate_image(
-      const taichi::lang::ImageParams &params) override final;
+  virtual TiImage
+  allocate_image(const taichi::lang::ImageParams &params) override final;
   virtual void free_image(TiImage image) override final;
 };
 class VulkanRuntimeImported : public VulkanRuntime {
@@ -31,7 +31,7 @@ class VulkanRuntimeImported : public VulkanRuntime {
   } inner_;
   taichi::lang::gfx::GfxRuntime gfx_runtime_;
 
- public:
+public:
   VulkanRuntimeImported(
       uint32_t api_version,
       const taichi::lang::vulkan::VulkanDevice::Params &params);
@@ -43,7 +43,7 @@ class VulkanRuntimeOwned : public VulkanRuntime {
   taichi::lang::vulkan::VulkanDeviceCreator vk_device_creator_;
   taichi::lang::gfx::GfxRuntime gfx_runtime_;
 
- public:
+public:
   VulkanRuntimeOwned();
   VulkanRuntimeOwned(
       const taichi::lang::vulkan::VulkanDeviceCreator::Params &params);
@@ -55,4 +55,4 @@ class VulkanRuntimeOwned : public VulkanRuntime {
 taichi::lang::vulkan::VulkanDeviceCreator::Params
 make_vulkan_runtime_creator_params();
 
-#endif  // TI_WITH_VULKAN
+#endif // TI_WITH_VULKAN

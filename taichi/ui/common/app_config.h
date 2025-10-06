@@ -1,8 +1,8 @@
 #pragma once
 
-#include <string>
-#include "taichi/ui/utils/utils.h"
 #include "taichi/rhi/arch.h"
+#include "taichi/ui/utils/utils.h"
+#include <string>
 
 namespace taichi {
 namespace ui {
@@ -21,5 +21,5 @@ struct AppConfig {
   Arch ggui_arch{Arch::vulkan};
 };
 
-}  // namespace ui
-}  // namespace taichi
+} // namespace ui
+} // namespace taichi

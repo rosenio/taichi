@@ -5,11 +5,10 @@ namespace taichi::lang {
 
 // Visits all non-containing statements
 class BasicStmtVisitor : public IRVisitor {
- public:
+public:
   BasicStmtVisitor();
 
-  virtual void preprocess_container_stmt(Stmt *stmt) {
-  }
+  virtual void preprocess_container_stmt(Stmt *stmt) {}
 
   void visit(Block *stmt_list) override;
 
@@ -32,4 +31,4 @@ class BasicStmtVisitor : public IRVisitor {
   void visit(FrontendIfStmt *stmt) override;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

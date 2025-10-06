@@ -1,17 +1,16 @@
 #pragma once
-#include <vector>
-#include <string>
-#include <unordered_map>
+#include "taichi/aot/module_data.h"
 #include "taichi/ir/type.h"
 #include "taichi/program/callable.h"
-#include "taichi/aot/module_data.h"
 #include "taichi/program/compile_config.h"
+#include <string>
+#include <unordered_map>
+#include <vector>
 #define TI_RUNTIME_HOST
 #include "taichi/program/context.h"
 #undef TI_RUNTIME_HOST
 
-template <typename T, typename G>
-T taichi_union_cast_with_different_sizes(G g);
+template <typename T, typename G> T taichi_union_cast_with_different_sizes(G g);
 
 namespace taichi::lang {
 class AotModuleBuilder;
@@ -45,36 +44,23 @@ struct Arg {
   std::vector<int> element_shape;
 
   // For texture
-  size_t num_channels;  // TODO: maybe rename field_dim and merge?
+  size_t num_channels; // TODO: maybe rename field_dim and merge?
 
   // For serialization & deserialization
   explicit Arg()
-      : tag(ArgKind::kUnknown),
-        name(""),
-        dtype_id(PrimitiveTypeID::unknown),
-        field_dim(0),
-        element_shape({}) {
-  }
+      : tag(ArgKind::kUnknown), name(""), dtype_id(PrimitiveTypeID::unknown),
+        field_dim(0), element_shape({}) {}
 
-  explicit Arg(ArgKind tag,
-               const std::string &name,
+  explicit Arg(ArgKind tag, const std::string &name,
 
-               PrimitiveTypeID dtype_id,
-               size_t field_dim,
+               PrimitiveTypeID dtype_id, size_t field_dim,
                const std::vector<int> &element_shape)
-      : tag(tag),
-        name(name),
-        dtype_id(dtype_id),
-        field_dim(field_dim),
-        element_shape(element_shape) {
-  }
+      : tag(tag), name(name), dtype_id(dtype_id), field_dim(field_dim),
+        element_shape(element_shape) {}
 
   // Python/C++ interface that's user facing.
-  explicit Arg(ArgKind tag,
-               const std::string &name,
-               const DataType &dtype,
-               size_t dim = 0,
-               const std::vector<int> &element_shape = {})
+  explicit Arg(ArgKind tag, const std::string &name, const DataType &dtype,
+               size_t dim = 0, const std::vector<int> &element_shape = {})
       : tag(tag), name(name), element_shape(element_shape) {
     if (tag == ArgKind::kTexture || tag == ArgKind::kRWTexture) {
       num_channels = dim;
@@ -84,9 +70,7 @@ struct Arg {
     dtype_id = dtype->as<PrimitiveType>()->type;
   }
 
-  DataType dtype() const {
-    return PrimitiveType::get(dtype_id);
-  }
+  DataType dtype() const { return PrimitiveType::get(dtype_id); }
 
   bool operator==(const Arg &other) const {
     return tag == other.tag && name == other.name &&
@@ -94,9 +78,7 @@ struct Arg {
            element_shape == other.element_shape;
   }
 
-  bool operator!=(const Arg &other) const {
-    return !(*this == other);
-  }
+  bool operator!=(const Arg &other) const { return !(*this == other); }
 
   TI_IO_DEF(name, dtype_id, field_dim, tag, element_shape, num_channels);
 };
@@ -105,7 +87,7 @@ struct Arg {
  * Runtime value used in graph execution.
  */
 struct TI_DLL_EXPORT IValue {
- public:
+public:
   uint64 val;
   ArgKind tag;
 
@@ -128,13 +110,12 @@ struct TI_DLL_EXPORT IValue {
                   ArgKind::kScalar);
   }
 
- private:
-  IValue(uint64 val, ArgKind tag) : val(val), tag(tag) {
-  }
+private:
+  IValue(uint64 val, ArgKind tag) : val(val), tag(tag) {}
 };
 
 class TI_DLL_EXPORT Kernel : public CallableBase {
- public:
+public:
   // Rule of 5 to make MSVC happy
   Kernel() = default;
   virtual ~Kernel() = default;
@@ -172,12 +153,12 @@ struct TI_DLL_EXPORT CompiledGraph {
 
   TI_IO_DEF(dispatches);
 
- private:
-  static void init_runtime_context(
-      const std::vector<Arg> &paramter_list,
-      const std::unordered_map<std::string, IValue> &args,
-      LaunchContextBuilder &ctx);
+private:
+  static void
+  init_runtime_context(const std::vector<Arg> &paramter_list,
+                       const std::unordered_map<std::string, IValue> &args,
+                       LaunchContextBuilder &ctx);
 };
 
-}  // namespace aot
-}  // namespace taichi::lang
+} // namespace aot
+} // namespace taichi::lang

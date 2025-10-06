@@ -15,9 +15,7 @@ void Dense_activate(Ptr meta, Ptr node, int i) {
   // Dense elements are always active
 }
 
-u1 Dense_is_active(Ptr meta, Ptr node, int i) {
-  return true;
-}
+u1 Dense_is_active(Ptr meta, Ptr node, int i) { return true; }
 
 Ptr Dense_lookup_element(Ptr meta, Ptr node, int i) {
   return node + ((StructMeta *)meta)->element_size * i;

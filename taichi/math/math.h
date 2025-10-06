@@ -5,21 +5,19 @@
 
 #pragma once
 
-#include "taichi/common/core.h"
-#include "geometry_util.h"
 #include "array.h"
+#include "geometry_util.h"
 #include "linalg.h"
+#include "taichi/common/core.h"
 
 namespace taichi {
 
 namespace math {
-template <typename T>
-TI_FORCE_INLINE T degrees(T rad) {
+template <typename T> TI_FORCE_INLINE T degrees(T rad) {
   return rad * (type::element<T>(180) / pi);
 }
 
-template <typename T>
-TI_FORCE_INLINE T radians(T deg) {
+template <typename T> TI_FORCE_INLINE T radians(T deg) {
   return deg * (pi / type::element<T>(180));
 }
 
@@ -37,6 +35,6 @@ TI_FORCE_INLINE
   return std::abs(A - B) <= tolerance;
 }
 
-}  // namespace math
+} // namespace math
 
-}  // namespace taichi
+} // namespace taichi

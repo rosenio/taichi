@@ -1,11 +1,11 @@
 #pragma once
 
 #include "taichi/ir/ir.h"
+#include "taichi/ir/mesh.h"
 #include "taichi/ir/offloaded_task_type.h"
 #include "taichi/ir/stmt_op_types.h"
 #include "taichi/rhi/arch.h"
 #include "taichi/rhi/device.h"
-#include "taichi/ir/mesh.h"
 
 #include <optional>
 
@@ -17,7 +17,7 @@ class Function;
  * Allocate a local variable with initial value 0.
  */
 class AllocaStmt : public Stmt, public ir_traits::Store {
- public:
+public:
   explicit AllocaStmt(DataType type, const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), is_shared(false) {
     if (type->is_primitive(PrimitiveTypeID::unknown)) {
@@ -28,23 +28,17 @@ class AllocaStmt : public Stmt, public ir_traits::Store {
     TI_STMT_REG_FIELDS;
   }
 
-  AllocaStmt(const std::vector<int> &shape,
-             DataType type,
-             bool is_shared = false,
-             const DebugInfo &dbg_info = DebugInfo())
+  AllocaStmt(const std::vector<int> &shape, DataType type,
+             bool is_shared = false, const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), is_shared(is_shared) {
     ret_type = TypeFactory::get_instance().get_pointer_type(
         TypeFactory::create_tensor_type(shape, type));
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   // IR Trait: Store
   stmt_refs get_store_destination() const override {
@@ -67,7 +61,7 @@ class AllocaStmt : public Stmt, public ir_traits::Store {
  * Updates mask, break if all bits of the mask are 0.
  */
 class WhileControlStmt : public Stmt {
- public:
+public:
   Stmt *mask;
   Stmt *cond;
   WhileControlStmt(Stmt *mask, Stmt *cond) : mask(mask), cond(cond) {
@@ -82,14 +76,12 @@ class WhileControlStmt : public Stmt {
  * Jump to the next loop iteration, i.e., `continue` in C++.
  */
 class ContinueStmt : public Stmt {
- public:
+public:
   // This is the loop on which this continue stmt has effects. It can be either
   // an offloaded task, or a for/while loop inside the kernel.
   Stmt *scope;
 
-  ContinueStmt() : scope(nullptr) {
-    TI_STMT_REG_FIELDS;
-  }
+  ContinueStmt() : scope(nullptr) { TI_STMT_REG_FIELDS; }
 
   // For top-level loops, since they are parallelized to multiple threads (on
   // either CPU or GPU), `continue` becomes semantically equivalent to `return`.
@@ -121,7 +113,7 @@ class ContinueStmt : public Stmt {
  * A decoration statement. The decorated "operands" will keep this decoration.
  */
 class DecorationStmt : public Stmt {
- public:
+public:
   enum class Decoration : uint32_t { kUnknown, kLoopUnique };
 
   Stmt *operand;
@@ -129,21 +121,13 @@ class DecorationStmt : public Stmt {
 
   DecorationStmt(Stmt *operand, const std::vector<uint32_t> &decoration);
 
-  bool same_operation(DecorationStmt *o) const {
-    return false;
-  }
+  bool same_operation(DecorationStmt *o) const { return false; }
 
-  bool is_cast() const {
-    return false;
-  }
+  bool is_cast() const { return false; }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool dead_instruction_eliminable() const override {
-    return false;
-  }
+  bool dead_instruction_eliminable() const override { return false; }
 
   TI_STMT_DEF_FIELDS(operand, decoration);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -153,21 +137,18 @@ class DecorationStmt : public Stmt {
  * A unary operation. The field |cast_type| is used only when is_cast() is true.
  */
 class UnaryOpStmt : public Stmt {
- public:
+public:
   UnaryOpType op_type;
   Stmt *operand;
   DataType cast_type;
 
-  UnaryOpStmt(UnaryOpType op_type,
-              Stmt *operand,
+  UnaryOpStmt(UnaryOpType op_type, Stmt *operand,
               const DebugInfo &dbg_info = DebugInfo());
 
   bool same_operation(UnaryOpStmt *o) const;
   bool is_cast() const;
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, op_type, operand, cast_type);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -181,7 +162,7 @@ class UnaryOpStmt : public Stmt {
  * |arg_depth| > 0.
  */
 class ArgLoadStmt : public Stmt {
- public:
+public:
   std::vector<int> arg_id;
 
   /* TODO(zhanlue): more organized argument-type information
@@ -200,24 +181,16 @@ class ArgLoadStmt : public Stmt {
 
   int arg_depth;
 
-  ArgLoadStmt(const std::vector<int> &arg_id,
-              const DataType &dt,
-              bool is_ptr,
-              bool create_load,
-              int arg_depth,
+  ArgLoadStmt(const std::vector<int> &arg_id, const DataType &dt, bool is_ptr,
+              bool create_load, int arg_depth,
               const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        arg_id(arg_id),
-        is_ptr(is_ptr),
-        create_load(create_load),
-        arg_depth(arg_depth) {
+      : Stmt(dbg_info), arg_id(arg_id), is_ptr(is_ptr),
+        create_load(create_load), arg_depth(arg_depth) {
     this->ret_type = dt;
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, arg_id, is_ptr, arg_depth);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -233,20 +206,16 @@ class ArgLoadStmt : public Stmt {
  * deterministic PRNG to generate a random value in the backend.
  */
 class RandStmt : public Stmt {
- public:
+public:
   explicit RandStmt(const DataType &dt, const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info) {
     ret_type = dt;
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -256,29 +225,22 @@ class RandStmt : public Stmt {
  * A binary operation.
  */
 class BinaryOpStmt : public Stmt {
- public:
+public:
   BinaryOpType op_type;
   Stmt *lhs, *rhs;
-  bool is_bit_vectorized;  // TODO: remove this field
+  bool is_bit_vectorized; // TODO: remove this field
 
-  BinaryOpStmt(BinaryOpType op_type,
-               Stmt *lhs,
-               Stmt *rhs,
+  BinaryOpStmt(BinaryOpType op_type, Stmt *lhs, Stmt *rhs,
                bool is_bit_vectorized = false,
                const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        op_type(op_type),
-        lhs(lhs),
-        rhs(rhs),
+      : Stmt(dbg_info), op_type(op_type), lhs(lhs), rhs(rhs),
         is_bit_vectorized(is_bit_vectorized) {
     TI_ASSERT(!lhs->is<AllocaStmt>());
     TI_ASSERT(!rhs->is<AllocaStmt>());
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, op_type, lhs, rhs, is_bit_vectorized);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -289,14 +251,11 @@ class BinaryOpStmt : public Stmt {
  * "?:" in C++) is the only supported ternary operation.
  */
 class TernaryOpStmt : public Stmt {
- public:
+public:
   TernaryOpType op_type;
   Stmt *op1, *op2, *op3;
 
-  TernaryOpStmt(TernaryOpType op_type,
-                Stmt *op1,
-                Stmt *op2,
-                Stmt *op3,
+  TernaryOpStmt(TernaryOpType op_type, Stmt *op1, Stmt *op2, Stmt *op3,
                 const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), op_type(op_type), op1(op1), op2(op2), op3(op3) {
     TI_ASSERT(!op1->is<AllocaStmt>());
@@ -305,9 +264,7 @@ class TernaryOpStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, op1, op2, op3);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -319,44 +276,32 @@ class TernaryOpStmt : public Stmt {
 class AtomicOpStmt : public Stmt,
                      public ir_traits::Store,
                      public ir_traits::Load {
- public:
+public:
   AtomicOpType op_type;
   Stmt *dest, *val;
   bool is_reduction;
 
-  AtomicOpStmt(AtomicOpType op_type,
-               Stmt *dest,
-               Stmt *val,
+  AtomicOpStmt(AtomicOpType op_type, Stmt *dest, Stmt *val,
                const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        op_type(op_type),
-        dest(dest),
-        val(val),
+      : Stmt(dbg_info), op_type(op_type), dest(dest), val(val),
         is_reduction(false) {
     TI_STMT_REG_FIELDS;
   }
 
-  static std::unique_ptr<AtomicOpStmt> make_for_reduction(AtomicOpType op_type,
-                                                          Stmt *dest,
-                                                          Stmt *val) {
+  static std::unique_ptr<AtomicOpStmt>
+  make_for_reduction(AtomicOpType op_type, Stmt *dest, Stmt *val) {
     auto stmt = std::make_unique<AtomicOpStmt>(op_type, dest, val);
     stmt->is_reduction = true;
     return stmt;
   }
 
   // IR Trait: Store
-  stmt_refs get_store_destination() const override {
-    return dest;
-  }
+  stmt_refs get_store_destination() const override { return dest; }
 
-  Stmt *get_store_data() const override {
-    return nullptr;
-  }
+  Stmt *get_store_data() const override { return nullptr; }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return dest;
-  }
+  stmt_refs get_load_pointers() const override { return dest; }
 
   TI_STMT_DEF_FIELDS(ret_type, op_type, dest, val);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -367,7 +312,7 @@ class AtomicOpStmt : public Stmt,
  * |is_ptr| == true.
  */
 class ExternalPtrStmt : public Stmt {
- public:
+public:
   Stmt *base_ptr;
 
   std::vector<Stmt *> indices;
@@ -386,21 +331,15 @@ class ExternalPtrStmt : public Stmt {
   bool is_grad = false;
   BoundaryMode boundary{BoundaryMode::kUnsafe};
 
-  ExternalPtrStmt(Stmt *base_ptr,
-                  const std::vector<Stmt *> &indices,
+  ExternalPtrStmt(Stmt *base_ptr, const std::vector<Stmt *> &indices,
                   bool is_grad = false,
                   BoundaryMode boundary = BoundaryMode::kUnsafe);
 
-  ExternalPtrStmt(Stmt *base_ptr,
-                  const std::vector<Stmt *> &indices,
-                  int ndim,
-                  const std::vector<int> &element_shape,
-                  bool is_grad = false,
+  ExternalPtrStmt(Stmt *base_ptr, const std::vector<Stmt *> &indices, int ndim,
+                  const std::vector<int> &element_shape, bool is_grad = false,
                   BoundaryMode boundary = BoundaryMode::kUnsafe);
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, base_ptr, indices, is_grad);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -415,26 +354,20 @@ class ExternalPtrStmt : public Stmt {
  * IR.
  */
 class GlobalPtrStmt : public Stmt {
- public:
+public:
   SNode *snode;
   std::vector<Stmt *> indices;
   bool activate;
   bool is_cell_access;
-  bool is_bit_vectorized;  // for bit_loop_vectorize pass
+  bool is_bit_vectorized; // for bit_loop_vectorize pass
 
-  GlobalPtrStmt(SNode *snode,
-                const std::vector<Stmt *> &indices,
-                bool activate = true,
-                bool is_cell_access = false,
+  GlobalPtrStmt(SNode *snode, const std::vector<Stmt *> &indices,
+                bool activate = true, bool is_cell_access = false,
                 const DebugInfo &dbg_info = DebugInfo());
 
-  bool has_global_side_effect() const override {
-    return activate;
-  }
+  bool has_global_side_effect() const override { return activate; }
 
-  bool common_statement_eliminable() const override {
-    return true;
-  }
+  bool common_statement_eliminable() const override { return true; }
 
   TI_STMT_DEF_FIELDS(ret_type, snode, indices, activate, is_bit_vectorized);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -448,7 +381,7 @@ class GlobalPtrStmt : public Stmt {
  * index) or have ptr_base initialized (dynamic index or whole-matrix access).
  */
 class MatrixOfGlobalPtrStmt : public Stmt {
- public:
+public:
   std::vector<SNode *> snodes;
   std::vector<Stmt *> indices;
   Stmt *ptr_base{nullptr};
@@ -458,26 +391,15 @@ class MatrixOfGlobalPtrStmt : public Stmt {
 
   MatrixOfGlobalPtrStmt(const std::vector<SNode *> &snodes,
                         const std::vector<Stmt *> &indices,
-                        bool dynamic_indexable,
-                        int dynamic_index_stride,
-                        DataType dt,
-                        bool activate = true);
+                        bool dynamic_indexable, int dynamic_index_stride,
+                        DataType dt, bool activate = true);
 
-  bool has_global_side_effect() const override {
-    return activate;
-  }
+  bool has_global_side_effect() const override { return activate; }
 
-  bool common_statement_eliminable() const override {
-    return true;
-  }
+  bool common_statement_eliminable() const override { return true; }
 
-  TI_STMT_DEF_FIELDS(ret_type,
-                     snodes,
-                     indices,
-                     ptr_base,
-                     dynamic_indexable,
-                     dynamic_index_stride,
-                     activate);
+  TI_STMT_DEF_FIELDS(ret_type, snodes, indices, ptr_base, dynamic_indexable,
+                     dynamic_index_stride, activate);
   TI_DEFINE_ACCEPT_AND_CLONE
 };
 
@@ -490,7 +412,7 @@ class MatrixOfGlobalPtrStmt : public Stmt {
  * operations even with real_matrix_scalarize=False
  */
 class MatrixOfMatrixPtrStmt : public Stmt {
- public:
+public:
   std::vector<Stmt *> stmts;
 
   MatrixOfMatrixPtrStmt(const std::vector<Stmt *> &stmts, DataType dt);
@@ -503,7 +425,7 @@ class MatrixOfMatrixPtrStmt : public Stmt {
  * A pointer to an element of a matrix.
  */
 class MatrixPtrStmt : public Stmt {
- public:
+public:
   Stmt *origin{nullptr};
   Stmt *offset{nullptr};
 
@@ -535,9 +457,7 @@ class MatrixPtrStmt : public Stmt {
     TI_NOT_IMPLEMENTED;
   }
 
-  bool is_unlowered_global_ptr() const {
-    return origin->is<GlobalPtrStmt>();
-  }
+  bool is_unlowered_global_ptr() const { return origin->is<GlobalPtrStmt>(); }
 
   bool has_global_side_effect() const override {
     // After access lowered, activate info will be recorded in SNodeLookupStmt's
@@ -556,16 +476,13 @@ class MatrixPtrStmt : public Stmt {
  * An operation to a SNode (not necessarily a leaf SNode).
  */
 class SNodeOpStmt : public Stmt, public ir_traits::Store {
- public:
+public:
   SNodeOpType op_type;
   SNode *snode;
   Stmt *ptr;
   Stmt *val;
 
-  SNodeOpStmt(SNodeOpType op_type,
-              SNode *snode,
-              Stmt *ptr,
-              Stmt *val = nullptr,
+  SNodeOpStmt(SNodeOpType op_type, SNode *snode, Stmt *ptr, Stmt *val = nullptr,
               const DebugInfo &dbg_info = DebugInfo());
 
   static bool activation_related(SNodeOpType op);
@@ -581,9 +498,7 @@ class SNodeOpStmt : public Stmt, public ir_traits::Store {
     }
   }
 
-  Stmt *get_store_data() const override {
-    return nullptr;
-  }
+  Stmt *get_store_data() const override { return nullptr; }
 
   TI_STMT_DEF_FIELDS(ret_type, op_type, snode, ptr, val);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -593,34 +508,28 @@ class SNodeOpStmt : public Stmt, public ir_traits::Store {
 // (penguinliong) This Stmt is used for both ND-arrays and textures. This is
 // subject to change in the future.
 class ExternalTensorShapeAlongAxisStmt : public Stmt {
- public:
+public:
   int axis;
   std::vector<int> arg_id;
 
-  ExternalTensorShapeAlongAxisStmt(int axis,
-                                   const std::vector<int> &arg_id,
+  ExternalTensorShapeAlongAxisStmt(int axis, const std::vector<int> &arg_id,
                                    const DebugInfo &dbg_info = DebugInfo());
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, axis, arg_id);
   TI_DEFINE_ACCEPT_AND_CLONE
 };
 
 class ExternalTensorBasePtrStmt : public Stmt {
- public:
+public:
   std::vector<int> arg_id;
   bool is_grad;
 
-  ExternalTensorBasePtrStmt(const std::vector<int> &arg_id,
-                            bool is_grad,
+  ExternalTensorBasePtrStmt(const std::vector<int> &arg_id, bool is_grad,
                             const DebugInfo &dbg_info = DebugInfo());
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, arg_id, is_grad);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -632,13 +541,12 @@ class ExternalTensorBasePtrStmt : public Stmt {
  * the program.
  */
 class AssertStmt : public Stmt {
- public:
+public:
   Stmt *cond;
   std::string text;
   std::vector<Stmt *> args;
 
-  AssertStmt(Stmt *cond,
-             const std::string &text,
+  AssertStmt(Stmt *cond, const std::string &text,
              const std::vector<Stmt *> &args,
              const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), cond(cond), text(text), args(args) {
@@ -656,31 +564,24 @@ class AssertStmt : public Stmt {
 class ExternalFuncCallStmt : public Stmt,
                              public ir_traits::Store,
                              public ir_traits::Load {
- public:
+public:
   enum Type { SHARED_OBJECT = 0, ASSEMBLY = 1, BITCODE = 2 };
 
   Type type;
-  void *so_func;            // SHARED_OBJECT
-  std::string asm_source;   // ASM
-  std::string bc_filename;  // BITCODE
-  std::string bc_funcname;  // BITCODE
+  void *so_func;           // SHARED_OBJECT
+  std::string asm_source;  // ASM
+  std::string bc_filename; // BITCODE
+  std::string bc_funcname; // BITCODE
   std::vector<Stmt *> arg_stmts;
-  std::vector<Stmt *> output_stmts;  // BITCODE doesn't use this
+  std::vector<Stmt *> output_stmts; // BITCODE doesn't use this
 
-  ExternalFuncCallStmt(Type type,
-                       void *so_func,
-                       std::string asm_source,
-                       std::string bc_filename,
-                       std::string bc_funcname,
+  ExternalFuncCallStmt(Type type, void *so_func, std::string asm_source,
+                       std::string bc_filename, std::string bc_funcname,
                        const std::vector<Stmt *> &arg_stmts,
                        const std::vector<Stmt *> &output_stmts)
-      : type(type),
-        so_func(so_func),
-        asm_source(asm_source),
-        bc_filename(bc_filename),
-        bc_funcname(bc_funcname),
-        arg_stmts(arg_stmts),
-        output_stmts(output_stmts) {
+      : type(type), so_func(so_func), asm_source(asm_source),
+        bc_filename(bc_filename), bc_funcname(bc_funcname),
+        arg_stmts(arg_stmts), output_stmts(output_stmts) {
     TI_STMT_REG_FIELDS;
   }
 
@@ -693,22 +594,13 @@ class ExternalFuncCallStmt : public Stmt,
     }
   }
 
-  Stmt *get_store_data() const override {
-    return nullptr;
-  }
+  Stmt *get_store_data() const override { return nullptr; }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return arg_stmts;
-  }
+  stmt_refs get_load_pointers() const override { return arg_stmts; }
 
-  TI_STMT_DEF_FIELDS(type,
-                     so_func,
-                     asm_source,
-                     bc_filename,
-                     bc_funcname,
-                     arg_stmts,
-                     output_stmts);
+  TI_STMT_DEF_FIELDS(type, so_func, asm_source, bc_filename, bc_funcname,
+                     arg_stmts, output_stmts);
   TI_DEFINE_ACCEPT_AND_CLONE
 };
 
@@ -719,23 +611,18 @@ class ExternalFuncCallStmt : public Stmt,
  * the Taichi compiler that |base| + |low| <= |input| < |base| + |high|.
  */
 class RangeAssumptionStmt : public Stmt {
- public:
+public:
   Stmt *input;
   Stmt *base;
   int low, high;
 
-  RangeAssumptionStmt(Stmt *input,
-                      Stmt *base,
-                      int low,
-                      int high,
+  RangeAssumptionStmt(Stmt *input, Stmt *base, int low, int high,
                       const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), input(input), base(base), low(low), high(high) {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, input, base, low, high);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -752,19 +639,16 @@ class RangeAssumptionStmt : public Stmt {
  * the SNodes with id in the |covers| field should have only one dimension.
  */
 class LoopUniqueStmt : public Stmt {
- public:
+public:
   Stmt *input;
-  std::unordered_set<int> covers;  // Stores SNode id
+  std::unordered_set<int> covers; // Stores SNode id
   // std::unordered_set<> provides operator==, and StmtFieldManager will
   // use that to check if two LoopUniqueStmts are the same.
 
-  LoopUniqueStmt(Stmt *input,
-                 const std::vector<SNode *> &covers,
+  LoopUniqueStmt(Stmt *input, const std::vector<SNode *> &covers,
                  const DebugInfo &dbg_info = DebugInfo());
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, input, covers);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -775,7 +659,7 @@ class LoopUniqueStmt : public Stmt {
  * and global temporary variables.
  */
 class GlobalLoadStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *src;
 
   explicit GlobalLoadStmt(Stmt *src, const DebugInfo &dbg_info = DebugInfo())
@@ -783,18 +667,12 @@ class GlobalLoadStmt : public Stmt, public ir_traits::Load {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return src;
-  }
+  stmt_refs get_load_pointers() const override { return src; }
 
   TI_STMT_DEF_FIELDS(ret_type, src);
   TI_DEFINE_ACCEPT_AND_CLONE;
@@ -805,29 +683,22 @@ class GlobalLoadStmt : public Stmt, public ir_traits::Load {
  * and global temporary variables.
  */
 class GlobalStoreStmt : public Stmt, public ir_traits::Store {
- public:
+public:
   Stmt *dest;
   Stmt *val;
 
-  GlobalStoreStmt(Stmt *dest,
-                  Stmt *val,
+  GlobalStoreStmt(Stmt *dest, Stmt *val,
                   const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), dest(dest), val(val) {
     TI_STMT_REG_FIELDS;
   }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   // IR Trait: Store
-  stmt_refs get_store_destination() const override {
-    return dest;
-  }
+  stmt_refs get_store_destination() const override { return dest; }
 
-  Stmt *get_store_data() const override {
-    return val;
-  }
+  Stmt *get_store_data() const override { return val; }
 
   TI_STMT_DEF_FIELDS(ret_type, dest, val);
   TI_DEFINE_ACCEPT_AND_CLONE;
@@ -837,7 +708,7 @@ class GlobalStoreStmt : public Stmt, public ir_traits::Store {
  * A load from a local variable, i.e., an "alloca".
  */
 class LocalLoadStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *src;
 
   explicit LocalLoadStmt(Stmt *src, const DebugInfo &dbg_info = DebugInfo())
@@ -845,18 +716,12 @@ class LocalLoadStmt : public Stmt, public ir_traits::Load {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return src;
-  }
+  stmt_refs get_load_pointers() const override { return src; }
 
   TI_STMT_DEF_FIELDS(ret_type, src);
   TI_DEFINE_ACCEPT_AND_CLONE;
@@ -866,7 +731,7 @@ class LocalLoadStmt : public Stmt, public ir_traits::Load {
  * A store to a local variable, i.e., an "alloca".
  */
 class LocalStoreStmt : public Stmt, public ir_traits::Store {
- public:
+public:
   Stmt *dest;
   Stmt *val;
 
@@ -877,26 +742,16 @@ class LocalStoreStmt : public Stmt, public ir_traits::Store {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool dead_instruction_eliminable() const override {
-    return false;
-  }
+  bool dead_instruction_eliminable() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   // IR Trait: Store
-  stmt_refs get_store_destination() const override {
-    return dest;
-  }
+  stmt_refs get_store_destination() const override { return dest; }
 
-  Stmt *get_store_data() const override {
-    return val;
-  }
+  Stmt *get_store_data() const override { return val; }
 
   TI_STMT_DEF_FIELDS(ret_type, dest, val);
   TI_DEFINE_ACCEPT_AND_CLONE;
@@ -907,7 +762,7 @@ class LocalStoreStmt : public Stmt, public ir_traits::Store {
  * |true_mask| and |false_mask| are used to support vectorization.
  */
 class IfStmt : public Stmt {
- public:
+public:
   Stmt *cond;
   std::unique_ptr<Block> true_statements, false_statements;
 
@@ -917,9 +772,7 @@ class IfStmt : public Stmt {
   void set_true_statements(std::unique_ptr<Block> &&new_true_statements);
   void set_false_statements(std::unique_ptr<Block> &&new_false_statements);
 
-  bool is_container_statement() const override {
-    return true;
-  }
+  bool is_container_statement() const override { return true; }
 
   std::unique_ptr<Stmt> clone() const override;
 
@@ -933,7 +786,7 @@ class IfStmt : public Stmt {
  * by a comma and a space.
  */
 class PrintStmt : public Stmt {
- public:
+public:
   using EntryType = std::variant<Stmt *, std::string>;
   using FormatType = std::optional<std::string>;
   const std::vector<EntryType> contents;
@@ -960,14 +813,12 @@ class PrintStmt : public Stmt {
   TI_STMT_DEF_FIELDS(ret_type, contents);
   TI_DEFINE_ACCEPT_AND_CLONE
 
- private:
-  static void make_entries_helper(std::vector<PrintStmt::EntryType> &entries) {
-  }
+private:
+  static void make_entries_helper(std::vector<PrintStmt::EntryType> &entries) {}
 
   template <typename T, typename... Args>
   static void make_entries_helper(std::vector<PrintStmt::EntryType> &entries,
-                                  T &&t,
-                                  Args &&...values) {
+                                  T &&t, Args &&...values) {
     entries.push_back(EntryType{t});
     make_entries_helper(entries, std::forward<Args>(values)...);
   }
@@ -984,7 +835,7 @@ class PrintStmt : public Stmt {
  * A constant value.
  */
 class ConstStmt : public Stmt {
- public:
+public:
   TypedConstant val;
 
   explicit ConstStmt(const TypedConstant &val,
@@ -994,9 +845,7 @@ class ConstStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, val);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1011,7 +860,7 @@ class ConstStmt : public Stmt {
  * serial for loop.
  */
 class RangeForStmt : public Stmt {
- public:
+public:
   Stmt *begin, *end;
   std::unique_ptr<Block> body;
   bool reversed;
@@ -1021,32 +870,18 @@ class RangeForStmt : public Stmt {
   bool strictly_serialized;
   std::string range_hint;
 
-  RangeForStmt(Stmt *begin,
-               Stmt *end,
-               std::unique_ptr<Block> &&body,
-               bool is_bit_vectorized,
-               int num_cpu_threads,
-               int block_dim,
-               bool strictly_serialized,
-               std::string range_hint = "");
+  RangeForStmt(Stmt *begin, Stmt *end, std::unique_ptr<Block> &&body,
+               bool is_bit_vectorized, int num_cpu_threads, int block_dim,
+               bool strictly_serialized, std::string range_hint = "");
 
-  bool is_container_statement() const override {
-    return true;
-  }
+  bool is_container_statement() const override { return true; }
 
-  void reverse() {
-    reversed = !reversed;
-  }
+  void reverse() { reversed = !reversed; }
 
   std::unique_ptr<Stmt> clone() const override;
 
-  TI_STMT_DEF_FIELDS(begin,
-                     end,
-                     reversed,
-                     is_bit_vectorized,
-                     num_cpu_threads,
-                     block_dim,
-                     strictly_serialized);
+  TI_STMT_DEF_FIELDS(begin, end, reversed, is_bit_vectorized, num_cpu_threads,
+                     block_dim, strictly_serialized);
   TI_DEFINE_ACCEPT
 };
 
@@ -1055,7 +890,7 @@ class RangeForStmt : public Stmt {
  * in Python. This statement must be at the top level before offloading.
  */
 class StructForStmt : public Stmt {
- public:
+public:
   SNode *snode;
   std::unique_ptr<Block> body;
   std::unique_ptr<Block> block_initialization;
@@ -1066,24 +901,15 @@ class StructForStmt : public Stmt {
   int block_dim;
   MemoryAccessOptions mem_access_opt;
 
-  StructForStmt(SNode *snode,
-                std::unique_ptr<Block> &&body,
-                bool is_bit_vectorized,
-                int num_cpu_threads,
-                int block_dim);
+  StructForStmt(SNode *snode, std::unique_ptr<Block> &&body,
+                bool is_bit_vectorized, int num_cpu_threads, int block_dim);
 
-  bool is_container_statement() const override {
-    return true;
-  }
+  bool is_container_statement() const override { return true; }
 
   std::unique_ptr<Stmt> clone() const override;
 
-  TI_STMT_DEF_FIELDS(snode,
-                     index_offsets,
-                     is_bit_vectorized,
-                     num_cpu_threads,
-                     block_dim,
-                     mem_access_opt);
+  TI_STMT_DEF_FIELDS(snode, index_offsets, is_bit_vectorized, num_cpu_threads,
+                     block_dim, mem_access_opt);
   TI_DEFINE_ACCEPT
 };
 
@@ -1091,7 +917,7 @@ class StructForStmt : public Stmt {
  * meshfor
  */
 class MeshForStmt : public Stmt {
- public:
+public:
   mesh::Mesh *mesh;
   std::unique_ptr<Block> body;
   bool is_bit_vectorized;
@@ -1102,26 +928,16 @@ class MeshForStmt : public Stmt {
   std::unordered_set<mesh::MeshRelationType> minor_relation_types{};
   MemoryAccessOptions mem_access_opt;
 
-  MeshForStmt(mesh::Mesh *mesh,
-              mesh::MeshElementType element_type,
-              std::unique_ptr<Block> &&body,
-              bool is_bit_vectorized,
-              int num_cpu_threads,
-              int block_dim);
+  MeshForStmt(mesh::Mesh *mesh, mesh::MeshElementType element_type,
+              std::unique_ptr<Block> &&body, bool is_bit_vectorized,
+              int num_cpu_threads, int block_dim);
 
-  bool is_container_statement() const override {
-    return true;
-  }
+  bool is_container_statement() const override { return true; }
 
   std::unique_ptr<Stmt> clone() const override;
 
-  TI_STMT_DEF_FIELDS(mesh,
-                     is_bit_vectorized,
-                     num_cpu_threads,
-                     block_dim,
-                     major_from_type,
-                     major_to_types,
-                     minor_relation_types,
+  TI_STMT_DEF_FIELDS(mesh, is_bit_vectorized, num_cpu_threads, block_dim,
+                     major_from_type, major_to_types, minor_relation_types,
                      mem_access_opt);
   TI_DEFINE_ACCEPT
 };
@@ -1130,23 +946,19 @@ class MeshForStmt : public Stmt {
  * Call an inline Taichi function.
  */
 class FuncCallStmt : public Stmt, public ir_traits::Store {
- public:
+public:
   Function *func;
   std::vector<Stmt *> args;
   bool global_side_effect{true};
 
   FuncCallStmt(Function *func, const std::vector<Stmt *> &args);
 
-  bool has_global_side_effect() const override {
-    return global_side_effect;
-  }
+  bool has_global_side_effect() const override { return global_side_effect; }
 
   // IR Trait: Store
   stmt_refs get_store_destination() const override;
 
-  Stmt *get_store_data() const override {
-    return nullptr;
-  }
+  Stmt *get_store_data() const override { return nullptr; }
 
   TI_STMT_DEF_FIELDS(ret_type, func, args);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1156,7 +968,7 @@ class FuncCallStmt : public Stmt, public ir_traits::Store {
  * A reference to a variable.
  */
 class ReferenceStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *var;
   bool global_side_effect{false};
 
@@ -1165,14 +977,10 @@ class ReferenceStmt : public Stmt, public ir_traits::Load {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return global_side_effect;
-  }
+  bool has_global_side_effect() const override { return global_side_effect; }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return var;
-  }
+  stmt_refs get_load_pointers() const override { return var; }
 
   TI_STMT_DEF_FIELDS(ret_type, var);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1182,11 +990,10 @@ class ReferenceStmt : public Stmt, public ir_traits::Load {
  * Gets an element from a struct
  */
 class GetElementStmt : public Stmt {
- public:
+public:
   Stmt *src;
   std::vector<int> index;
-  GetElementStmt(Stmt *src,
-                 const std::vector<int> &index,
+  GetElementStmt(Stmt *src, const std::vector<int> &index,
                  const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), src(src), index(index) {
     TI_STMT_REG_FIELDS;
@@ -1200,16 +1007,14 @@ class GetElementStmt : public Stmt {
  * Exit the kernel or function with a return value.
  */
 class ReturnStmt : public Stmt {
- public:
+public:
   std::vector<Stmt *> values;
 
   explicit ReturnStmt(const std::vector<Stmt *> &values) : values(values) {
     TI_STMT_REG_FIELDS;
   }
 
-  explicit ReturnStmt(Stmt *value) : values({value}) {
-    TI_STMT_REG_FIELDS;
-  }
+  explicit ReturnStmt(Stmt *value) : values({value}) { TI_STMT_REG_FIELDS; }
 
   std::vector<DataType> element_types() {
     std::vector<DataType> ele_types;
@@ -1237,15 +1042,13 @@ class ReturnStmt : public Stmt {
  * A serial while-true loop. |mask| is to support vectorization.
  */
 class WhileStmt : public Stmt {
- public:
+public:
   Stmt *mask;
   std::unique_ptr<Block> body;
 
   explicit WhileStmt(std::unique_ptr<Block> &&body);
 
-  bool is_container_statement() const override {
-    return true;
-  }
+  bool is_container_statement() const override { return true; }
 
   std::unique_ptr<Stmt> clone() const override;
 
@@ -1255,7 +1058,7 @@ class WhileStmt : public Stmt {
 
 // TODO: remove this (replace with input + ConstStmt(offset))
 class IntegerOffsetStmt : public Stmt {
- public:
+public:
   Stmt *input;
   int64 offset;
 
@@ -1263,9 +1066,7 @@ class IntegerOffsetStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, input, offset);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1275,7 +1076,7 @@ class IntegerOffsetStmt : public Stmt {
  * All indices of an address fused together.
  */
 class LinearizeStmt : public Stmt {
- public:
+public:
   std::vector<Stmt *> inputs;
   std::vector<int> strides;
 
@@ -1286,9 +1087,7 @@ class LinearizeStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, inputs, strides);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1298,7 +1097,7 @@ class LinearizeStmt : public Stmt {
  * The SNode root.
  */
 class GetRootStmt : public Stmt {
- public:
+public:
   explicit GetRootStmt(SNode *root = nullptr) : root_(root) {
     if (this->root_ != nullptr) {
       while (this->root_->parent) {
@@ -1308,22 +1107,16 @@ class GetRootStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, root_);
   TI_DEFINE_ACCEPT_AND_CLONE
 
-  SNode *root() {
-    return root_;
-  }
+  SNode *root() { return root_; }
 
-  const SNode *root() const {
-    return root_;
-  }
+  const SNode *root() const { return root_; }
 
- private:
+private:
   SNode *root_;
 };
 
@@ -1331,30 +1124,22 @@ class GetRootStmt : public Stmt {
  * Lookup a component of a SNode.
  */
 class SNodeLookupStmt : public Stmt {
- public:
+public:
   SNode *snode;
   Stmt *input_snode;
   Stmt *input_index;
   bool activate;
 
-  SNodeLookupStmt(SNode *snode,
-                  Stmt *input_snode,
-                  Stmt *input_index,
+  SNodeLookupStmt(SNode *snode, Stmt *input_snode, Stmt *input_index,
                   bool activate)
-      : snode(snode),
-        input_snode(input_snode),
-        input_index(input_index),
+      : snode(snode), input_snode(input_snode), input_index(input_index),
         activate(activate) {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return activate;
-  }
+  bool has_global_side_effect() const override { return activate; }
 
-  bool common_statement_eliminable() const override {
-    return true;
-  }
+  bool common_statement_eliminable() const override { return true; }
 
   TI_STMT_DEF_FIELDS(ret_type, snode, input_snode, input_index, activate);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1364,7 +1149,7 @@ class SNodeLookupStmt : public Stmt {
  * Get a child of a SNode on the hierarchical SNode tree.
  */
 class GetChStmt : public Stmt {
- public:
+public:
   Stmt *input_ptr;
   SNode *input_snode, *output_snode;
   int chid;
@@ -1374,25 +1159,15 @@ class GetChStmt : public Stmt {
   // irpass::type_check()
   bool overrided_dtype = false;
 
-  GetChStmt(Stmt *input_ptr,
-            int chid,
-            bool is_bit_vectorized = false,
+  GetChStmt(Stmt *input_ptr, int chid, bool is_bit_vectorized = false,
             const DebugInfo &dbg_info = DebugInfo());
-  GetChStmt(Stmt *input_ptr,
-            SNode *snode,
-            int chid,
+  GetChStmt(Stmt *input_ptr, SNode *snode, int chid,
             bool is_bit_vectorized = false,
             const DebugInfo &dbg_info = DebugInfo());
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  TI_STMT_DEF_FIELDS(ret_type,
-                     input_ptr,
-                     input_snode,
-                     output_snode,
-                     chid,
+  TI_STMT_DEF_FIELDS(ret_type, input_ptr, input_snode, output_snode, chid,
                      is_bit_vectorized);
   TI_DEFINE_ACCEPT_AND_CLONE
 };
@@ -1401,7 +1176,7 @@ class GetChStmt : public Stmt {
  * The statement corresponding to an offloaded task.
  */
 class OffloadedStmt : public Stmt {
- public:
+public:
   using TaskType = OffloadedTaskType;
 
   Kernel *kernel_;
@@ -1428,23 +1203,23 @@ class OffloadedStmt : public Stmt {
   std::unordered_set<mesh::MeshRelationType> minor_relation_types;
 
   std::unordered_map<mesh::MeshElementType, Stmt *>
-      owned_offset_local;  // |owned_offset[idx]|
+      owned_offset_local; // |owned_offset[idx]|
   std::unordered_map<mesh::MeshElementType, Stmt *>
-      total_offset_local;  // |total_offset[idx]|
+      total_offset_local; // |total_offset[idx]|
   std::unordered_map<mesh::MeshElementType, Stmt *>
-      owned_num_local;  // |owned_offset[idx+1] - owned_offset[idx]|
+      owned_num_local; // |owned_offset[idx+1] - owned_offset[idx]|
   std::unordered_map<mesh::MeshElementType, Stmt *>
-      total_num_local;  // |total_offset[idx+1] - total_offset[idx]|
+      total_num_local; // |total_offset[idx+1] - total_offset[idx]|
 
   std::vector<int> index_offsets;
 
   std::unique_ptr<Block> tls_prologue;
-  std::unique_ptr<Block> mesh_prologue;  // mesh-for only block
+  std::unique_ptr<Block> mesh_prologue; // mesh-for only block
   std::unique_ptr<Block> bls_prologue;
   std::unique_ptr<Block> body;
   std::unique_ptr<Block> bls_epilogue;
   std::unique_ptr<Block> tls_epilogue;
-  std::size_t tls_size{1};  // avoid allocating dynamic memory with 0 byte
+  std::size_t tls_size{1}; // avoid allocating dynamic memory with 0 byte
   std::size_t bls_size{0};
   MemoryAccessOptions mem_access_opt;
 
@@ -1458,34 +1233,18 @@ class OffloadedStmt : public Stmt {
     return task_type != TaskType::listgen && task_type != TaskType::gc;
   }
 
-  Callable *get_callable() const override {
-    return (Callable *)kernel_;
-  }
+  Callable *get_callable() const override { return (Callable *)kernel_; }
 
-  bool is_container_statement() const override {
-    return has_body();
-  }
+  bool is_container_statement() const override { return has_body(); }
 
   std::unique_ptr<Stmt> clone() const override;
 
   void all_blocks_accept(IRVisitor *visitor, bool skip_mesh_prologue = false);
 
-  TI_STMT_DEF_FIELDS(ret_type /*inherited from Stmt*/,
-                     task_type,
-                     device,
-                     snode,
-                     begin_offset,
-                     end_offset,
-                     const_begin,
-                     const_end,
-                     begin_value,
-                     end_value,
-                     grid_dim,
-                     block_dim,
-                     reversed,
-                     num_cpu_threads,
-                     index_offsets,
-                     mem_access_opt);
+  TI_STMT_DEF_FIELDS(ret_type /*inherited from Stmt*/, task_type, device, snode,
+                     begin_offset, end_offset, const_begin, const_end,
+                     begin_value, end_value, grid_dim, block_dim, reversed,
+                     num_cpu_threads, index_offsets, mem_access_opt);
   TI_DEFINE_ACCEPT
 };
 
@@ -1493,7 +1252,7 @@ class OffloadedStmt : public Stmt {
  * The |index|-th index of the |loop|.
  */
 class LoopIndexStmt : public Stmt {
- public:
+public:
   Stmt *loop;
   int index;
 
@@ -1522,9 +1281,7 @@ class LoopIndexStmt : public Stmt {
     }
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, loop, index);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1535,16 +1292,12 @@ class LoopIndexStmt : public Stmt {
  * TODO: Remove this. Have a better way for retrieving thread index.
  */
 class LoopLinearIndexStmt : public Stmt {
- public:
+public:
   Stmt *loop;
 
-  explicit LoopLinearIndexStmt(Stmt *loop) : loop(loop) {
-    TI_STMT_REG_FIELDS;
-  }
+  explicit LoopLinearIndexStmt(Stmt *loop) : loop(loop) { TI_STMT_REG_FIELDS; }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, loop);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1554,14 +1307,10 @@ class LoopLinearIndexStmt : public Stmt {
  * global thread index, i.e. thread_idx() + block_idx() * block_dim()
  */
 class GlobalThreadIndexStmt : public Stmt {
- public:
-  explicit GlobalThreadIndexStmt() {
-    TI_STMT_REG_FIELDS;
-  }
+public:
+  explicit GlobalThreadIndexStmt() { TI_STMT_REG_FIELDS; }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1572,7 +1321,7 @@ class GlobalThreadIndexStmt : public Stmt {
  * the block.
  */
 class BlockCornerIndexStmt : public Stmt {
- public:
+public:
   Stmt *loop;
   int index;
 
@@ -1580,9 +1329,7 @@ class BlockCornerIndexStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, loop, index);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1593,7 +1340,7 @@ class BlockCornerIndexStmt : public Stmt {
  * buffer.
  */
 class GlobalTemporaryStmt : public Stmt {
- public:
+public:
   std::size_t offset;
 
   GlobalTemporaryStmt(std::size_t offset, const DataType &ret_type)
@@ -1602,9 +1349,7 @@ class GlobalTemporaryStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, offset);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1614,7 +1359,7 @@ class GlobalTemporaryStmt : public Stmt {
  * A thread-local pointer, located at |offset| in the thread-local storage.
  */
 class ThreadLocalPtrStmt : public Stmt {
- public:
+public:
   std::size_t offset;
 
   ThreadLocalPtrStmt(std::size_t offset, const DataType &ret_type)
@@ -1623,9 +1368,7 @@ class ThreadLocalPtrStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, offset);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1635,7 +1378,7 @@ class ThreadLocalPtrStmt : public Stmt {
  * A block-local pointer, located at |offset| in the block-local storage.
  */
 class BlockLocalPtrStmt : public Stmt {
- public:
+public:
   Stmt *offset;
 
   BlockLocalPtrStmt(Stmt *offset, const DataType &ret_type) : offset(offset) {
@@ -1643,9 +1386,7 @@ class BlockLocalPtrStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, offset);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1655,7 +1396,7 @@ class BlockLocalPtrStmt : public Stmt {
  * The statement corresponding to a clear-list task.
  */
 class ClearListStmt : public Stmt {
- public:
+public:
   explicit ClearListStmt(SNode *snode);
 
   SNode *snode;
@@ -1668,7 +1409,7 @@ class ClearListStmt : public Stmt {
 bool is_clear_list_task(const OffloadedStmt *stmt);
 
 class InternalFuncStmt : public Stmt {
- public:
+public:
   std::string func_name;
   std::vector<Stmt *> args;
   bool with_runtime_context;
@@ -1677,8 +1418,7 @@ class InternalFuncStmt : public Stmt {
                             const std::vector<Stmt *> &args,
                             Type *ret_type = nullptr,
                             bool with_runtime_context = true)
-      : func_name(func_name),
-        args(args),
+      : func_name(func_name), args(args),
         with_runtime_context(with_runtime_context) {
     if (ret_type == nullptr) {
       this->ret_type = PrimitiveType::i32;
@@ -1695,7 +1435,7 @@ class InternalFuncStmt : public Stmt {
 class Texture;
 
 class TexturePtrStmt : public Stmt {
- public:
+public:
   Stmt *arg_load_stmt{nullptr};
   int dimensions{2};
   bool is_storage{false};
@@ -1704,27 +1444,17 @@ class TexturePtrStmt : public Stmt {
   BufferFormat format{0};
   int lod{0};
 
-  explicit TexturePtrStmt(Stmt *stmt,
-                          int dimensions,
-                          bool is_storage,
-                          BufferFormat format,
-                          int lod,
+  explicit TexturePtrStmt(Stmt *stmt, int dimensions, bool is_storage,
+                          BufferFormat format, int lod,
                           const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        arg_load_stmt(stmt),
-        dimensions(dimensions),
-        is_storage(is_storage),
-        format(format),
-        lod(lod) {
+      : Stmt(dbg_info), arg_load_stmt(stmt), dimensions(dimensions),
+        is_storage(is_storage), format(format), lod(lod) {
     TI_STMT_REG_FIELDS;
   }
 
-  explicit TexturePtrStmt(Stmt *stmt,
-                          int dimensions,
+  explicit TexturePtrStmt(Stmt *stmt, int dimensions,
                           const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        arg_load_stmt(stmt),
-        dimensions(dimensions),
+      : Stmt(dbg_info), arg_load_stmt(stmt), dimensions(dimensions),
         is_storage(false) {
     TI_STMT_REG_FIELDS;
   }
@@ -1734,13 +1464,12 @@ class TexturePtrStmt : public Stmt {
 };
 
 class TextureOpStmt : public Stmt {
- public:
+public:
   TextureOpType op;
   Stmt *texture_ptr;
   std::vector<Stmt *> args;
 
-  explicit TextureOpStmt(TextureOpType op,
-                         Stmt *texture_ptr,
+  explicit TextureOpStmt(TextureOpType op, Stmt *texture_ptr,
                          const std::vector<Stmt *> &args,
                          const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info), op(op), texture_ptr(texture_ptr), args(args) {
@@ -1765,9 +1494,9 @@ class TextureOpStmt : public Stmt {
  * A local AD-stack.
  */
 class AdStackAllocaStmt : public Stmt {
- public:
+public:
   DataType dt;
-  std::size_t max_size{0};  // 0 = adaptive
+  std::size_t max_size{0}; // 0 = adaptive
 
   AdStackAllocaStmt(const DataType &dt, std::size_t max_size)
       : dt(dt), max_size(max_size) {
@@ -1775,9 +1504,7 @@ class AdStackAllocaStmt : public Stmt {
     TI_STMT_REG_FIELDS;
   }
 
-  std::size_t element_size_in_bytes() const {
-    return data_type_size(ret_type);
-  }
+  std::size_t element_size_in_bytes() const { return data_type_size(ret_type); }
 
   std::size_t entry_size_in_bytes() const {
     return element_size_in_bytes() * 2;
@@ -1787,13 +1514,9 @@ class AdStackAllocaStmt : public Stmt {
     return sizeof(int32) + entry_size_in_bytes() * max_size;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, dt, max_size);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1803,7 +1526,7 @@ class AdStackAllocaStmt : public Stmt {
  * Load the top primal value of an AD-stack.
  */
 class AdStackLoadTopStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *stack;
 
   // return the pointer to the top element instead of the stack, instead of
@@ -1817,18 +1540,12 @@ class AdStackLoadTopStmt : public Stmt, public ir_traits::Load {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return stack;
-  }
+  stmt_refs get_load_pointers() const override { return stack; }
 
   TI_STMT_DEF_FIELDS(ret_type, stack);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1838,7 +1555,7 @@ class AdStackLoadTopStmt : public Stmt, public ir_traits::Load {
  * Load the top adjoint value of an AD-stack.
  */
 class AdStackLoadTopAdjStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *stack;
 
   explicit AdStackLoadTopAdjStmt(Stmt *stack) {
@@ -1847,18 +1564,12 @@ class AdStackLoadTopAdjStmt : public Stmt, public ir_traits::Load {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return stack;
-  }
+  stmt_refs get_load_pointers() const override { return stack; }
 
   TI_STMT_DEF_FIELDS(ret_type, stack);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -1868,7 +1579,7 @@ class AdStackLoadTopAdjStmt : public Stmt, public ir_traits::Load {
  * Pop the top primal and adjoint values in the AD-stack.
  */
 class AdStackPopStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *stack;
 
   explicit AdStackPopStmt(Stmt *stack) {
@@ -1895,7 +1606,7 @@ class AdStackPopStmt : public Stmt, public ir_traits::Load {
  * value to 0.
  */
 class AdStackPushStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *stack;
   Stmt *v;
 
@@ -1924,7 +1635,7 @@ class AdStackPushStmt : public Stmt, public ir_traits::Load {
  * This statement loads and stores the adjoint data.
  */
 class AdStackAccAdjointStmt : public Stmt, public ir_traits::Load {
- public:
+public:
   Stmt *stack;
   Stmt *v;
 
@@ -1936,9 +1647,7 @@ class AdStackAccAdjointStmt : public Stmt, public ir_traits::Load {
   }
 
   // IR Trait: Load
-  stmt_refs get_load_pointers() const override {
-    return stack;
-  }
+  stmt_refs get_load_pointers() const override { return stack; }
 
   // Mark has_global_side_effect == true to prevent being moved out of an if
   // clause in the simplify pass for now.
@@ -1951,14 +1660,13 @@ class AdStackAccAdjointStmt : public Stmt, public ir_traits::Load {
  * A global store to one or more children of a bit struct.
  */
 class BitStructStoreStmt : public Stmt {
- public:
+public:
   Stmt *ptr;
   std::vector<int> ch_ids;
   std::vector<Stmt *> values;
   bool is_atomic;
 
-  BitStructStoreStmt(Stmt *ptr,
-                     const std::vector<int> &ch_ids,
+  BitStructStoreStmt(Stmt *ptr, const std::vector<int> &ch_ids,
                      const std::vector<Stmt *> &values)
       : ptr(ptr), ch_ids(ch_ids), values(values), is_atomic(true) {
     TI_ASSERT(ch_ids.size() == values.size());
@@ -1967,9 +1675,7 @@ class BitStructStoreStmt : public Stmt {
 
   BitStructType *get_bit_struct() const;
 
-  bool common_statement_eliminable() const override {
-    return false;
-  }
+  bool common_statement_eliminable() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, ptr, ch_ids, values, is_atomic);
   TI_DEFINE_ACCEPT_AND_CLONE;
@@ -1983,46 +1689,33 @@ class BitStructStoreStmt : public Stmt {
  * relation) of a mesh idx
  */
 class MeshRelationAccessStmt : public Stmt {
- public:
+public:
   mesh::Mesh *mesh;
   Stmt *mesh_idx;
   mesh::MeshElementType to_type;
   Stmt *neighbor_idx;
 
-  MeshRelationAccessStmt(mesh::Mesh *mesh,
-                         Stmt *mesh_idx,
-                         mesh::MeshElementType to_type,
-                         Stmt *neighbor_idx,
+  MeshRelationAccessStmt(mesh::Mesh *mesh, Stmt *mesh_idx,
+                         mesh::MeshElementType to_type, Stmt *neighbor_idx,
                          const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        mesh(mesh),
-        mesh_idx(mesh_idx),
-        to_type(to_type),
+      : Stmt(dbg_info), mesh(mesh), mesh_idx(mesh_idx), to_type(to_type),
         neighbor_idx(neighbor_idx) {
     this->ret_type = PrimitiveType::u16;
     TI_STMT_REG_FIELDS;
   }
 
-  MeshRelationAccessStmt(mesh::Mesh *mesh,
-                         Stmt *mesh_idx,
+  MeshRelationAccessStmt(mesh::Mesh *mesh, Stmt *mesh_idx,
                          mesh::MeshElementType to_type,
                          const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        mesh(mesh),
-        mesh_idx(mesh_idx),
-        to_type(to_type),
+      : Stmt(dbg_info), mesh(mesh), mesh_idx(mesh_idx), to_type(to_type),
         neighbor_idx(nullptr) {
     this->ret_type = PrimitiveType::u16;
     TI_STMT_REG_FIELDS;
   }
 
-  bool is_size() const {
-    return neighbor_idx == nullptr;
-  }
+  bool is_size() const { return neighbor_idx == nullptr; }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   mesh::MeshElementType from_type() const {
     if (auto idx = mesh_idx->cast<LoopIndexStmt>()) {
@@ -2044,30 +1737,23 @@ class MeshRelationAccessStmt : public Stmt {
  *  Convert a mesh index to another index space
  */
 class MeshIndexConversionStmt : public Stmt {
- public:
+public:
   mesh::Mesh *mesh;
   mesh::MeshElementType idx_type;
   Stmt *idx;
 
   mesh::ConvType conv_type;
 
-  MeshIndexConversionStmt(mesh::Mesh *mesh,
-                          mesh::MeshElementType idx_type,
-                          Stmt *idx,
-                          mesh::ConvType conv_type,
+  MeshIndexConversionStmt(mesh::Mesh *mesh, mesh::MeshElementType idx_type,
+                          Stmt *idx, mesh::ConvType conv_type,
                           const DebugInfo &dbg_info = DebugInfo())
-      : Stmt(dbg_info),
-        mesh(mesh),
-        idx_type(idx_type),
-        idx(idx),
+      : Stmt(dbg_info), mesh(mesh), idx_type(idx_type), idx(idx),
         conv_type(conv_type) {
     this->ret_type = PrimitiveType::i32;
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type, mesh, idx_type, idx, conv_type);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -2077,16 +1763,14 @@ class MeshIndexConversionStmt : public Stmt {
  * The patch index of the |mesh_loop|.
  */
 class MeshPatchIndexStmt : public Stmt {
- public:
+public:
   explicit MeshPatchIndexStmt(const DebugInfo &dbg_info = DebugInfo())
       : Stmt(dbg_info) {
     this->ret_type = PrimitiveType::i32;
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
 
   TI_STMT_DEF_FIELDS(ret_type);
   TI_DEFINE_ACCEPT_AND_CLONE
@@ -2096,16 +1780,14 @@ class MeshPatchIndexStmt : public Stmt {
  * Initialization of a local matrix
  */
 class MatrixInitStmt : public Stmt {
- public:
+public:
   std::vector<Stmt *> values;
 
   explicit MatrixInitStmt(const std::vector<Stmt *> &values) : values(values) {
     TI_STMT_REG_FIELDS;
   }
 
-  bool has_global_side_effect() const override {
-    return false;
-  }
+  bool has_global_side_effect() const override { return false; }
   TI_STMT_DEF_FIELDS(ret_type, values);
   TI_DEFINE_ACCEPT_AND_CLONE
 };
@@ -2140,4 +1822,4 @@ std::vector<std::unique_ptr<Stmt>> get_const_stmt_with_value(DataType dt,
   }
 }
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

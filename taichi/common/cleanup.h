@@ -5,7 +5,7 @@
 namespace taichi {
 
 class RaiiCleanup {
- public:
+public:
   using Func = std::function<void()>;
 
   explicit RaiiCleanup(Func fn);
@@ -15,10 +15,10 @@ class RaiiCleanup {
   RaiiCleanup(RaiiCleanup &&) = default;
   RaiiCleanup &operator=(RaiiCleanup &&) = default;
 
- private:
+private:
   Func fn_;
 };
 
 RaiiCleanup make_cleanup(RaiiCleanup::Func fn);
 
-}  // namespace taichi
+} // namespace taichi

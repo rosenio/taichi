@@ -5,15 +5,15 @@
 // and invoking compiled functions (kernels).
 // Designed to be multithreaded for parallel compilation.
 
-#include <mutex>
 #include <functional>
+#include <mutex>
 #include <thread>
 
-#include "taichi/util/lang_util.h"
-#include "taichi/runtime/llvm/llvm_fwd.h"
+#include "taichi/codegen/llvm/llvm_compiled_data.h"
 #include "taichi/ir/snode.h"
 #include "taichi/jit/jit_session.h"
-#include "taichi/codegen/llvm/llvm_compiled_data.h"
+#include "taichi/runtime/llvm/llvm_fwd.h"
+#include "taichi/util/lang_util.h"
 
 namespace taichi::lang {
 
@@ -24,7 +24,7 @@ class LlvmProgramImpl;
  * Manages an LLVMContext for Taichi's usage.
  */
 class TaichiLLVMContext {
- private:
+private:
   struct ThreadLocalData {
     std::unique_ptr<llvm::orc::ThreadSafeContext> thread_safe_llvm_context{
         nullptr};
@@ -36,7 +36,7 @@ class TaichiLLVMContext {
   };
   const CompileConfig &config_;
 
- public:
+public:
   // main_thread is defined to be the thread that runs the initializer
 
   std::unique_ptr<ThreadLocalData> linking_context_data{nullptr};
@@ -69,8 +69,7 @@ class TaichiLLVMContext {
 
   llvm::Type *get_data_type(DataType dt);
 
-  template <typename T>
-  llvm::Type *get_data_type() {
+  template <typename T> llvm::Type *get_data_type() {
     return TaichiLLVMContext::get_data_type(taichi::lang::get_data_type<T>());
   }
 
@@ -78,15 +77,13 @@ class TaichiLLVMContext {
 
   std::size_t get_struct_element_offset(llvm::StructType *type, int idx);
 
-  std::pair<const StructType *, size_t> get_struct_type_with_data_layout(
-      const StructType *old_ty,
-      const std::string &layout);
+  std::pair<const StructType *, size_t>
+  get_struct_type_with_data_layout(const StructType *old_ty,
+                                   const std::string &layout);
 
-  template <typename T>
-  llvm::Value *get_constant(T t);
+  template <typename T> llvm::Value *get_constant(T t);
 
-  template <typename T>
-  llvm::Value *get_constant(DataType dt, T t);
+  template <typename T> llvm::Value *get_constant(DataType dt, T t);
 
   llvm::DataLayout get_data_layout();
 
@@ -114,9 +111,8 @@ class TaichiLLVMContext {
   llvm::Function *get_struct_function(const std::string &name, int tree_id);
   llvm::Type *get_runtime_type(const std::string &name);
 
-  std::unique_ptr<llvm::Module> new_module(
-      std::string name,
-      llvm::LLVMContext *context = nullptr);
+  std::unique_ptr<llvm::Module>
+  new_module(std::string name, llvm::LLVMContext *context = nullptr);
 
   void delete_snode_tree(int id);
 
@@ -124,18 +120,18 @@ class TaichiLLVMContext {
 
   static std::string get_struct_for_func_name(int tls_size);
 
-  LLVMCompiledKernel link_compiled_tasks(
-      std::vector<std::unique_ptr<LLVMCompiledTask>> data_list);
+  LLVMCompiledKernel
+  link_compiled_tasks(std::vector<std::unique_ptr<LLVMCompiledTask>> data_list);
 
   static llvm::DataLayout get_data_layout(Arch arch);
 
- private:
-  std::unique_ptr<llvm::Module> clone_module_to_context(
-      llvm::Module *module,
-      llvm::LLVMContext *target_context);
+private:
+  std::unique_ptr<llvm::Module>
+  clone_module_to_context(llvm::Module *module,
+                          llvm::LLVMContext *target_context);
 
-  void link_module_with_custom_cuda_library(
-      std::unique_ptr<llvm::Module> &module);
+  void
+  link_module_with_custom_cuda_library(std::unique_ptr<llvm::Module> &module);
 
   void link_module_with_cuda_libdevice(std::unique_ptr<llvm::Module> &module);
 
@@ -145,8 +141,8 @@ class TaichiLLVMContext {
 
   void insert_nvvm_annotation(llvm::Function *func, std::string key, int val);
 
-  std::unique_ptr<llvm::Module> clone_module_to_this_thread_context(
-      llvm::Module *module);
+  std::unique_ptr<llvm::Module>
+  clone_module_to_this_thread_context(llvm::Module *module);
 
   ThreadLocalData *get_this_thread_data();
 
@@ -164,7 +160,7 @@ class TaichiLLVMContext {
 };
 
 class LlvmModuleBitcodeLoader {
- public:
+public:
   LlvmModuleBitcodeLoader &set_bitcode_path(const std::string &bitcode_path) {
     bitcode_path_ = bitcode_path;
     return *this;
@@ -182,14 +178,14 @@ class LlvmModuleBitcodeLoader {
 
   std::unique_ptr<llvm::Module> load(llvm::LLVMContext *ctx) const;
 
- private:
+private:
   std::string bitcode_path_;
   std::string buffer_id_;
   bool inline_funcs_{false};
 };
 
-std::unique_ptr<llvm::Module> module_from_bitcode_file(
-    const std::string &bitcode_path,
-    llvm::LLVMContext *ctx);
+std::unique_ptr<llvm::Module>
+module_from_bitcode_file(const std::string &bitcode_path,
+                         llvm::LLVMContext *ctx);
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

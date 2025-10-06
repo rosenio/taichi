@@ -6,22 +6,17 @@
 #include "Eigen/IterativeLinearSolvers"
 
 namespace taichi::lang {
-template <typename EigenT, typename DT>
-class CG {
- public:
+template <typename EigenT, typename DT> class CG {
+public:
   CG(SparseMatrix &A, int max_iters, float tol, bool verbose)
       : A_(A), max_iters_(max_iters), tol_(tol), verbose_(verbose) {
     x_ = EigenT::Zero(A_.num_cols());
     b_ = EigenT::Zero(A_.num_rows());
   }
 
-  void set_x(EigenT &x) {
-    x_ = x;
-  }
+  void set_x(EigenT &x) { x_ = x; }
 
-  void set_b(EigenT &b) {
-    b_ = b;
-  }
+  void set_b(EigenT &b) { b_ = b; }
 
   void set_x_ndarray(Program *prog, Ndarray &x) {
     size_t dX = prog->get_ndarray_data_ptr_as_int(&x);
@@ -52,15 +47,11 @@ class CG {
     is_success_ = !(cg.info());
   }
 
-  EigenT &get_x() {
-    return x_;
-  }
+  EigenT &get_x() { return x_; }
 
-  bool is_success() {
-    return is_success_;
-  }
+  bool is_success() { return is_success_; }
 
- private:
+private:
   SparseMatrix &A_;
   EigenT x_;
   EigenT b_;
@@ -71,15 +62,13 @@ class CG {
 };
 
 template <typename EigenT, typename DT>
-std::unique_ptr<CG<EigenT, DT>> make_cg_solver(SparseMatrix &A,
-                                               int max_iters,
-                                               float tol,
-                                               bool verbose) {
+std::unique_ptr<CG<EigenT, DT>> make_cg_solver(SparseMatrix &A, int max_iters,
+                                               float tol, bool verbose) {
   return std::make_unique<CG<EigenT, DT>>(A, max_iters, tol, verbose);
 }
 
 class CUCG {
- public:
+public:
   CUCG(SparseMatrix &A, int max_iters, float tol, bool verbose)
       : A_(A), max_iters_(max_iters), tol_(tol), verbose_(verbose) {
     init_solver();
@@ -87,7 +76,7 @@ class CUCG {
 
   void solve(Program *prog, const Ndarray &x, const Ndarray &b);
 
- private:
+private:
   void init_solver();
   cublasHandle_t handle_;
   SparseMatrix &A_;
@@ -97,8 +86,6 @@ class CUCG {
   bool is_success_{false};
 };
 
-std::unique_ptr<CUCG> make_cucg_solver(SparseMatrix &A,
-                                       int max_iters,
-                                       float tol,
-                                       bool verbose);
-}  // namespace taichi::lang
+std::unique_ptr<CUCG> make_cucg_solver(SparseMatrix &A, int max_iters,
+                                       float tol, bool verbose);
+} // namespace taichi::lang

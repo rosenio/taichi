@@ -1,7 +1,7 @@
 #pragma once
 
-#include <vector>
 #include <mutex>
+#include <vector>
 
 #include "taichi/common/core.h"
 #include "taichi/system/timer.h"
@@ -18,20 +18,16 @@ struct TimelineEvent {
 };
 
 class Timeline {
- public:
+public:
   Timeline();
 
   ~Timeline();
 
   static Timeline &get_this_thread_instance();
 
-  void set_name(const std::string &tid) {
-    tid_ = tid;
-  }
+  void set_name(const std::string &tid) { tid_ = tid; }
 
-  std::string get_name() {
-    return tid_;
-  }
+  std::string get_name() { return tid_; }
 
   void clear();
 
@@ -40,16 +36,16 @@ class Timeline {
   std::vector<TimelineEvent> fetch_events();
 
   class Guard {
-   public:
+  public:
     explicit Guard(const std::string &name);
 
     ~Guard();
 
-   private:
+  private:
     std::string name_;
   };
 
- private:
+private:
   std::string tid_;
   std::mutex mut_;
   std::vector<TimelineEvent> events_;
@@ -57,7 +53,7 @@ class Timeline {
 
 // A timeline system for multi-threaded applications
 class Timelines {
- public:
+public:
   static Timelines &get_instance();
 
   void insert_events(const std::vector<TimelineEvent> &events);
@@ -76,16 +72,16 @@ class Timelines {
 
   void set_enabled(bool enabled);
 
- private:
+private:
   std::mutex mut_;
   std::vector<TimelineEvent> events_;
   std::vector<Timeline *> timelines_;
   bool enabled_{false};
 };
 
-#define TI_TIMELINE(name) \
+#define TI_TIMELINE(name)                                                      \
   taichi::Timeline::Guard _timeline_guard_##__LINE__(name);
 
 #define TI_AUTO_TIMELINE TI_TIMELINE(__FUNCTION__)
 
-}  // namespace taichi
+} // namespace taichi

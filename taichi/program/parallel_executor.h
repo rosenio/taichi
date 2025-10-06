@@ -1,5 +1,6 @@
 #pragma once
 
+#include "taichi/common/core.h"
 #include <atomic>
 #include <condition_variable>
 #include <deque>
@@ -8,11 +9,10 @@
 #include <mutex>
 #include <thread>
 #include <unordered_map>
-#include "taichi/common/core.h"
 
 namespace taichi::lang {
 class ParallelExecutor {
- public:
+public:
   using TaskType = std::function<void()>;
 
   explicit ParallelExecutor(const std::string &name, int num_threads);
@@ -22,11 +22,9 @@ class ParallelExecutor {
 
   void flush();
 
-  int get_num_threads() {
-    return num_threads_;
-  }
+  int get_num_threads() { return num_threads_; }
 
- private:
+private:
   enum class ExecutorStatus {
     uninitialized,
     initialized,
@@ -62,4 +60,4 @@ class ParallelExecutor {
   // callback to be executed?
   std::condition_variable flush_cv_;
 };
-}  // namespace taichi::lang
+} // namespace taichi::lang

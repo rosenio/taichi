@@ -1,7 +1,7 @@
 #pragma once
-#include <string>
-#include <map>
 #include <cstdint>
+#include <map>
+#include <string>
 
 namespace taichi::lang {
 
@@ -18,7 +18,7 @@ const std::string to_string(DeviceCapability c);
 
 // A collection of device capability.
 struct DeviceCapabilityConfig {
- public:
+public:
   std::map<DeviceCapability, uint32_t> devcaps;
 
   uint32_t contains(DeviceCapability cap) const;
@@ -32,4 +32,4 @@ struct DeviceCapabilityConfig {
   // TI_IO_DEF(devcaps);
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

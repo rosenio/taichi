@@ -2,11 +2,11 @@
 
 #ifndef TAICHI_H
 #include "taichi.h"
-#endif  // TAICHI_H
+#endif // TAICHI_H
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 // Structure `TiCudaMemoryInteropInfo`
 typedef struct TiCudaMemoryInteropInfo {
@@ -15,10 +15,8 @@ typedef struct TiCudaMemoryInteropInfo {
 } TiCudaMemoryInteropInfo;
 
 // Function `ti_export_cuda_memory`
-TI_DLL_EXPORT void TI_API_CALL
-ti_export_cuda_memory(TiRuntime runtime,
-                      TiMemory memory,
-                      TiCudaMemoryInteropInfo *interop_info);
+TI_DLL_EXPORT void TI_API_CALL ti_export_cuda_memory(
+    TiRuntime runtime, TiMemory memory, TiCudaMemoryInteropInfo *interop_info);
 
 // Function `ti_import_cuda_memory`
 TI_DLL_EXPORT TiMemory TI_API_CALL ti_import_cuda_memory(TiRuntime runtime,
@@ -32,5 +30,5 @@ TI_DLL_EXPORT void TI_API_CALL ti_set_cuda_stream(void *stream);
 TI_DLL_EXPORT void TI_API_CALL ti_get_cuda_stream(void **stream);
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
+} // extern "C"
+#endif // __cplusplus

@@ -14,6 +14,6 @@ struct NSWindowAdapter {
   void set_content_view(GLFWwindow *glfw_window, metal::MetalSurface *mtl_surf);
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

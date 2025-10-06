@@ -29,25 +29,22 @@
 // JSON serialization/deserialization.
 // @PENGUINLIONG
 #pragma once
-#include <string>
-#include <vector>
 #include <map>
 #include <sstream>
+#include <string>
+#include <vector>
 
 namespace liong {
 namespace json {
 
 // Any error occured during JSON serialization/deserialization.
 class JsonException : public std::exception {
- private:
+private:
   std::string msg_;
 
- public:
-  explicit JsonException(std::string_view msg) : msg_(msg) {
-  }
-  const char *what() const noexcept override {
-    return msg_.c_str();
-  }
+public:
+  explicit JsonException(std::string_view msg) : msg_(msg) {}
+  const char *what() const noexcept override { return msg_.c_str(); }
 };
 
 // Type of JSON value.
@@ -66,33 +63,25 @@ struct JsonValue;
 class JsonElementEnumerator {
   std::vector<JsonValue>::const_iterator beg_, end_;
 
- public:
+public:
   explicit JsonElementEnumerator(const std::vector<JsonValue> &arr)
-      : beg_(arr.cbegin()), end_(arr.cend()) {
-  }
+      : beg_(arr.cbegin()), end_(arr.cend()) {}
 
-  std::vector<JsonValue>::const_iterator begin() const {
-    return beg_;
-  }
-  std::vector<JsonValue>::const_iterator end() const {
-    return end_;
-  }
+  std::vector<JsonValue>::const_iterator begin() const { return beg_; }
+  std::vector<JsonValue>::const_iterator end() const { return end_; }
 };
 
 class JsonFieldEnumerator {
   std::map<std::string, JsonValue>::const_iterator beg_, end_;
 
- public:
+public:
   explicit JsonFieldEnumerator(const std::map<std::string, JsonValue> &obj)
-      : beg_(obj.cbegin()), end_(obj.cend()) {
-  }
+      : beg_(obj.cbegin()), end_(obj.cend()) {}
 
   std::map<std::string, JsonValue>::const_iterator begin() const {
     return beg_;
   }
-  std::map<std::string, JsonValue>::const_iterator end() const {
-    return end_;
-  }
+  std::map<std::string, JsonValue>::const_iterator end() const { return end_; }
 };
 
 // JSON array builder.
@@ -100,10 +89,8 @@ struct JsonArray {
   std::vector<JsonValue> inner;
 
   inline JsonArray() = default;
-  inline explicit JsonArray(std::vector<JsonValue> &&b) : inner(std::move(b)) {
-  }
-  inline JsonArray(std::initializer_list<JsonValue> &&elems) : inner(elems) {
-  }
+  inline explicit JsonArray(std::vector<JsonValue> &&b) : inner(std::move(b)) {}
+  inline JsonArray(std::initializer_list<JsonValue> &&elems) : inner(elems) {}
 };
 // JSON object builder.
 struct JsonObject {
@@ -111,12 +98,10 @@ struct JsonObject {
 
   inline JsonObject() = default;
   inline explicit JsonObject(std::map<std::string, JsonValue> &&b)
-      : inner(std::move(b)) {
-  }
+      : inner(std::move(b)) {}
   inline JsonObject(
       std::initializer_list<std::pair<const std::string, JsonValue>> &&fields)
-      : inner(fields) {
-  }
+      : inner(fields) {}
 };
 
 // Represent a abstract value in JSON representation.
@@ -129,53 +114,33 @@ struct JsonValue {
   JsonObject obj;
   JsonArray arr;
 
-  inline explicit JsonValue() : ty(L_JSON_NULL) {
-  }
-  inline explicit JsonValue(std::nullptr_t) : ty(L_JSON_NULL) {
-  }
-  inline explicit JsonValue(bool b) : ty(L_JSON_BOOLEAN), b(b) {
-  }
-  inline explicit JsonValue(double num) : ty(L_JSON_FLOAT), num_float(num) {
-  }
-  inline explicit JsonValue(float num) : ty(L_JSON_FLOAT), num_float(num) {
-  }
-  inline explicit JsonValue(char num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(signed char num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(unsigned char num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(short num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(unsigned short num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(int num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(unsigned int num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(long num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(unsigned long num) : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(long long num) : ty(L_JSON_INT), num_int(num) {
-  }
+  inline explicit JsonValue() : ty(L_JSON_NULL) {}
+  inline explicit JsonValue(std::nullptr_t) : ty(L_JSON_NULL) {}
+  inline explicit JsonValue(bool b) : ty(L_JSON_BOOLEAN), b(b) {}
+  inline explicit JsonValue(double num) : ty(L_JSON_FLOAT), num_float(num) {}
+  inline explicit JsonValue(float num) : ty(L_JSON_FLOAT), num_float(num) {}
+  inline explicit JsonValue(char num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(signed char num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(unsigned char num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(short num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(unsigned short num)
+      : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(int num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(unsigned int num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(long num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(unsigned long num) : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(long long num) : ty(L_JSON_INT), num_int(num) {}
   inline explicit JsonValue(unsigned long long num)
-      : ty(L_JSON_INT), num_int(num) {
-  }
-  inline explicit JsonValue(const char *str) : ty(L_JSON_STRING), str(str) {
-  }
+      : ty(L_JSON_INT), num_int(num) {}
+  inline explicit JsonValue(const char *str) : ty(L_JSON_STRING), str(str) {}
   inline explicit JsonValue(const std::string &str)
-      : ty(L_JSON_STRING), str(str) {
-  }
+      : ty(L_JSON_STRING), str(str) {}
   inline explicit JsonValue(std::string &&str)
-      : ty(L_JSON_STRING), str(std::forward<std::string>(str)) {
-  }
+      : ty(L_JSON_STRING), str(std::forward<std::string>(str)) {}
   inline explicit JsonValue(JsonObject &&obj)
-      : ty(L_JSON_OBJECT), obj(std::move(obj.inner)) {
-  }
+      : ty(L_JSON_OBJECT), obj(std::move(obj.inner)) {}
   inline explicit JsonValue(JsonArray &&arr)
-      : ty(L_JSON_ARRAY), arr(move(arr.inner)) {
-  }
+      : ty(L_JSON_ARRAY), arr(move(arr.inner)) {}
 
   inline JsonValue &operator[](const char *key) {
     if (!is_obj()) {
@@ -316,24 +281,12 @@ struct JsonValue {
     return obj;
   }
 
-  inline bool is_null() const {
-    return ty == L_JSON_NULL;
-  }
-  inline bool is_bool() const {
-    return ty == L_JSON_BOOLEAN;
-  }
-  inline bool is_num() const {
-    return ty == L_JSON_FLOAT || ty == L_JSON_INT;
-  }
-  inline bool is_str() const {
-    return ty == L_JSON_STRING;
-  }
-  inline bool is_obj() const {
-    return ty == L_JSON_OBJECT;
-  }
-  inline bool is_arr() const {
-    return ty == L_JSON_ARRAY;
-  }
+  inline bool is_null() const { return ty == L_JSON_NULL; }
+  inline bool is_bool() const { return ty == L_JSON_BOOLEAN; }
+  inline bool is_num() const { return ty == L_JSON_FLOAT || ty == L_JSON_INT; }
+  inline bool is_str() const { return ty == L_JSON_STRING; }
+  inline bool is_obj() const { return ty == L_JSON_OBJECT; }
+  inline bool is_arr() const { return ty == L_JSON_ARRAY; }
 
   inline size_t size() const {
     if (is_obj()) {
@@ -363,5 +316,5 @@ bool try_parse(const std::string &json_lit, JsonValue &out);
 
 std::string print(const JsonValue &json);
 
-}  // namespace json
-}  // namespace liong
+} // namespace json
+} // namespace liong

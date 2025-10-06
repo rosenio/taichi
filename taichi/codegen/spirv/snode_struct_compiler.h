@@ -30,9 +30,7 @@ struct SNodeDescriptor {
   // starts at a fixed offset in its parent cell's memory.
   size_t mem_offset_in_parent_cell = 0;
 
-  SNode *get_child(int ch_i) const {
-    return snode->ch[ch_i].get();
-  }
+  SNode *get_child(int ch_i) const { return snode->ch[ch_i].get(); }
 };
 
 using SNodeDescriptorsMap = std::unordered_map<int, SNodeDescriptor>;
@@ -52,5 +50,5 @@ struct CompiledSNodeStructs {
 
 CompiledSNodeStructs compile_snode_structs(SNode &root);
 
-}  // namespace spirv
-}  // namespace taichi::lang
+} // namespace spirv
+} // namespace taichi::lang

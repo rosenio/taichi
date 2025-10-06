@@ -5,13 +5,11 @@ namespace taichi {
 namespace lang {
 namespace directx12 {
 class KernelImpl : public aot::Kernel {
- public:
-  explicit KernelImpl() {
-  }
+public:
+  explicit KernelImpl() {}
 
-  void launch(LaunchContextBuilder &ctx) override {
-  }
+  void launch(LaunchContextBuilder &ctx) override {}
 };
-}  // namespace directx12
-}  // namespace lang
-}  // namespace taichi
+} // namespace directx12
+} // namespace lang
+} // namespace taichi

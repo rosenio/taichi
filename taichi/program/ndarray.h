@@ -14,13 +14,12 @@ class Program;
 class NdarrayRwAccessorsBank;
 
 class TI_DLL_EXPORT Ndarray {
- public:
+public:
   /* Constructs a Ndarray managed by Program.
    * Memory allocation and deallocation is handled by Program.
    * TODO: Ideally Ndarray shouldn't worry about memory alloc/dealloc at all.
    */
-  explicit Ndarray(Program *prog,
-                   const DataType type,
+  explicit Ndarray(Program *prog, const DataType type,
                    const std::vector<int> &shape,
                    ExternalArrayLayout layout = ExternalArrayLayout::kNull,
                    const DebugInfo &dbg_info = DebugInfo());
@@ -30,8 +29,7 @@ class TI_DLL_EXPORT Ndarray {
    * You can see a Ndarray as a view or interpretation of DeviceAllocation
    * with specified dtype & layout.
    */
-  explicit Ndarray(DeviceAllocation &devalloc,
-                   const DataType type,
+  explicit Ndarray(DeviceAllocation &devalloc, const DataType type,
                    const std::vector<int> &shape,
                    ExternalArrayLayout layout = ExternalArrayLayout::kNull,
                    const DebugInfo &dbg_info = DebugInfo());
@@ -40,8 +38,7 @@ class TI_DLL_EXPORT Ndarray {
    * This is an overloaded constructor for constructing Ndarray with TensorType
    * elements "type" is expected to be PrimitiveType
    */
-  explicit Ndarray(DeviceAllocation &devalloc,
-                   const DataType type,
+  explicit Ndarray(DeviceAllocation &devalloc, const DataType type,
                    const std::vector<int> &shape,
                    const std::vector<int> &element_shape,
                    ExternalArrayLayout layout = ExternalArrayLayout::kNull,
@@ -71,12 +68,10 @@ class TI_DLL_EXPORT Ndarray {
   void write_int(const std::vector<int> &i, int64 val);
   void write_float(const std::vector<int> &i, float64 val);
 
-  const std::vector<int> &total_shape() const {
-    return total_shape_;
-  }
+  const std::vector<int> &total_shape() const { return total_shape_; }
   ~Ndarray();
 
- private:
+private:
   std::size_t nelement_{1};
   std::size_t element_size_{1};
   std::vector<int> total_shape_;
@@ -84,4 +79,4 @@ class TI_DLL_EXPORT Ndarray {
   Program *prog_{nullptr};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

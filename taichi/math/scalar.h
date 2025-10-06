@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <cmath>
 #include "taichi/common/core.h"
+#include <cmath>
 
 namespace taichi {
 
@@ -24,8 +24,7 @@ using std::tan;
 const real pi{acosf(-1.0_f)};
 const real eps = 1e-6_f;
 
-template <int I, typename T>
-constexpr TI_FORCE_INLINE T pow(T a) noexcept {
+template <int I, typename T> constexpr TI_FORCE_INLINE T pow(T a) noexcept {
   T ret(1);
   for (int i = 0; i < I; i++) {
     ret *= a;
@@ -33,13 +32,9 @@ constexpr TI_FORCE_INLINE T pow(T a) noexcept {
   return ret;
 };
 
-TI_FORCE_INLINE float32 fract(float32 a) noexcept {
-  return a - (int)floor(a);
-}
+TI_FORCE_INLINE float32 fract(float32 a) noexcept { return a - (int)floor(a); }
 
-TI_FORCE_INLINE float64 fract(float64 a) noexcept {
-  return a - (int)floor(a);
-}
+TI_FORCE_INLINE float64 fract(float64 a) noexcept { return a - (int)floor(a); }
 
 template <typename T>
 TI_FORCE_INLINE T clamp(const T &a, const T &min, const T &max) noexcept {
@@ -50,8 +45,7 @@ TI_FORCE_INLINE T clamp(const T &a, const T &min, const T &max) noexcept {
   return a;
 }
 
-template <typename T>
-TI_FORCE_INLINE T clamp01(const T &a) noexcept {
+template <typename T> TI_FORCE_INLINE T clamp01(const T &a) noexcept {
   if (a < T(0))
     return T(0);
   if (a > T(1))
@@ -59,8 +53,7 @@ TI_FORCE_INLINE T clamp01(const T &a) noexcept {
   return a;
 }
 
-template <typename T>
-TI_FORCE_INLINE T clamp(const T &a) noexcept {
+template <typename T> TI_FORCE_INLINE T clamp(const T &a) noexcept {
   return clamp01(a);
 }
 
@@ -69,8 +62,7 @@ TI_FORCE_INLINE V lerp(T a, V x_0, V x_1) noexcept {
   return V((T(1) - a) * x_0 + a * x_1);
 }
 
-template <typename T>
-TI_FORCE_INLINE T sqr(const T &a) noexcept {
+template <typename T> TI_FORCE_INLINE T sqr(const T &a) noexcept {
   return pow<2>(a);
 }
 
@@ -108,23 +100,17 @@ TI_FORCE_INLINE float32 rand() noexcept {
   return rand_int() * (1.0_f / 4294967296.0f);
 }
 
-template <typename T>
-TI_FORCE_INLINE T rand() noexcept;
+template <typename T> TI_FORCE_INLINE T rand() noexcept;
 
-template <>
-TI_FORCE_INLINE float rand<float>() noexcept {
+template <> TI_FORCE_INLINE float rand<float>() noexcept {
   return rand_int() * (1.0_f / 4294967296.0f);
 }
 
-template <>
-TI_FORCE_INLINE double rand<double>() noexcept {
+template <> TI_FORCE_INLINE double rand<double>() noexcept {
   return rand_int() * (1.0 / 4294967296.0);
 }
 
-template <>
-TI_FORCE_INLINE int rand<int>() noexcept {
-  return rand_int();
-}
+template <> TI_FORCE_INLINE int rand<int>() noexcept { return rand_int(); }
 
 inline int is_prime(int a) noexcept {
   assert(a >= 2);
@@ -148,13 +134,11 @@ TI_FORCE_INLINE float64 pow(const float64 &a, const float64 &b) noexcept {
   return ::pow(a, b);
 }
 
-template <typename T>
-TI_FORCE_INLINE bool is_normal(T m) noexcept {
+template <typename T> TI_FORCE_INLINE bool is_normal(T m) noexcept {
   return std::isfinite(m);
 }
 
-template <typename T>
-TI_FORCE_INLINE bool abnormal(T m) noexcept {
+template <typename T> TI_FORCE_INLINE bool abnormal(T m) noexcept {
   return !is_normal(m);
 }
 
@@ -170,4 +154,4 @@ inline int64 get_largest_pot(int64 a) noexcept {
   return a - (a >> 1);
 }
 
-}  // namespace taichi
+} // namespace taichi

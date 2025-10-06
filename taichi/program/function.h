@@ -1,8 +1,8 @@
 #pragma once
 
-#include <unordered_set>
 #include "taichi/program/callable.h"
 #include "taichi/program/function_key.h"
+#include <unordered_set>
 
 namespace taichi::lang {
 
@@ -10,7 +10,7 @@ class Program;
 class Stmt;
 
 class Function : public Callable {
- public:
+public:
   enum class IRStage : int {
     None = 0,
     AST = 1,
@@ -36,19 +36,15 @@ class Function : public Callable {
     return ast_serialization_data_;
   }
 
-  void set_ir_stage(IRStage type) {
-    ir_stage_ = type;
-  }
+  void set_ir_stage(IRStage type) { ir_stage_ = type; }
 
-  IRStage ir_stage() const {
-    return ir_stage_;
-  }
+  IRStage ir_stage() const { return ir_stage_; }
 
   std::unordered_set<Stmt *> store_dests;
 
- private:
+private:
   IRStage ir_stage_{IRStage::None};
-  std::optional<std::string> ast_serialization_data_;  // For generating AST-Key
+  std::optional<std::string> ast_serialization_data_; // For generating AST-Key
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

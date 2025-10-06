@@ -16,7 +16,7 @@ class VecStatement;
  * Lowers an SNode at a given indices to a series of concrete ops.
  */
 class ScalarPointerLowerer {
- public:
+public:
   /**
    * Constructor
    *
@@ -40,7 +40,7 @@ class ScalarPointerLowerer {
    */
   void run();
 
- protected:
+protected:
   /**
    * Handles the SNode at a given @param level.
    *
@@ -48,28 +48,23 @@ class ScalarPointerLowerer {
    * @param linearized: Linearized indices statement for this level
    * @param last: SNode access op (e.g. GetCh) of the last iteration
    */
-  virtual Stmt *handle_snode_at_level(int level,
-                                      LinearizeStmt *linearized,
+  virtual Stmt *handle_snode_at_level(int level, LinearizeStmt *linearized,
                                       Stmt *last) {
     return last;
   }
 
-  std::vector<SNode *> snodes() const {
-    return snodes_;
-  }
+  std::vector<SNode *> snodes() const { return snodes_; }
 
-  int path_length() const {
-    return path_length_;
-  }
+  int path_length() const { return path_length_; }
 
   const std::vector<Stmt *> indices_;
   const SNodeOpType snode_op_;
   const bool is_bit_vectorized_;
   VecStatement *const lowered_;
 
- private:
+private:
   std::vector<SNode *> snodes_;
   int path_length_{0};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

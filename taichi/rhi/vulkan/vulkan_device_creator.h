@@ -6,17 +6,17 @@
 
 #ifndef VK_NO_PROTOTYPES
 #define VK_NO_PROTOTYPES 1
-#endif  // VK_NO_PROTOTYPES
+#endif // VK_NO_PROTOTYPES
 
-#include <taichi/rhi/vulkan/vulkan_common.h>
-#include <taichi/rhi/device.h>
 #include <taichi/program/kernel_profiler.h>
+#include <taichi/rhi/device.h>
+#include <taichi/rhi/vulkan/vulkan_common.h>
 
+#include <functional>
 #include <memory>
 #include <optional>
-#include <vector>
 #include <string>
-#include <functional>
+#include <vector>
 
 namespace taichi::lang {
 namespace vulkan {
@@ -32,9 +32,7 @@ struct VulkanQueueFamilyIndices {
   // TRANSFER-dedicated queue family.
   // https://vulkan-tutorial.com/Vertex_buffers/Staging_buffer#page_Transfer-queue
 
-  bool is_complete() const {
-    return compute_family.has_value();
-  }
+  bool is_complete() const { return compute_family.has_value(); }
 
   bool is_complete_for_ui() {
     return graphics_family.has_value() && present_family.has_value();
@@ -46,7 +44,7 @@ struct VulkanQueueFamilyIndices {
  * embedded directly inside the class.
  */
 class TI_DLL_EXPORT VulkanDeviceCreator {
- public:
+public:
   struct Params {
     // User-provided API version. If assigned, the users MUST list all
     // their desired extensions in `additional_instance_extensions` and
@@ -65,15 +63,11 @@ class TI_DLL_EXPORT VulkanDeviceCreator {
   explicit VulkanDeviceCreator(const Params &params);
   ~VulkanDeviceCreator();
 
-  const VulkanDevice *device() const {
-    return ti_device_.get();
-  }
+  const VulkanDevice *device() const { return ti_device_.get(); }
 
-  VulkanDevice *device() {
-    return ti_device_.get();
-  }
+  VulkanDevice *device() { return ti_device_.get(); }
 
- private:
+private:
   void create_instance(uint32_t vk_api_version, bool manual_create);
   void setup_debug_messenger();
   void pick_physical_device(VkSurfaceKHR test_surface);
@@ -93,5 +87,5 @@ class TI_DLL_EXPORT VulkanDeviceCreator {
   Params params_;
 };
 
-}  // namespace vulkan
-}  // namespace taichi::lang
+} // namespace vulkan
+} // namespace taichi::lang

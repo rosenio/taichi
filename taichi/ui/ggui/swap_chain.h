@@ -6,7 +6,7 @@ namespace taichi::ui {
 namespace vulkan {
 
 class TI_DLL_EXPORT SwapChain {
- public:
+public:
   void init(class AppContext *app_context);
   ~SwapChain();
 
@@ -24,7 +24,7 @@ class TI_DLL_EXPORT SwapChain {
 
   void write_image(const std::string &filename);
 
- private:
+private:
   void create_depth_resources();
   void create_image_resources();
 
@@ -42,6 +42,6 @@ class TI_DLL_EXPORT SwapChain {
   uint32_t curr_height_;
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

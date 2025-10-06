@@ -5,7 +5,7 @@
 namespace taichi::lang {
 
 class GatherUniquelyAccessedBitStructsPass : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Result {
@@ -15,4 +15,4 @@ class GatherUniquelyAccessedBitStructsPass : public Pass {
   };
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

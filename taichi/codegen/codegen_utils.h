@@ -16,13 +16,12 @@ inline std::array<std::string, 5> parse_printf_specifier(std::string spec) {
   // See https://en.cppreference.com/w/cpp/io/c/fprintf
   // Note that in taichi we support omitting the conversion, and the leading '%'
   // is ignored.
-  const std::regex re = std::regex(
-      "%?"
-      "([-+ #0]+)?"
-      "(\\d+|\\*)?"
-      "(\\.(?:\\d+|\\*))?"
-      "([hljztL]|hh|ll)?"
-      "([csdioxXufFeEaAgGnp])?");
+  const std::regex re = std::regex("%?"
+                                   "([-+ #0]+)?"
+                                   "(\\d+|\\*)?"
+                                   "(\\.(?:\\d+|\\*))?"
+                                   "([hljztL]|hh|ll)?"
+                                   "([csdioxXufFeEaAgGnp])?");
   std::smatch match;
   bool matched = std::regex_match(spec, match, re);
   if (matched == false) {
@@ -56,9 +55,9 @@ inline std::array<std::string, 5> parse_printf_specifier(std::string spec) {
 //   d. '%.2f',
 //   e. '%.12f',
 // accordingly.
-inline std::string merge_printf_specifier(
-    std::optional<std::string> const &from_user,
-    std::string const &from_data_type) {
+inline std::string
+merge_printf_specifier(std::optional<std::string> const &from_user,
+                       std::string const &from_data_type) {
   if (!from_user.has_value()) {
     return from_data_type;
   }
@@ -121,4 +120,4 @@ inline std::string merge_printf_specifier(
   return res;
 }
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

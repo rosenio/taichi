@@ -21,37 +21,27 @@ enum class TypeKind : int {
 };
 
 class TI_DLL_EXPORT Type {
- public:
-  explicit Type(TypeKind type_kind) : type_kind(type_kind) {
-  }
+public:
+  explicit Type(TypeKind type_kind) : type_kind(type_kind) {}
   TypeKind type_kind;
   virtual std::string to_string() const = 0;
 
-  template <typename T>
-  bool is() const {
-    return cast<T>() != nullptr;
-  }
+  template <typename T> bool is() const { return cast<T>() != nullptr; }
 
-  template <typename T>
-  const T *cast() const {
+  template <typename T> const T *cast() const {
     return dynamic_cast<const T *>(this);
   }
 
-  template <typename T>
-  T *cast() {
-    return dynamic_cast<T *>(this);
-  }
+  template <typename T> T *cast() { return dynamic_cast<T *>(this); }
 
-  template <typename T>
-  T *as() {
+  template <typename T> T *as() {
     auto p = dynamic_cast<T *>(this);
     TI_ASSERT_INFO(p != nullptr, "Cannot treat {} as {}", this->to_string(),
                    typeid(T).name());
     return p;
   }
 
-  template <typename T>
-  const T *as() const {
+  template <typename T> const T *as() const {
     auto p = dynamic_cast<const T *>(this);
     TI_ASSERT_INFO(p != nullptr, "Cannot treat {} as {}", this->to_string(),
                    typeid(T).name());
@@ -74,56 +64,39 @@ class TI_DLL_EXPORT Type {
 
   bool is_primitive(PrimitiveTypeID type) const;
 
-  virtual Type *get_compute_type() {
-    TI_NOT_IMPLEMENTED;
-  }
+  virtual Type *get_compute_type() { TI_NOT_IMPLEMENTED; }
 
-  virtual ~Type() {
-  }
+  virtual ~Type() {}
 };
 
 // A "Type" handle. This should be removed later.
 class TI_DLL_EXPORT DataType {
- public:
+public:
   DataType();
 
   // NOLINTNEXTLINE(google-explicit-constructor)
-  DataType(const Type *ptr) : ptr_((Type *)ptr) {
-  }
+  DataType(const Type *ptr) : ptr_((Type *)ptr) {}
 
-  DataType(const DataType &o) : ptr_(o.ptr_) {
-  }
+  DataType(const DataType &o) : ptr_(o.ptr_) {}
 
-  bool operator==(const DataType &o) const {
-    return ptr_ == o.ptr_;
-  }
+  bool operator==(const DataType &o) const { return ptr_ == o.ptr_; }
 
-  bool operator!=(const DataType &o) const {
-    return !(*this == o);
-  }
+  bool operator!=(const DataType &o) const { return !(*this == o); }
 
   std::size_t hash() const;
 
-  std::string to_string() const {
-    return ptr_->to_string();
-  };
+  std::string to_string() const { return ptr_->to_string(); };
 
   // NOLINTNEXTLINE(google-explicit-constructor)
-  operator const Type *() const {
-    return ptr_;
-  }
+  operator const Type *() const { return ptr_; }
 
   // NOLINTNEXTLINE(google-explicit-constructor)
-  operator Type *() {
-    return ptr_;
-  }
+  operator Type *() { return ptr_; }
 
   // Temporary API and members
   // for LegacyVectorType-compatibility
 
-  Type *operator->() const {
-    return ptr_;
-  }
+  Type *operator->() const { return ptr_; }
 
   DataType &operator=(const DataType &o) {
     ptr_ = o.ptr_;
@@ -142,14 +115,14 @@ class TI_DLL_EXPORT DataType {
 
   TI_IO_DEF(ptr_);
 
- private:
+private:
   Type *ptr_;
 };
 
 // Note that all types are immutable once created.
 
 class TI_DLL_EXPORT PrimitiveType : public Type {
- public:
+public:
 #define PER_TYPE(x) static DataType x;
 #include "taichi/inc/data_type.inc.h"
 #undef PER_TYPE
@@ -158,14 +131,11 @@ class TI_DLL_EXPORT PrimitiveType : public Type {
   PrimitiveTypeID type;
 
   explicit PrimitiveType(PrimitiveTypeID type = PrimitiveTypeID::unknown)
-      : Type(TypeKind::Primitive), type(type) {
-  }
+      : Type(TypeKind::Primitive), type(type) {}
 
   std::string to_string() const override;
 
-  Type *get_compute_type() override {
-    return this;
-  }
+  Type *get_compute_type() override { return this; }
 
   static DataType get(PrimitiveTypeID type);
 
@@ -175,26 +145,18 @@ class TI_DLL_EXPORT PrimitiveType : public Type {
 };
 
 class TI_DLL_EXPORT PointerType : public Type {
- public:
+public:
   PointerType() : Type(TypeKind::Pointer) {};
 
   PointerType(Type *pointee, bool is_bit_pointer)
-      : Type(TypeKind::Pointer),
-        pointee_(pointee),
-        is_bit_pointer_(is_bit_pointer) {
-  }
+      : Type(TypeKind::Pointer), pointee_(pointee),
+        is_bit_pointer_(is_bit_pointer) {}
 
-  Type *get_pointee_type() const {
-    return pointee_;
-  }
+  Type *get_pointee_type() const { return pointee_; }
 
-  auto get_addr_space() const {
-    return addr_space_;
-  }
+  auto get_addr_space() const { return addr_space_; }
 
-  bool is_bit_pointer() const {
-    return is_bit_pointer_;
-  }
+  bool is_bit_pointer() const { return is_bit_pointer_; }
 
   std::string to_string() const override;
 
@@ -202,22 +164,19 @@ class TI_DLL_EXPORT PointerType : public Type {
 
   TI_IO_DEF(pointee_, addr_space_, is_bit_pointer_);
 
- private:
+private:
   Type *pointee_{nullptr};
-  int addr_space_{0};  // TODO: make this an enum
+  int addr_space_{0}; // TODO: make this an enum
   bool is_bit_pointer_{false};
 };
 
 class TI_DLL_EXPORT TensorType : public Type {
- public:
+public:
   TensorType() : Type(TypeKind::Tensor) {};
   TensorType(std::vector<int> shape, Type *element)
-      : Type(TypeKind::Tensor), shape_(std::move(shape)), element_(element) {
-  }
+      : Type(TypeKind::Tensor), shape_(std::move(shape)), element_(element) {}
 
-  Type *get_element_type() const {
-    return element_;
-  }
+  Type *get_element_type() const { return element_; }
 
   int get_num_elements() const {
     int num_elements = 1;
@@ -226,17 +185,11 @@ class TI_DLL_EXPORT TensorType : public Type {
     return num_elements;
   }
 
-  std::vector<int> get_shape() const {
-    return shape_;
-  }
+  std::vector<int> get_shape() const { return shape_; }
 
-  void set_shape(const std::vector<int> &shape) {
-    shape_ = shape;
-  }
+  void set_shape(const std::vector<int> &shape) { shape_ = shape; }
 
-  Type *get_compute_type() override {
-    return this;
-  }
+  Type *get_compute_type() override { return this; }
 
   std::string to_string() const override;
 
@@ -246,7 +199,7 @@ class TI_DLL_EXPORT TensorType : public Type {
 
   TI_IO_DEF(shape_, element_);
 
- private:
+private:
   std::vector<int> shape_;
   Type *element_{nullptr};
 };
@@ -262,43 +215,36 @@ struct TI_DLL_EXPORT AbstractDictionaryMember {
 };
 
 class TI_DLL_EXPORT AbstractDictionaryType : public Type {
- public:
+public:
   explicit AbstractDictionaryType(TypeKind type_kind) : Type(type_kind) {};
   explicit AbstractDictionaryType(
-      TypeKind type_kind,
-      const std::vector<AbstractDictionaryMember> &elements,
+      TypeKind type_kind, const std::vector<AbstractDictionaryMember> &elements,
       const std::string &layout = "none")
-      : Type(type_kind), elements_(elements), layout_(layout) {
-  }
+      : Type(type_kind), elements_(elements), layout_(layout) {}
 
-  const std::string &get_layout() const {
-    return layout_;
-  }
+  const std::string &get_layout() const { return layout_; }
 
   const std::vector<AbstractDictionaryMember> &elements() const {
     return elements_;
   }
 
-  Type *get_compute_type() override {
-    return this;
-  }
+  Type *get_compute_type() override { return this; }
 
   const Type *get_element_type(const std::vector<int> &indices) const;
 
   TI_IO_DEF(elements_, layout_);
 
- protected:
+protected:
   std::vector<AbstractDictionaryMember> elements_;
   std::string layout_;
 };
 
 class TI_DLL_EXPORT StructType : public AbstractDictionaryType {
- public:
+public:
   StructType() : AbstractDictionaryType(TypeKind::Struct) {};
   explicit StructType(const std::vector<AbstractDictionaryMember> &elements,
                       const std::string &layout = "none")
-      : AbstractDictionaryType(TypeKind::Struct, elements, layout) {
-  }
+      : AbstractDictionaryType(TypeKind::Struct, elements, layout) {}
 
   std::string to_string() const override;
 
@@ -326,12 +272,11 @@ class TI_DLL_EXPORT StructType : public AbstractDictionaryType {
 };
 
 class TI_DLL_EXPORT ArgPackType : public AbstractDictionaryType {
- public:
+public:
   ArgPackType() : AbstractDictionaryType(TypeKind::ArgPack) {};
   explicit ArgPackType(const std::vector<AbstractDictionaryMember> &elements,
                        const std::string &layout = "none")
-      : AbstractDictionaryType(TypeKind::ArgPack, elements, layout) {
-  }
+      : AbstractDictionaryType(TypeKind::ArgPack, elements, layout) {}
 
   size_t get_element_offset(const std::vector<int> &indices) const;
 
@@ -343,29 +288,23 @@ class TI_DLL_EXPORT ArgPackType : public AbstractDictionaryType {
 };
 
 class TI_DLL_EXPORT QuantIntType : public Type {
- public:
+public:
   QuantIntType() : Type(TypeKind::QuantInt) {};
   QuantIntType(int num_bits, bool is_signed, Type *compute_type = nullptr);
 
   std::string to_string() const override;
 
-  Type *get_compute_type() override {
-    return compute_type_;
-  }
+  Type *get_compute_type() override { return compute_type_; }
 
-  int get_num_bits() const {
-    return num_bits_;
-  }
+  int get_num_bits() const { return num_bits_; }
 
-  bool get_is_signed() const {
-    return is_signed_;
-  }
+  bool get_is_signed() const { return is_signed_; }
 
   const Type *get_type() const override;
 
   TI_IO_DEF(num_bits_, is_signed_, compute_type_);
 
- private:
+private:
   // TODO(type): for now we can uniformly use i32 as the "compute_type". It may
   // be a good idea to make "compute_type" also customizable.
   Type *compute_type_{nullptr};
@@ -374,7 +313,7 @@ class TI_DLL_EXPORT QuantIntType : public Type {
 };
 
 class TI_DLL_EXPORT QuantFixedType : public Type {
- public:
+public:
   QuantFixedType() : Type(TypeKind::QuantFixed) {};
   QuantFixedType(Type *digits_type, Type *compute_type, float64 scale);
 
@@ -382,43 +321,32 @@ class TI_DLL_EXPORT QuantFixedType : public Type {
 
   bool get_is_signed() const;
 
-  Type *get_digits_type() {
-    return digits_type_;
-  }
+  Type *get_digits_type() { return digits_type_; }
 
-  Type *get_compute_type() override {
-    return compute_type_;
-  }
+  Type *get_compute_type() override { return compute_type_; }
 
-  float64 get_scale() const {
-    return scale_;
-  }
+  float64 get_scale() const { return scale_; }
 
   const Type *get_type() const override;
 
   TI_IO_DEF(digits_type_, compute_type_, scale_);
 
- private:
+private:
   Type *digits_type_{nullptr};
   Type *compute_type_{nullptr};
   float64 scale_{1.0};
 };
 
 class TI_DLL_EXPORT QuantFloatType : public Type {
- public:
-  QuantFloatType() : Type(TypeKind::QuantFloat) {
-  }
+public:
+  QuantFloatType() : Type(TypeKind::QuantFloat) {}
   QuantFloatType(Type *digits_type, Type *exponent_type, Type *compute_type);
 
   std::string to_string() const override;
 
-  Type *get_digits_type() {
-    return digits_type_;
-  }
+  Type *get_digits_type() { return digits_type_; }
 
-  Type *get_exponent_type() {
-    return exponent_type_;
-  }
+  Type *get_exponent_type() { return exponent_type_; }
 
   int get_exponent_conversion_offset() const;
 
@@ -426,22 +354,20 @@ class TI_DLL_EXPORT QuantFloatType : public Type {
 
   bool get_is_signed() const;
 
-  Type *get_compute_type() override {
-    return compute_type_;
-  }
+  Type *get_compute_type() override { return compute_type_; }
 
   const Type *get_type() const override;
 
   TI_IO_DEF(digits_type_, exponent_type_, compute_type_);
 
- private:
+private:
   Type *digits_type_{nullptr};
   Type *exponent_type_{nullptr};
   Type *compute_type_{nullptr};
 };
 
 class TI_DLL_EXPORT BitStructType : public Type {
- public:
+public:
   BitStructType() : Type(TypeKind::BitStruct) {};
   BitStructType(PrimitiveType *physical_type,
                 const std::vector<Type *> &member_types,
@@ -451,30 +377,20 @@ class TI_DLL_EXPORT BitStructType : public Type {
 
   std::string to_string() const override;
 
-  PrimitiveType *get_physical_type() const {
-    return physical_type_;
-  }
+  PrimitiveType *get_physical_type() const { return physical_type_; }
 
-  int get_num_members() const {
-    return (int)member_types_.size();
-  }
+  int get_num_members() const { return (int)member_types_.size(); }
 
-  Type *get_member_type(int i) const {
-    return member_types_[i];
-  }
+  Type *get_member_type(int i) const { return member_types_[i]; }
 
-  int get_member_bit_offset(int i) const {
-    return member_bit_offsets_[i];
-  }
+  int get_member_bit_offset(int i) const { return member_bit_offsets_[i]; }
 
   bool get_member_owns_shared_exponent(int i) const {
     return member_exponents_[i] != -1 &&
            member_exponent_users_[member_exponents_[i]].size() > 1;
   }
 
-  int get_member_exponent(int i) const {
-    return member_exponents_[i];
-  }
+  int get_member_exponent(int i) const { return member_exponents_[i]; }
 
   const std::vector<int> &get_member_exponent_users(int i) const {
     return member_exponent_users_[i];
@@ -482,13 +398,10 @@ class TI_DLL_EXPORT BitStructType : public Type {
 
   const Type *get_type() const override;
 
-  TI_IO_DEF(physical_type_,
-            member_types_,
-            member_bit_offsets_,
-            member_exponents_,
-            member_exponent_users_);
+  TI_IO_DEF(physical_type_, member_types_, member_bit_offsets_,
+            member_exponents_, member_exponent_users_);
 
- private:
+private:
   PrimitiveType *physical_type_;
   std::vector<Type *> member_types_;
   std::vector<int> member_bit_offsets_;
@@ -497,16 +410,12 @@ class TI_DLL_EXPORT BitStructType : public Type {
 };
 
 class TI_DLL_EXPORT QuantArrayType : public Type {
- public:
-  QuantArrayType() : Type(TypeKind::QuantArray) {
-  }
-  QuantArrayType(PrimitiveType *physical_type,
-                 Type *element_type_,
+public:
+  QuantArrayType() : Type(TypeKind::QuantArray) {}
+  QuantArrayType(PrimitiveType *physical_type, Type *element_type_,
                  int num_elements_)
-      : Type(TypeKind::QuantArray),
-        physical_type_(physical_type),
-        element_type_(element_type_),
-        num_elements_(num_elements_) {
+      : Type(TypeKind::QuantArray), physical_type_(physical_type),
+        element_type_(element_type_), num_elements_(num_elements_) {
     if (auto qit = element_type_->cast<QuantIntType>()) {
       element_num_bits_ = qit->get_num_bits();
     } else if (auto qfxt = element_type_->cast<QuantFixedType>()) {
@@ -519,27 +428,19 @@ class TI_DLL_EXPORT QuantArrayType : public Type {
 
   std::string to_string() const override;
 
-  PrimitiveType *get_physical_type() const {
-    return physical_type_;
-  }
+  PrimitiveType *get_physical_type() const { return physical_type_; }
 
-  Type *get_element_type() const {
-    return element_type_;
-  }
+  Type *get_element_type() const { return element_type_; }
 
-  int get_num_elements() const {
-    return num_elements_;
-  }
+  int get_num_elements() const { return num_elements_; }
 
-  int get_element_num_bits() const {
-    return element_num_bits_;
-  }
+  int get_element_num_bits() const { return element_num_bits_; }
 
   const Type *get_type() const override;
 
   TI_IO_DEF(physical_type_, element_type_, num_elements_, element_num_bits_);
 
- private:
+private:
   PrimitiveType *physical_type_;
   Type *element_type_;
   int num_elements_;
@@ -547,7 +448,7 @@ class TI_DLL_EXPORT QuantArrayType : public Type {
 };
 
 class TypedConstant {
- public:
+public:
   DataType dt;
 
   /*
@@ -568,9 +469,8 @@ class TypedConstant {
     uint64 val_u64;
   };
 
- public:
-  TypedConstant() : dt(PrimitiveType::unknown) {
-  }
+public:
+  TypedConstant() : dt(PrimitiveType::unknown) {}
 
   explicit TypedConstant(DataType dt) : dt(dt) {
     TI_ASSERT_INFO(dt->is<PrimitiveType>(),
@@ -579,41 +479,29 @@ class TypedConstant {
     value_bits = 0;
   }
 
-  explicit TypedConstant(int32 x) : dt(PrimitiveType::i32), val_i32(x) {
-  }
+  explicit TypedConstant(int32 x) : dt(PrimitiveType::i32), val_i32(x) {}
 
-  explicit TypedConstant(float32 x) : dt(PrimitiveType::f32), val_f32(x) {
-  }
+  explicit TypedConstant(float32 x) : dt(PrimitiveType::f32), val_f32(x) {}
 
-  explicit TypedConstant(int64 x) : dt(PrimitiveType::i64), val_i64(x) {
-  }
+  explicit TypedConstant(int64 x) : dt(PrimitiveType::i64), val_i64(x) {}
 
-  explicit TypedConstant(float64 x) : dt(PrimitiveType::f64), val_f64(x) {
-  }
+  explicit TypedConstant(float64 x) : dt(PrimitiveType::f64), val_f64(x) {}
 
-  explicit TypedConstant(int8 x) : dt(PrimitiveType::i8), val_i8(x) {
-  }
+  explicit TypedConstant(int8 x) : dt(PrimitiveType::i8), val_i8(x) {}
 
-  explicit TypedConstant(int16 x) : dt(PrimitiveType::i16), val_i16(x) {
-  }
+  explicit TypedConstant(int16 x) : dt(PrimitiveType::i16), val_i16(x) {}
 
-  explicit TypedConstant(uint1 x) : dt(PrimitiveType::u1), val_u1(x) {
-  }
+  explicit TypedConstant(uint1 x) : dt(PrimitiveType::u1), val_u1(x) {}
 
-  explicit TypedConstant(uint8 x) : dt(PrimitiveType::u8), val_u8(x) {
-  }
+  explicit TypedConstant(uint8 x) : dt(PrimitiveType::u8), val_u8(x) {}
 
-  explicit TypedConstant(uint16 x) : dt(PrimitiveType::u16), val_u16(x) {
-  }
+  explicit TypedConstant(uint16 x) : dt(PrimitiveType::u16), val_u16(x) {}
 
-  explicit TypedConstant(uint32 x) : dt(PrimitiveType::u32), val_u32(x) {
-  }
+  explicit TypedConstant(uint32 x) : dt(PrimitiveType::u32), val_u32(x) {}
 
-  explicit TypedConstant(uint64 x) : dt(PrimitiveType::u64), val_u64(x) {
-  }
+  explicit TypedConstant(uint64 x) : dt(PrimitiveType::u64), val_u64(x) {}
 
-  template <typename T>
-  TypedConstant(DataType dt, const T &value) : dt(dt) {
+  template <typename T> TypedConstant(DataType dt, const T &value) : dt(dt) {
     // TODO: loud failure on pointers
     dt.set_is_pointer(false);
     if (dt->is_primitive(PrimitiveTypeID::f32)) {
@@ -645,8 +533,7 @@ class TypedConstant {
     }
   }
 
-  template <typename T>
-  bool equal_value(const T &value) const {
+  template <typename T> bool equal_value(const T &value) const {
     return equal_type_and_value(TypedConstant(dt, value));
   }
 
@@ -673,7 +560,7 @@ class TypedConstant {
   int64 val_int() const;
   uint64 val_uint() const;
   float64 val_float() const;
-  int64 val_as_int64() const;  // unifies val_int() and val_uint()
+  int64 val_as_int64() const; // unifies val_int() and val_uint()
   float64 val_cast_to_float64() const;
 };
 
@@ -687,15 +574,15 @@ Type::ptr_io(const T *&ptr, S &serializer, bool writing) {
     }
     serializer("type_kind", ptr->type_kind);
     switch (ptr->type_kind) {
-#define PER_TYPE_KIND(x)                                 \
-  case TypeKind::x: {                                    \
-    serializer("content", *ptr->template as<x##Type>()); \
-    break;                                               \
+#define PER_TYPE_KIND(x)                                                       \
+  case TypeKind::x: {                                                          \
+    serializer("content", *ptr->template as<x##Type>());                       \
+    break;                                                                     \
   }
 #include "taichi/inc/type_kind.inc.h"
 #undef PER_TYPE_KIND
-      default:
-        TI_NOT_IMPLEMENTED;
+    default:
+      TI_NOT_IMPLEMENTED;
     }
   } else {
     TypeKind type_kind = (TypeKind)-1;
@@ -705,26 +592,24 @@ Type::ptr_io(const T *&ptr, S &serializer, bool writing) {
       return;
     }
     switch (type_kind) {
-#define PER_TYPE_KIND(x)               \
-  case TypeKind::x: {                  \
-    x##Type content;                   \
-    serializer("content", content);    \
-    ptr = content.get_type()->as<T>(); \
-    break;                             \
+#define PER_TYPE_KIND(x)                                                       \
+  case TypeKind::x: {                                                          \
+    x##Type content;                                                           \
+    serializer("content", content);                                            \
+    ptr = content.get_type()->as<T>();                                         \
+    break;                                                                     \
   }
 #include "taichi/inc/type_kind.inc.h"
 #undef PER_TYPE_KIND
-      default:
-        TI_NOT_IMPLEMENTED;
+    default:
+      TI_NOT_IMPLEMENTED;
     }
   }
 }
 
 template <typename T>
 typename std::enable_if<std::is_base_of_v<Type, T>, void>::type
-Type::jsonserde_ptr_io(const T *&ptr,
-                       JsonValue &value,
-                       bool writing,
+Type::jsonserde_ptr_io(const T *&ptr, JsonValue &value, bool writing,
                        bool strict) {
   if (writing) {
     if (ptr == nullptr) {
@@ -736,15 +621,15 @@ Type::jsonserde_ptr_io(const T *&ptr,
     JsonValue content;
 
     switch (ptr->type_kind) {
-#define PER_TYPE_KIND(x)                                            \
-  case TypeKind::x: {                                               \
-    content = ptr->template as<x##Type>()->json_serialize_fields(); \
-    break;                                                          \
+#define PER_TYPE_KIND(x)                                                       \
+  case TypeKind::x: {                                                          \
+    content = ptr->template as<x##Type>()->json_serialize_fields();            \
+    break;                                                                     \
   }
 #include "taichi/inc/type_kind.inc.h"
 #undef PER_TYPE_KIND
-      default:
-        TI_NOT_IMPLEMENTED
+    default:
+      TI_NOT_IMPLEMENTED
     }
 
     obj.inner["content"] = std::move(content);
@@ -756,29 +641,28 @@ Type::jsonserde_ptr_io(const T *&ptr,
     }
     TypeKind type_kind = (TypeKind)(int)value["type_kind"];
     switch (type_kind) {
-#define PER_TYPE_KIND(x)                                      \
-  case TypeKind::x: {                                         \
-    x##Type content;                                          \
-    auto &content_val = value["content"];                     \
-    TI_ASSERT(content_val.is_obj());                          \
-    content.json_deserialize_fields(content_val.obj, strict); \
-    ptr = content.get_type()->as<T>();                        \
-    break;                                                    \
+#define PER_TYPE_KIND(x)                                                       \
+  case TypeKind::x: {                                                          \
+    x##Type content;                                                           \
+    auto &content_val = value["content"];                                      \
+    TI_ASSERT(content_val.is_obj());                                           \
+    content.json_deserialize_fields(content_val.obj, strict);                  \
+    ptr = content.get_type()->as<T>();                                         \
+    break;                                                                     \
   }
 #include "taichi/inc/type_kind.inc.h"
 #undef PER_TYPE_KIND
-      default:
-        TI_NOT_IMPLEMENTED
+    default:
+      TI_NOT_IMPLEMENTED
     }
   }
 }
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace taichi::hashing {
 
-template <>
-struct Hasher<lang::AbstractDictionaryMember> {
- public:
+template <> struct Hasher<lang::AbstractDictionaryMember> {
+public:
   size_t operator()(lang::AbstractDictionaryMember const &member) const {
     size_t ret = hash_value(member.type);
     hash_combine(ret, member.name);
@@ -787,4 +671,4 @@ struct Hasher<lang::AbstractDictionaryMember> {
   }
 };
 
-}  // namespace taichi::hashing
+} // namespace taichi::hashing

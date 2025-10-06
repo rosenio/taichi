@@ -1,8 +1,8 @@
 #pragma once
+#include <map>
+#include <memory>
 #include <mutex>
 #include <vector>
-#include <memory>
-#include <map>
 
 #include "taichi/rhi/arch.h"
 #include "taichi/rhi/device.h"
@@ -13,7 +13,7 @@ class HostMemoryPool;
 
 // This class can only be accessed by MemoryPool
 class UnifiedAllocator {
- public:
+public:
   struct MemoryChunk {
     bool is_exclusive;
     void *data;
@@ -21,13 +21,12 @@ class UnifiedAllocator {
     void *tail;
   };
 
- private:
+private:
   static std::size_t default_allocator_size;
 
   UnifiedAllocator();
 
-  void *allocate(std::size_t size,
-                 std::size_t alignment,
+  void *allocate(std::size_t size, std::size_t alignment,
                  bool exclusive = false);
 
   bool release(size_t sz, void *ptr);
@@ -38,4 +37,4 @@ class UnifiedAllocator {
   friend class HostMemoryPoolTestHelper;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

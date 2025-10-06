@@ -18,7 +18,7 @@ using RangeForTaskFunc = void(void *, int thread_id, int i);
 using ParallelFor = void(int n, int num_threads, void *, RangeForTaskFunc func);
 
 class ThreadPool {
- public:
+public:
   std::vector<std::thread> threads;
   std::condition_variable slave_cv;
   std::condition_variable master_cv;
@@ -33,24 +33,19 @@ class ThreadPool {
   bool started;
   bool exiting;
   RangeForTaskFunc *func;
-  void *range_for_task_context;  // Note: this is a pointer to a
-                                 // range_task_helper_context defined in the
-                                 // LLVM runtime, which is different from
-                                 // taichi::lang::Context.
+  void *range_for_task_context; // Note: this is a pointer to a
+                                // range_task_helper_context defined in the
+                                // LLVM runtime, which is different from
+                                // taichi::lang::Context.
   int thread_counter;
 
   explicit ThreadPool(int max_num_threads);
 
-  void run(int splits,
-           int desired_num_threads,
-           void *range_for_task_context,
+  void run(int splits, int desired_num_threads, void *range_for_task_context,
            RangeForTaskFunc *func);
 
-  static void static_run(ThreadPool *pool,
-                         int splits,
-                         int desired_num_threads,
-                         void *range_for_task_context,
-                         RangeForTaskFunc *func) {
+  static void static_run(ThreadPool *pool, int splits, int desired_num_threads,
+                         void *range_for_task_context, RangeForTaskFunc *func) {
     return pool->run(splits, desired_num_threads, range_for_task_context, func);
   }
 
@@ -59,4 +54,4 @@ class ThreadPool {
   ~ThreadPool();
 };
 
-}  // namespace taichi
+} // namespace taichi

@@ -16,5 +16,5 @@ bool is_dx_api_available();
 
 std::shared_ptr<Device> make_dx11_device();
 
-}  // namespace directx11
-}  // namespace taichi::lang
+} // namespace directx11
+} // namespace taichi::lang

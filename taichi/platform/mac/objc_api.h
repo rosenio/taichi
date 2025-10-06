@@ -32,19 +32,15 @@ R clscall(const char *class_name, const char *select, Args... args) {
                                 sel_getUid(select), args...);
 }
 
-template <typename O>
-class NsObjDeleter {
- public:
-  void operator()(O *o) {
-    call(o, "release");
-  }
+template <typename O> class NsObjDeleter {
+public:
+  void operator()(O *o) { call(o, "release"); }
 };
 
 template <typename O>
 using nsobj_unique_ptr = std::unique_ptr<O, NsObjDeleter<O>>;
 
-template <typename O>
-nsobj_unique_ptr<O> wrap_as_nsobj_unique_ptr(O *nsobj) {
+template <typename O> nsobj_unique_ptr<O> wrap_as_nsobj_unique_ptr(O *nsobj) {
   return nsobj_unique_ptr<O>(nsobj);
 }
 
@@ -91,8 +87,7 @@ std::string to_string(TI_NSString *ns);
 
 int ns_array_count(TI_NSArray *na);
 
-template <typename R>
-R ns_array_object_at_index(TI_NSArray *na, int i) {
+template <typename R> R ns_array_object_at_index(TI_NSArray *na, int i) {
   return cast_call<R>(na, "objectAtIndex:", i);
 }
 
@@ -103,15 +98,15 @@ TI_NSAutoreleasePool *create_autorelease_pool();
 void drain_autorelease_pool(TI_NSAutoreleasePool *pool);
 
 class ScopedAutoreleasePool {
- public:
+public:
   ScopedAutoreleasePool();
   ~ScopedAutoreleasePool();
 
- private:
+private:
   TI_NSAutoreleasePool *pool_;
 };
 
-}  // namespace mac
-}  // namespace taichi
+} // namespace mac
+} // namespace taichi
 
-#endif  // TI_PLATFORM_OSX
+#endif // TI_PLATFORM_OSX

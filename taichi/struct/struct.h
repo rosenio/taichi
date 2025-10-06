@@ -6,7 +6,7 @@
 namespace taichi::lang {
 
 class StructCompiler {
- public:
+public:
   std::vector<SNode *> stack;
   std::vector<SNode *> snodes;
   std::size_t root_size{0};
@@ -23,4 +23,4 @@ class StructCompiler {
   virtual void run(SNode &node) = 0;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

@@ -1,15 +1,15 @@
 #pragma once
 
 #include "taichi/math/math.h"
-#include "taichi/system/timer.h"
 #include "taichi/program/kernel_profiler.h"
+#include "taichi/system/timer.h"
 
 #include <atomic>
 #include <ctime>
 #include <numeric>
 #include <unordered_map>
 
-#if defined(TI_PLATFORM_LINUX) || \
+#if defined(TI_PLATFORM_LINUX) ||                                              \
     (defined(TI_PLATFORM_UNIX) && !defined(TI_PLATFORM_OSX))
 #if defined(TI_PLATFORM_ANDROID)
 #define TI_GUI_ANDROID
@@ -53,7 +53,7 @@ class TI_DLL_EXPORT Canvas {
     real _radius;
   };
 
- public:
+public:
   Context context;
 
   Canvas &color(Vector4 val) {
@@ -82,11 +82,10 @@ class TI_DLL_EXPORT Canvas {
     real _radius;
     int n_vertices;
     bool finished;
-    static Vector2 vertices[128];  // TODO: ...
+    static Vector2 vertices[128]; // TODO: ...
 
     TI_FORCE_INLINE explicit Line(Canvas &canvas)
-        : canvas(canvas),
-          _color(canvas.context._color),
+        : canvas(canvas), _color(canvas.context._color),
           _radius(canvas.context._radius) {
       n_vertices = 0;
       finished = false;
@@ -104,10 +103,7 @@ class TI_DLL_EXPORT Canvas {
       push(c);
     }
 
-    TI_FORCE_INLINE Line(Canvas &canvas,
-                         Vector2 a,
-                         Vector2 b,
-                         Vector2 c,
+    TI_FORCE_INLINE Line(Canvas &canvas, Vector2 a, Vector2 b, Vector2 c,
                          Vector2 d)
         : Line(canvas) {
       push(a);
@@ -116,9 +112,7 @@ class TI_DLL_EXPORT Canvas {
       push(d);
     }
 
-    TI_FORCE_INLINE void push(Vector2 vec) {
-      vertices[n_vertices++] = vec;
-    }
+    TI_FORCE_INLINE void push(Vector2 vec) { vertices[n_vertices++] = vec; }
 
     TI_FORCE_INLINE Line &path(Vector2 a) {
       push(a);
@@ -233,9 +227,7 @@ class TI_DLL_EXPORT Canvas {
     bool finished;
 
     TI_FORCE_INLINE Circle(Canvas &canvas, Vector2 center)
-        : canvas(canvas),
-          _center(center),
-          _color(canvas.context._color),
+        : canvas(canvas), _center(center), _color(canvas.context._color),
           _radius(canvas.context._radius) {
       finished = false;
     }
@@ -293,7 +285,7 @@ class TI_DLL_EXPORT Canvas {
     }
   };
 
- public:
+public:
   Array2D<Vector4> &img;
   Matrix3 transform_matrix;
 
@@ -322,28 +314,17 @@ class TI_DLL_EXPORT Canvas {
     return circles.back();
   }
 
-  void circles_batched(int n,
-                       std::size_t x,
-                       uint32 color_single,
-                       std::size_t color_array,
-                       real radius_single,
+  void circles_batched(int n, std::size_t x, uint32 color_single,
+                       std::size_t color_array, real radius_single,
                        std::size_t radius_array);
 
   void circle_single(real x, real y, uint32 color, real radius);
 
-  void paths_batched(int n,
-                     std::size_t a_,
-                     std::size_t b_,
-                     uint32 color_single,
-                     std::size_t color_array,
-                     real radius_single,
+  void paths_batched(int n, std::size_t a_, std::size_t b_, uint32 color_single,
+                     std::size_t color_array, real radius_single,
                      std::size_t radius_array);
 
-  void path_single(real x0,
-                   real y0,
-                   real x1,
-                   real y1,
-                   uint32 color,
+  void path_single(real x0, real y0, real x1, real y1, uint32 color,
                    real radius);
 
   Line &path(real xa, real ya, real xb, real yb) {
@@ -393,24 +374,13 @@ class TI_DLL_EXPORT Canvas {
 
   void triangle(Vector2 a, Vector2 b, Vector2 c, Vector4 color);
 
-  void triangles_batched(int n,
-                         std::size_t a_,
-                         std::size_t b_,
-                         std::size_t c_,
-                         uint32 color_single,
-                         std::size_t color_array);
+  void triangles_batched(int n, std::size_t a_, std::size_t b_, std::size_t c_,
+                         uint32 color_single, std::size_t color_array);
 
-  void triangle_single(real x0,
-                       real y0,
-                       real x1,
-                       real y1,
-                       real x2,
-                       real y2,
+  void triangle_single(real x0, real y0, real x1, real y1, real x2, real y2,
                        uint32 color);
 
-  void text(const std::string &str,
-            Vector2 position,
-            real size,
+  void text(const std::string &str, Vector2 position, real size,
             Vector4 color) {
     position = transform(position);
     std::string folder;
@@ -425,22 +395,17 @@ class TI_DLL_EXPORT Canvas {
     img.reset(color);
   }
 
-  void clear(uint32 c) {
-    clear(color_from_hex(c));
-  }
+  void clear(uint32 c) { clear(color_from_hex(c)); }
 
-  ~Canvas() {
-  }
+  ~Canvas() {}
 
-  void set_identity_transform_matrix() {
-    transform_matrix = Matrix3(1);
-  }
+  void set_identity_transform_matrix() { transform_matrix = Matrix3(1); }
 };
 
 #if defined(TI_GUI_ANDROID)
 
 class GUIBaseAndroid {
- public:
+public:
   // @TODO
 };
 
@@ -453,7 +418,7 @@ using GUIBase = GUIBaseAndroid;
 class CXImage;
 
 class GUIBaseX11 {
- public:
+public:
   void *display;
   void *visual;
   unsigned long window;
@@ -467,7 +432,7 @@ using GUIBase = GUIBaseX11;
 
 #if defined(TI_GUI_WIN32)
 class GUIBaseWin32 {
- public:
+public:
   HWND hwnd;
   HDC hdc;
   COLORREF *data;
@@ -480,7 +445,7 @@ using GUIBase = GUIBaseWin32;
 
 #if defined(TI_GUI_COCOA)
 class GUIBaseCocoa {
- public:
+public:
   id window, view;
   std::size_t img_data_length;
   std::vector<uint8_t> img_data;
@@ -499,7 +464,7 @@ using GUIBase = GUIBaseCocoa;
 #endif
 
 class TI_DLL_EXPORT GUI : public GUIBase {
- public:
+public:
   std::string window_name;
   int width, height;
   int frame_id = 0;
@@ -521,9 +486,7 @@ class TI_DLL_EXPORT GUI : public GUIBase {
   bool fast_gui;
   uintptr_t fast_buf;
 
-  void set_mouse_pos(int x, int y) {
-    cursor_pos = Vector2i(x, y);
-  }
+  void set_mouse_pos(int x, int y) { cursor_pos = Vector2i(x, y); }
 
   Vector2i widget_size = Vector2i(200, 40);
 
@@ -548,34 +511,23 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     Vector2i pos;
     Vector2i size;
     TI_IO_DEF(pos, size);
-    Rect() {
-    }
-    Rect(Vector2i pos, Vector2i size) : pos(pos), size(size) {
-    }
-    bool inside(Vector2i p) {
-      return pos <= p && p < pos + size;
-    }
+    Rect() {}
+    Rect(Vector2i pos, Vector2i size) : pos(pos), size(size) {}
+    bool inside(Vector2i p) { return pos <= p && p < pos + size; }
   };
 
   class Widget {
-   public:
+  public:
     Rect rect;
     bool hover;
 
-    Widget() {
-      hover = false;
-    }
+    Widget() { hover = false; }
 
-    explicit Widget(Rect rect) : Widget() {
-      this->rect = rect;
-    }
+    explicit Widget(Rect rect) : Widget() { this->rect = rect; }
 
-    bool inside(Vector2i p) {
-      return rect.inside(p);
-    }
+    bool inside(Vector2i p) { return rect.inside(p); }
 
-    virtual void mouse_event(MouseEvent e) {
-    }
+    virtual void mouse_event(MouseEvent e) {}
 
     virtual void redraw(Canvas &canvas) {
       Vector4 color =
@@ -587,26 +539,22 @@ class TI_DLL_EXPORT GUI : public GUIBase {
       }
     }
 
-    void set_hover(bool val) {
-      hover = val;
-    }
+    void set_hover(bool val) { hover = val; }
 
-    virtual ~Widget() {
-    }
+    virtual ~Widget() {}
   };
 
   std::vector<std::unique_ptr<Widget>> widgets;
 
   class Button : public Widget {
-   public:
+  public:
     std::string text;
 
     using CallbackType = std::function<void()>;
     CallbackType callback;
 
     Button(Rect rect, const std::string text, const CallbackType &callback)
-        : Widget(rect), text(text), callback(callback) {
-    }
+        : Widget(rect), text(text), callback(callback) {}
 
     void mouse_event(MouseEvent e) override {
       if (e.type == MouseEvent::Type::release) {
@@ -624,9 +572,8 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     }
   };
 
-  template <typename T>
-  class Slider : public Widget {
-   public:
+  template <typename T> class Slider : public Widget {
+  public:
     std::string text;
     T &val;
     T minimum, maximum, step;
@@ -636,19 +583,10 @@ class TI_DLL_EXPORT GUI : public GUIBase {
 
     const int slider_padding = 10;
 
-    Slider(Rect rect,
-           const std::string text,
-           T &val,
-           T minimum,
-           T maximum,
+    Slider(Rect rect, const std::string text, T &val, T minimum, T maximum,
            T step)
-        : Widget(rect),
-          text(text),
-          val(val),
-          minimum(minimum),
-          maximum(maximum),
-          step(step) {
-    }
+        : Widget(rect), text(text), val(val), minimum(minimum),
+          maximum(maximum), step(step) {}
 
     void mouse_event(MouseEvent e) override {
       if ((e.type == MouseEvent::Type::press ||
@@ -695,17 +633,15 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     }
   };
 
-  template <typename T>
-  class Label : public Widget {
-   public:
+  template <typename T> class Label : public Widget {
+  public:
     std::string text;
     T &val;
 
     const int slider_padding = 5;
 
     Label(Rect rect, const std::string text, T &val)
-        : Widget(rect), text(text), val(val) {
-    }
+        : Widget(rect), text(text), val(val) {}
 
     void redraw(Canvas &canvas) override {
       Widget::redraw(canvas);
@@ -742,8 +678,7 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     return *this;
   }
 
-  template <typename T>
-  GUI &label(std::string text, T &val) {
+  template <typename T> GUI &label(std::string text, T &val) {
     widgets.push_back(std::make_unique<Label<T>>(
         make_widget_rect(widget_size[1] / 2), text, val));
     return *this;
@@ -772,22 +707,13 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     }
   }
 
-  explicit GUI(const std::string &window_name,
-               int width = 800,
-               int height = 800,
-               bool show_gui = true,
-               bool fullscreen = true,
-               bool fast_gui = false,
-               uintptr_t fast_buf = 0,
+  explicit GUI(const std::string &window_name, int width = 800,
+               int height = 800, bool show_gui = true, bool fullscreen = true,
+               bool fast_gui = false, uintptr_t fast_buf = 0,
                bool normalized_coord = true)
-      : window_name(window_name),
-        width(width),
-        height(height),
-        key_pressed(false),
-        show_gui(show_gui),
-        fullscreen(fullscreen),
-        fast_gui(fast_gui),
-        fast_buf(fast_buf) {
+      : window_name(window_name), width(width), height(height),
+        key_pressed(false), show_gui(show_gui), fullscreen(fullscreen),
+        fast_gui(fast_gui), fast_buf(fast_buf) {
     memset(button_status, 0, sizeof(button_status));
     start_time = taichi::Time::get_time();
     buffer.initialize(Vector2i(width, height));
@@ -802,22 +728,11 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     }
   }
 
-  explicit GUI(const std::string &window_name,
-               Vector2i res,
-               bool show_gui,
-               bool fullscreen = true,
-               bool fast_gui = false,
-               uintptr_t fast_buf = 0,
-               bool normalized_coord = true)
-      : GUI(window_name,
-            res[0],
-            res[1],
-            show_gui,
-            fullscreen,
-            fast_gui,
-            fast_buf,
-            normalized_coord) {
-  }
+  explicit GUI(const std::string &window_name, Vector2i res, bool show_gui,
+               bool fullscreen = true, bool fast_gui = false,
+               uintptr_t fast_buf = 0, bool normalized_coord = true)
+      : GUI(window_name, res[0], res[1], show_gui, fullscreen, fast_gui,
+            fast_buf, normalized_coord) {}
 
   void create_window();
 
@@ -826,9 +741,7 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     set_title(window_name);
   }
 
-  Canvas &get_canvas() {
-    return *canvas;
-  }
+  Canvas &get_canvas() { return *canvas; }
 
   void redraw();
 
@@ -881,9 +794,7 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     }
   }
 
-  bool has_key_event() {
-    return !!key_events.size();
-  }
+  bool has_key_event() { return !!key_events.size(); }
 
   void wait_key_event() {
     while (!key_events.size()) {
@@ -891,17 +802,11 @@ class TI_DLL_EXPORT GUI : public GUIBase {
     }
   }
 
-  KeyEvent get_key_event_head() {
-    return key_events[0];
-  }
+  KeyEvent get_key_event_head() { return key_events[0]; }
 
-  Vector2 get_cursor_pos() {
-    return canvas->untransform(Vector2(cursor_pos));
-  }
+  Vector2 get_cursor_pos() { return canvas->untransform(Vector2(cursor_pos)); }
 
-  void pop_key_event_head() {
-    key_events.erase(key_events.begin());
-  }
+  void pop_key_event_head() { key_events.erase(key_events.begin()); }
 
   void wait_key() {
     while (true) {
@@ -945,4 +850,4 @@ class TI_DLL_EXPORT GUI : public GUIBase {
   ~GUI();
 };
 
-}  // namespace taichi
+} // namespace taichi

@@ -31,4 +31,4 @@ bool arch_use_host_memory(Arch arch);
 
 int default_simd_width(Arch arch);
 
-}  // namespace taichi
+} // namespace taichi

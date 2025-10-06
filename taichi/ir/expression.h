@@ -1,9 +1,9 @@
 #pragma once
 
+#include "taichi/ir/expr.h"
+#include "taichi/ir/ir.h"
 #include "taichi/program/compile_config.h"
 #include "taichi/util/str.h"
-#include "taichi/ir/ir.h"
-#include "taichi/ir/expr.h"
 
 namespace taichi::lang {
 
@@ -11,10 +11,10 @@ class ExpressionVisitor;
 
 // always a tree - used as rvalues
 class Expression {
- protected:
+protected:
   Stmt *stmt;
 
- public:
+public:
   DebugInfo dbg_info;
   std::map<std::string, std::string> attributes;
   DataType ret_type;
@@ -27,19 +27,14 @@ class Expression {
       return stmts.push_back(std::move(stmt));
     }
 
-    template <typename T, typename... Args>
-    T *push_back(Args &&...args) {
+    template <typename T, typename... Args> T *push_back(Args &&...args) {
       return stmts.push_back<T>(std::forward<Args>(args)...);
     }
 
-    Stmt *back_stmt() {
-      return stmts.back().get();
-    }
+    Stmt *back_stmt() { return stmts.back().get(); }
   };
 
-  Expression() {
-    stmt = nullptr;
-  }
+  Expression() { stmt = nullptr; }
 
   explicit Expression(const DebugInfo &dbg_info) : Expression() {
     this->dbg_info = dbg_info;
@@ -49,44 +44,28 @@ class Expression {
 
   virtual void accept(ExpressionVisitor *visitor) = 0;
 
-  virtual void flatten(FlattenContext *ctx) {
-    TI_NOT_IMPLEMENTED;
-  };
+  virtual void flatten(FlattenContext *ctx) { TI_NOT_IMPLEMENTED; };
 
-  virtual bool is_lvalue() const {
-    return false;
-  }
+  virtual bool is_lvalue() const { return false; }
 
-  virtual ~Expression() {
-  }
+  virtual ~Expression() {}
 
-  Stmt *get_flattened_stmt() const {
-    return stmt;
-  }
+  Stmt *get_flattened_stmt() const { return stmt; }
 
-  std::string get_last_tb() const {
-    return dbg_info.get_last_tb();
-  }
+  std::string get_last_tb() const { return dbg_info.get_last_tb(); }
 
-  std::string const &get_tb() const {
-    return dbg_info.tb;
-  }
+  std::string const &get_tb() const { return dbg_info.tb; }
 
-  void set_tb(std::string const &tb) {
-    dbg_info.tb = tb;
-  }
+  void set_tb(std::string const &tb) { dbg_info.tb = tb; }
 };
 
 class ExprGroup {
- public:
+public:
   std::vector<Expr> exprs;
 
-  ExprGroup() {
-  }
+  ExprGroup() {}
 
-  explicit ExprGroup(const Expr &a) {
-    exprs.emplace_back(a);
-  }
+  explicit ExprGroup(const Expr &a) { exprs.emplace_back(a); }
 
   ExprGroup(const Expr &a, const Expr &b) {
     exprs.emplace_back(a);
@@ -110,21 +89,13 @@ class ExprGroup {
     }
   }
 
-  void push_back(const Expr &expr) {
-    exprs.emplace_back(expr);
-  }
+  void push_back(const Expr &expr) { exprs.emplace_back(expr); }
 
-  std::size_t size() const {
-    return exprs.size();
-  }
+  std::size_t size() const { return exprs.size(); }
 
-  const Expr &operator[](int i) const {
-    return exprs[i];
-  }
+  const Expr &operator[](int i) const { return exprs[i]; }
 
-  Expr &operator[](int i) {
-    return exprs[i];
-  }
+  Expr &operator[](int i) { return exprs[i]; }
 };
 
 inline ExprGroup operator,(const Expr &a, const Expr &b) {
@@ -140,20 +111,17 @@ inline ExprGroup operator,(const ExprGroup &a, const Expr &b) {
 #undef PER_EXPRESSION
 
 class ExpressionVisitor {
- public:
+public:
   explicit ExpressionVisitor(bool allow_undefined_visitor = false,
                              bool invoke_default_visitor = false)
       : allow_undefined_visitor_(allow_undefined_visitor),
-        invoke_default_visitor_(invoke_default_visitor) {
-  }
+        invoke_default_visitor_(invoke_default_visitor) {}
 
   virtual ~ExpressionVisitor() = default;
 
   virtual void visit(ExprGroup &expr_group) = 0;
 
-  void visit(Expr &expr) {
-    expr.expr->accept(this);
-  }
+  void visit(Expr &expr) { expr.expr->accept(this); }
 
   virtual void visit(Expression *expr) {
     if (!allow_undefined_visitor_) {
@@ -161,27 +129,25 @@ class ExpressionVisitor {
     }
   }
 
-#define DEFINE_VISIT(T)             \
-  virtual void visit(T *expr) {     \
-    if (allow_undefined_visitor_) { \
-      if (invoke_default_visitor_)  \
-        visit((Expression *)expr);  \
-    } else                          \
-      TI_NOT_IMPLEMENTED;           \
+#define DEFINE_VISIT(T)                                                        \
+  virtual void visit(T *expr) {                                                \
+    if (allow_undefined_visitor_) {                                            \
+      if (invoke_default_visitor_)                                             \
+        visit((Expression *)expr);                                             \
+    } else                                                                     \
+      TI_NOT_IMPLEMENTED;                                                      \
   }
 
 #define PER_EXPRESSION(x) DEFINE_VISIT(x)
 #include "taichi/inc/expressions.inc.h"
 #undef PER_EXPRESSION
 #undef DEFINE_VISIT
- private:
+private:
   bool allow_undefined_visitor_{false};
   bool invoke_default_visitor_{false};
 };
 
-#define TI_DEFINE_ACCEPT_FOR_EXPRESSION              \
-  void accept(ExpressionVisitor *visitor) override { \
-    visitor->visit(this);                            \
-  }
+#define TI_DEFINE_ACCEPT_FOR_EXPRESSION                                        \
+  void accept(ExpressionVisitor *visitor) override { visitor->visit(this); }
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

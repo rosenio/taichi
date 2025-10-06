@@ -9,13 +9,13 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include <iostream>
-#include <type_traits>
-#include <cstdint>
 #include <algorithm>
-#include <vector>
-#include <string>
+#include <cstdint>
 #include <functional>
+#include <iostream>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 //******************************************************************************
 //                                 System State
@@ -84,7 +84,7 @@ static_assert(__cplusplus >= 201402L, "C++14 required.");
 #include "taichi/platform/windows/windows.h"
 #pragma warning(pop)
 #include <intrin.h>
-#endif  // _WIN64
+#endif // _WIN64
 
 #ifndef _WIN64
 #define sscanf_s sscanf
@@ -114,7 +114,7 @@ namespace taichi {
 //******************************************************************************
 
 class CoreState {
- public:
+public:
   bool python_imported = false;
   bool trigger_gdb_when_crash = false;
 
@@ -167,42 +167,22 @@ using real = float32;
 
 // Float literal for both float32/64
 // (Learned from https://github.com/hi2p-perim/lightmetrica-v2)
-real constexpr operator"" _f(long double v) {
-  return real(v);
-}
-real constexpr operator"" _f(unsigned long long v) {
-  return real(v);
-}
+real constexpr operator"" _f(long double v) { return real(v); }
+real constexpr operator"" _f(unsigned long long v) { return real(v); }
 
-float32 constexpr operator"" _f32(long double v) {
-  return float32(v);
-}
-float32 constexpr operator"" _f32(unsigned long long v) {
-  return float32(v);
-}
+float32 constexpr operator"" _f32(long double v) { return float32(v); }
+float32 constexpr operator"" _f32(unsigned long long v) { return float32(v); }
 
-float32 constexpr operator"" _fs(long double v) {
-  return float32(v);
-}
-float32 constexpr operator"" _fs(unsigned long long v) {
-  return float32(v);
-}
+float32 constexpr operator"" _fs(long double v) { return float32(v); }
+float32 constexpr operator"" _fs(unsigned long long v) { return float32(v); }
 
-float64 constexpr operator"" _f64(long double v) {
-  return float64(v);
-}
-float64 constexpr operator"" _f64(unsigned long long v) {
-  return float64(v);
-}
+float64 constexpr operator"" _f64(long double v) { return float64(v); }
+float64 constexpr operator"" _f64(unsigned long long v) { return float64(v); }
 
-float64 constexpr operator"" _fd(long double v) {
-  return float64(v);
-}
-float64 constexpr operator"" _fd(unsigned long long v) {
-  return float64(v);
-}
+float64 constexpr operator"" _fd(long double v) { return float64(v); }
+float64 constexpr operator"" _fd(unsigned long long v) { return float64(v); }
 
-}  // namespace taichi
+} // namespace taichi
 //******************************************************************************
 //                           Meta-programming
 //******************************************************************************
@@ -219,7 +199,7 @@ void write(std::string fn, const uint8 *data, std::size_t len);
 void write(const std::string &fn, const std::string &data);
 std::vector<uint8> read(const std::string fn, bool verbose = false);
 
-}  // namespace zip
+} // namespace zip
 
 //******************************************************************************
 //                               String Utils
@@ -267,7 +247,7 @@ inline bool starts_with(std::string const &str, std::string const &ending) {
     return std::equal(ending.begin(), ending.end(), str.begin());
 }
 
-}  // namespace taichi
+} // namespace taichi
 
 //******************************************************************************
 //                               Serialization
@@ -282,8 +262,7 @@ inline bool starts_with(std::string const &str, std::string const &ending) {
 namespace taichi {
 
 extern int __trash__;
-template <typename T>
-void trash(T &&t) {
+template <typename T> void trash(T &&t) {
   static_assert(!std::is_same<T, void>::value, "");
   __trash__ = *reinterpret_cast<uint8 *>(&t);
 }
@@ -291,14 +270,11 @@ void trash(T &&t) {
 class DeferedExecution {
   std::function<void(void)> statement_;
 
- public:
+public:
   explicit DeferedExecution(const std::function<void(void)> &statement)
-      : statement_(statement) {
-  }
+      : statement_(statement) {}
 
-  ~DeferedExecution() {
-    statement_();
-  }
+  ~DeferedExecution() { statement_(); }
 };
 
 #define TI_DEFER(x) taichi::DeferedExecution _defered([&]() { x; });
@@ -309,9 +285,7 @@ std::string get_python_package_dir();
 
 void set_python_package_dir(const std::string &dir);
 
-inline std::string assets_dir() {
-  return get_repo_dir() + "/assets/";
-}
+inline std::string assets_dir() { return get_repo_dir() + "/assets/"; }
 
 std::string cpp_demangle(const std::string &mangled_name);
 
@@ -328,9 +302,9 @@ std::string get_commit_hash();
 std::string get_cuda_version_string();
 
 class PID {
- public:
+public:
   static int get_pid();
   static int get_parent_pid();
 };
 
-}  // namespace taichi
+} // namespace taichi

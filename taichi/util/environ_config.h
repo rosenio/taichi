@@ -2,8 +2,8 @@
 
 #include "taichi/common/core.h"
 
-#include <string>
 #include <cstdlib>
+#include <string>
 
 namespace taichi::lang {
 
@@ -15,4 +15,4 @@ static inline int get_environ_config(const std::string &name,
   return std::stoi(res);
 }
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

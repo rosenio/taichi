@@ -205,8 +205,8 @@
 #include <time.h>
 #endif
 
-#if defined(_M_IX86) || defined(_M_X64) || defined(__i386__) || \
-    defined(__i386) || defined(__i486__) || defined(__i486) ||  \
+#if defined(_M_IX86) || defined(_M_X64) || defined(__i386__) ||                \
+    defined(__i386) || defined(__i486__) || defined(__i486) ||                 \
     defined(i386) || defined(__ia64__) || defined(__x86_64__)
 /* MINIZ_X86_OR_X64_CPU is only used to help set the below macros. */
 #define MINIZ_X86_OR_X64_CPU 1
@@ -255,8 +255,8 @@
 #endif
 #endif
 
-#if defined(_M_X64) || defined(_WIN64) || defined(__MINGW64__) || \
-    defined(_LP64) || defined(__LP64__) || defined(__ia64__) ||   \
+#if defined(_M_X64) || defined(_WIN64) || defined(__MINGW64__) ||              \
+    defined(_LP64) || defined(__LP64__) || defined(__ia64__) ||                \
     defined(__x86_64__)
 /* Set MINIZ_HAS_64BIT_REGISTERS to 1 if operations on 64-bit integers are
  * reasonably fast (and don't involve compiler generated calls to helper
@@ -284,15 +284,13 @@ MINIZ_EXPORT void mz_free(void *p);
 #define MZ_ADLER32_INIT (1)
 /* mz_adler32() returns the initial adler-32 value to use when called with
  * ptr==NULL. */
-MINIZ_EXPORT mz_ulong mz_adler32(mz_ulong adler,
-                                 const unsigned char *ptr,
+MINIZ_EXPORT mz_ulong mz_adler32(mz_ulong adler, const unsigned char *ptr,
                                  size_t buf_len);
 
 #define MZ_CRC32_INIT (0)
 /* mz_crc32() returns the initial CRC-32 value to use when called with
  * ptr==NULL. */
-MINIZ_EXPORT mz_ulong mz_crc32(mz_ulong crc,
-                               const unsigned char *ptr,
+MINIZ_EXPORT mz_ulong mz_crc32(mz_ulong crc, const unsigned char *ptr,
                                size_t buf_len);
 
 /* Compression strategies. */
@@ -312,9 +310,7 @@ Note that mz_alloc_func parameter types purposely differ from zlib's: items/size
 is size_t, not unsigned long. */
 typedef void *(*mz_alloc_func)(void *opaque, size_t items, size_t size);
 typedef void (*mz_free_func)(void *opaque, void *address);
-typedef void *(*mz_realloc_func)(void *opaque,
-                                 void *address,
-                                 size_t items,
+typedef void *(*mz_realloc_func)(void *opaque, void *address, size_t items,
                                  size_t size);
 
 /* Compression levels: 0-9 are the standard zlib-style levels, 10 is best
@@ -421,12 +417,8 @@ MINIZ_EXPORT int mz_deflateInit(mz_streamp pStream, int level);
  * zlib header/adler-32 footer) or -MZ_DEFAULT_WINDOW_BITS (raw deflate/no
  * header or footer) */
 /*   mem_level must be between [1, 9] (it's checked but ignored by miniz.c) */
-MINIZ_EXPORT int mz_deflateInit2(mz_streamp pStream,
-                                 int level,
-                                 int method,
-                                 int window_bits,
-                                 int mem_level,
-                                 int strategy);
+MINIZ_EXPORT int mz_deflateInit2(mz_streamp pStream, int level, int method,
+                                 int window_bits, int mem_level, int strategy);
 
 /* Quickly resets a compressor without having to reallocate anything. Same as
  * calling mz_deflateEnd() followed by mz_deflateInit()/mz_deflateInit2(). */
@@ -466,14 +458,10 @@ MINIZ_EXPORT mz_ulong mz_deflateBound(mz_streamp pStream, mz_ulong source_len);
 /* Single-call compression functions mz_compress() and mz_compress2(): */
 /* Returns MZ_OK on success, or one of the error codes from mz_deflate() on
  * failure. */
-MINIZ_EXPORT int mz_compress(unsigned char *pDest,
-                             mz_ulong *pDest_len,
-                             const unsigned char *pSource,
-                             mz_ulong source_len);
-MINIZ_EXPORT int mz_compress2(unsigned char *pDest,
-                              mz_ulong *pDest_len,
-                              const unsigned char *pSource,
-                              mz_ulong source_len,
+MINIZ_EXPORT int mz_compress(unsigned char *pDest, mz_ulong *pDest_len,
+                             const unsigned char *pSource, mz_ulong source_len);
+MINIZ_EXPORT int mz_compress2(unsigned char *pDest, mz_ulong *pDest_len,
+                              const unsigned char *pSource, mz_ulong source_len,
                               int level);
 
 /* mz_compressBound() returns a (very) conservative upper bound on the amount of
@@ -532,12 +520,10 @@ MINIZ_EXPORT int mz_inflateEnd(mz_streamp pStream);
 /* Single-call decompression. */
 /* Returns MZ_OK on success, or one of the error codes from mz_inflate() on
  * failure. */
-MINIZ_EXPORT int mz_uncompress(unsigned char *pDest,
-                               mz_ulong *pDest_len,
+MINIZ_EXPORT int mz_uncompress(unsigned char *pDest, mz_ulong *pDest_len,
                                const unsigned char *pSource,
                                mz_ulong source_len);
-MINIZ_EXPORT int mz_uncompress2(unsigned char *pDest,
-                                mz_ulong *pDest_len,
+MINIZ_EXPORT int mz_uncompress2(unsigned char *pDest, mz_ulong *pDest_len,
                                 const unsigned char *pSource,
                                 mz_ulong *pSource_len);
 #endif /*#ifndef MINIZ_NO_INFLATE_APIS*/
@@ -704,19 +690,19 @@ typedef struct mz_dummy_time_t_tag {
 #define MZ_READ_LE16(p) *((const mz_uint16 *)(p))
 #define MZ_READ_LE32(p) *((const mz_uint32 *)(p))
 #else
-#define MZ_READ_LE16(p)                      \
-  ((mz_uint32)(((const mz_uint8 *)(p))[0]) | \
+#define MZ_READ_LE16(p)                                                        \
+  ((mz_uint32)(((const mz_uint8 *)(p))[0]) |                                   \
    ((mz_uint32)(((const mz_uint8 *)(p))[1]) << 8U))
-#define MZ_READ_LE32(p)                               \
-  ((mz_uint32)(((const mz_uint8 *)(p))[0]) |          \
-   ((mz_uint32)(((const mz_uint8 *)(p))[1]) << 8U) |  \
-   ((mz_uint32)(((const mz_uint8 *)(p))[2]) << 16U) | \
+#define MZ_READ_LE32(p)                                                        \
+  ((mz_uint32)(((const mz_uint8 *)(p))[0]) |                                   \
+   ((mz_uint32)(((const mz_uint8 *)(p))[1]) << 8U) |                           \
+   ((mz_uint32)(((const mz_uint8 *)(p))[2]) << 16U) |                          \
    ((mz_uint32)(((const mz_uint8 *)(p))[3]) << 24U))
 #endif
 
-#define MZ_READ_LE64(p)                                                  \
-  (((mz_uint64)MZ_READ_LE32(p)) |                                        \
-   (((mz_uint64)MZ_READ_LE32((const mz_uint8 *)(p) + sizeof(mz_uint32))) \
+#define MZ_READ_LE64(p)                                                        \
+  (((mz_uint64)MZ_READ_LE32(p)) |                                              \
+   (((mz_uint64)MZ_READ_LE32((const mz_uint8 *)(p) + sizeof(mz_uint32)))       \
     << 32U))
 
 #ifdef _MSC_VER
@@ -731,14 +717,11 @@ typedef struct mz_dummy_time_t_tag {
 extern "C" {
 #endif
 
-extern MINIZ_EXPORT void *miniz_def_alloc_func(void *opaque,
-                                               size_t items,
+extern MINIZ_EXPORT void *miniz_def_alloc_func(void *opaque, size_t items,
                                                size_t size);
 extern MINIZ_EXPORT void miniz_def_free_func(void *opaque, void *address);
-extern MINIZ_EXPORT void *miniz_def_realloc_func(void *opaque,
-                                                 void *address,
-                                                 size_t items,
-                                                 size_t size);
+extern MINIZ_EXPORT void *miniz_def_realloc_func(void *opaque, void *address,
+                                                 size_t items, size_t size);
 
 #define MZ_UINT16_MAX (0xFFFFU)
 #define MZ_UINT32_MAX (0xFFFFFFFFU)
@@ -812,8 +795,7 @@ enum {
 /*  The caller must free() the returned block when it's no longer needed. */
 MINIZ_EXPORT void *tdefl_compress_mem_to_heap(const void *pSrc_buf,
                                               size_t src_buf_len,
-                                              size_t *pOut_len,
-                                              int flags);
+                                              size_t *pOut_len, int flags);
 
 /* tdefl_compress_mem_to_mem() compresses a block in memory to another block in
  * memory. */
@@ -821,8 +803,7 @@ MINIZ_EXPORT void *tdefl_compress_mem_to_heap(const void *pSrc_buf,
 MINIZ_EXPORT size_t tdefl_compress_mem_to_mem(void *pOut_buf,
                                               size_t out_buf_len,
                                               const void *pSrc_buf,
-                                              size_t src_buf_len,
-                                              int flags);
+                                              size_t src_buf_len, int flags);
 
 /* Compresses an image to a compressed PNG file in memory. */
 /* On entry: */
@@ -839,34 +820,25 @@ MINIZ_EXPORT size_t tdefl_compress_mem_to_mem(void *pOut_buf,
 /*  *pLen_out will be set to the size of the PNG image file. */
 /*  The caller must mz_free() the returned heap block (which will typically be
  * larger than *pLen_out) when it's no longer needed. */
-MINIZ_EXPORT void *tdefl_write_image_to_png_file_in_memory_ex(
-    const void *pImage,
-    int w,
-    int h,
-    int num_chans,
-    size_t *pLen_out,
-    mz_uint level,
-    mz_bool flip);
+MINIZ_EXPORT void *
+tdefl_write_image_to_png_file_in_memory_ex(const void *pImage, int w, int h,
+                                           int num_chans, size_t *pLen_out,
+                                           mz_uint level, mz_bool flip);
 MINIZ_EXPORT void *tdefl_write_image_to_png_file_in_memory(const void *pImage,
-                                                           int w,
-                                                           int h,
+                                                           int w, int h,
                                                            int num_chans,
                                                            size_t *pLen_out);
 
 /* Output stream interface. The compressor uses this interface to write
  * compressed data. It'll typically be called TDEFL_OUT_BUF_SIZE at a time. */
-typedef mz_bool (*tdefl_put_buf_func_ptr)(const void *pBuf,
-                                          int len,
+typedef mz_bool (*tdefl_put_buf_func_ptr)(const void *pBuf, int len,
                                           void *pUser);
 
 /* tdefl_compress_mem_to_output() compresses a block to an output stream. The
  * above helpers use this function internally. */
-MINIZ_EXPORT mz_bool
-tdefl_compress_mem_to_output(const void *pBuf,
-                             size_t buf_len,
-                             tdefl_put_buf_func_ptr pPut_buf_func,
-                             void *pPut_buf_user,
-                             int flags);
+MINIZ_EXPORT mz_bool tdefl_compress_mem_to_output(
+    const void *pBuf, size_t buf_len, tdefl_put_buf_func_ptr pPut_buf_func,
+    void *pPut_buf_user, int flags);
 
 enum {
   TDEFL_MAX_HUFF_TABLES = 3,
@@ -963,16 +935,14 @@ typedef struct {
  * etc.) */
 MINIZ_EXPORT tdefl_status tdefl_init(tdefl_compressor *d,
                                      tdefl_put_buf_func_ptr pPut_buf_func,
-                                     void *pPut_buf_user,
-                                     int flags);
+                                     void *pPut_buf_user, int flags);
 
 /* Compresses a block of data, consuming as much of the specified input buffer
  * as possible, and writing as much compressed data to the specified output
  * buffer as possible. */
 MINIZ_EXPORT tdefl_status tdefl_compress(tdefl_compressor *d,
                                          const void *pIn_buf,
-                                         size_t *pIn_buf_size,
-                                         void *pOut_buf,
+                                         size_t *pIn_buf_size, void *pOut_buf,
                                          size_t *pOut_buf_size,
                                          tdefl_flush flush);
 
@@ -1052,8 +1022,7 @@ enum {
  * needed. */
 MINIZ_EXPORT void *tinfl_decompress_mem_to_heap(const void *pSrc_buf,
                                                 size_t src_buf_len,
-                                                size_t *pOut_len,
-                                                int flags);
+                                                size_t *pOut_len, int flags);
 
 /* tinfl_decompress_mem_to_mem() decompresses a block in memory to another block
  * in memory. */
@@ -1063,20 +1032,17 @@ MINIZ_EXPORT void *tinfl_decompress_mem_to_heap(const void *pSrc_buf,
 MINIZ_EXPORT size_t tinfl_decompress_mem_to_mem(void *pOut_buf,
                                                 size_t out_buf_len,
                                                 const void *pSrc_buf,
-                                                size_t src_buf_len,
-                                                int flags);
+                                                size_t src_buf_len, int flags);
 
 /* tinfl_decompress_mem_to_callback() decompresses a block in memory to an
  * internal 32KB buffer, and a user provided callback function will be called to
  * flush the buffer. */
 /* Returns 1 on success or 0 on failure. */
 typedef int (*tinfl_put_buf_func_ptr)(const void *pBuf, int len, void *pUser);
-MINIZ_EXPORT int tinfl_decompress_mem_to_callback(
-    const void *pIn_buf,
-    size_t *pIn_buf_size,
-    tinfl_put_buf_func_ptr pPut_buf_func,
-    void *pPut_buf_user,
-    int flags);
+MINIZ_EXPORT int
+tinfl_decompress_mem_to_callback(const void *pIn_buf, size_t *pIn_buf_size,
+                                 tinfl_put_buf_func_ptr pPut_buf_func,
+                                 void *pPut_buf_user, int flags);
 
 struct tinfl_decompressor_tag;
 typedef struct tinfl_decompressor_tag tinfl_decompressor;
@@ -1152,10 +1118,10 @@ typedef enum {
 } tinfl_status;
 
 /* Initializes the decompressor to its initial state. */
-#define tinfl_init(r) \
-  do {                \
-    (r)->m_state = 0; \
-  }                   \
+#define tinfl_init(r)                                                          \
+  do {                                                                         \
+    (r)->m_state = 0;                                                          \
+  }                                                                            \
   MZ_MACRO_END
 #define tinfl_get_adler32(r) (r)->m_check_adler32
 
@@ -1165,13 +1131,10 @@ typedef enum {
 /* This is a universal API, i.e. it can be used as a building block to build any
  * desired higher level decompression API. In the limit case, it can be called
  * once per every byte input or output. */
-MINIZ_EXPORT tinfl_status tinfl_decompress(tinfl_decompressor *r,
-                                           const mz_uint8 *pIn_buf_next,
-                                           size_t *pIn_buf_size,
-                                           mz_uint8 *pOut_buf_start,
-                                           mz_uint8 *pOut_buf_next,
-                                           size_t *pOut_buf_size,
-                                           const mz_uint32 decomp_flags);
+MINIZ_EXPORT tinfl_status tinfl_decompress(
+    tinfl_decompressor *r, const mz_uint8 *pIn_buf_next, size_t *pIn_buf_size,
+    mz_uint8 *pOut_buf_start, mz_uint8 *pOut_buf_next, size_t *pOut_buf_size,
+    const mz_uint32 decomp_flags);
 
 /* Internal/private bits follow. */
 enum {
@@ -1299,14 +1262,10 @@ typedef struct {
 #endif
 } mz_zip_archive_file_stat;
 
-typedef size_t (*mz_file_read_func)(void *pOpaque,
-                                    mz_uint64 file_ofs,
-                                    void *pBuf,
-                                    size_t n);
-typedef size_t (*mz_file_write_func)(void *pOpaque,
-                                     mz_uint64 file_ofs,
-                                     const void *pBuf,
-                                     size_t n);
+typedef size_t (*mz_file_read_func)(void *pOpaque, mz_uint64 file_ofs,
+                                    void *pBuf, size_t n);
+typedef size_t (*mz_file_write_func)(void *pOpaque, mz_uint64 file_ofs,
+                                     const void *pBuf, size_t n);
 typedef mz_bool (*mz_file_needs_keepalive)(void *pOpaque);
 
 struct mz_zip_internal_state_tag;
@@ -1444,13 +1403,11 @@ typedef struct {
 
 /* Inits a ZIP archive reader. */
 /* These functions read and validate the archive's central directory. */
-MINIZ_EXPORT mz_bool mz_zip_reader_init(mz_zip_archive *pZip,
-                                        mz_uint64 size,
+MINIZ_EXPORT mz_bool mz_zip_reader_init(mz_zip_archive *pZip, mz_uint64 size,
                                         mz_uint flags);
 
 MINIZ_EXPORT mz_bool mz_zip_reader_init_mem(mz_zip_archive *pZip,
-                                            const void *pMem,
-                                            size_t size,
+                                            const void *pMem, size_t size,
                                             mz_uint flags);
 
 #ifndef MINIZ_NO_STDIO
@@ -1504,8 +1461,7 @@ MINIZ_EXPORT MZ_FILE *mz_zip_get_cfile(mz_zip_archive *pZip);
 /* Reads n bytes of raw archive data, starting at file offset file_ofs, to pBuf.
  */
 MINIZ_EXPORT size_t mz_zip_read_archive_data(mz_zip_archive *pZip,
-                                             mz_uint64 file_ofs,
-                                             void *pBuf,
+                                             mz_uint64 file_ofs, void *pBuf,
                                              size_t n);
 
 /* All mz_zip funcs set the m_last_error field in the mz_zip_archive struct.
@@ -1545,8 +1501,7 @@ MINIZ_EXPORT mz_uint mz_zip_reader_get_filename(mz_zip_archive *pZip,
 /* Returns -1 if the file cannot be found. */
 MINIZ_EXPORT int mz_zip_reader_locate_file(mz_zip_archive *pZip,
                                            const char *pName,
-                                           const char *pComment,
-                                           mz_uint flags);
+                                           const char *pComment, mz_uint flags);
 MINIZ_EXPORT mz_bool mz_zip_reader_locate_file_v2(mz_zip_archive *pZip,
                                                   const char *pName,
                                                   const char *pComment,
@@ -1571,28 +1526,17 @@ MINIZ_EXPORT size_t mz_zip_get_central_dir_size(mz_zip_archive *pZip);
 /* Extracts a archive file to a memory buffer using no memory allocation. */
 /* There must be at least enough room on the stack to store the inflator's state
  * (~34KB or so). */
-MINIZ_EXPORT mz_bool
-mz_zip_reader_extract_to_mem_no_alloc(mz_zip_archive *pZip,
-                                      mz_uint file_index,
-                                      void *pBuf,
-                                      size_t buf_size,
-                                      mz_uint flags,
-                                      void *pUser_read_buf,
-                                      size_t user_read_buf_size);
-MINIZ_EXPORT mz_bool
-mz_zip_reader_extract_file_to_mem_no_alloc(mz_zip_archive *pZip,
-                                           const char *pFilename,
-                                           void *pBuf,
-                                           size_t buf_size,
-                                           mz_uint flags,
-                                           void *pUser_read_buf,
-                                           size_t user_read_buf_size);
+MINIZ_EXPORT mz_bool mz_zip_reader_extract_to_mem_no_alloc(
+    mz_zip_archive *pZip, mz_uint file_index, void *pBuf, size_t buf_size,
+    mz_uint flags, void *pUser_read_buf, size_t user_read_buf_size);
+MINIZ_EXPORT mz_bool mz_zip_reader_extract_file_to_mem_no_alloc(
+    mz_zip_archive *pZip, const char *pFilename, void *pBuf, size_t buf_size,
+    mz_uint flags, void *pUser_read_buf, size_t user_read_buf_size);
 
 /* Extracts a archive file to a memory buffer. */
 MINIZ_EXPORT mz_bool mz_zip_reader_extract_to_mem(mz_zip_archive *pZip,
                                                   mz_uint file_index,
-                                                  void *pBuf,
-                                                  size_t buf_size,
+                                                  void *pBuf, size_t buf_size,
                                                   mz_uint flags);
 MINIZ_EXPORT mz_bool mz_zip_reader_extract_file_to_mem(mz_zip_archive *pZip,
                                                        const char *pFilename,
@@ -1606,8 +1550,7 @@ MINIZ_EXPORT mz_bool mz_zip_reader_extract_file_to_mem(mz_zip_archive *pZip,
 /* Returns NULL and sets the last error on failure. */
 MINIZ_EXPORT void *mz_zip_reader_extract_to_heap(mz_zip_archive *pZip,
                                                  mz_uint file_index,
-                                                 size_t *pSize,
-                                                 mz_uint flags);
+                                                 size_t *pSize, mz_uint flags);
 MINIZ_EXPORT void *mz_zip_reader_extract_file_to_heap(mz_zip_archive *pZip,
                                                       const char *pFilename,
                                                       size_t *pSize,
@@ -1615,32 +1558,22 @@ MINIZ_EXPORT void *mz_zip_reader_extract_file_to_heap(mz_zip_archive *pZip,
 
 /* Extracts a archive file using a callback function to output the file's data.
  */
-MINIZ_EXPORT mz_bool
-mz_zip_reader_extract_to_callback(mz_zip_archive *pZip,
-                                  mz_uint file_index,
-                                  mz_file_write_func pCallback,
-                                  void *pOpaque,
-                                  mz_uint flags);
-MINIZ_EXPORT mz_bool
-mz_zip_reader_extract_file_to_callback(mz_zip_archive *pZip,
-                                       const char *pFilename,
-                                       mz_file_write_func pCallback,
-                                       void *pOpaque,
-                                       mz_uint flags);
+MINIZ_EXPORT mz_bool mz_zip_reader_extract_to_callback(
+    mz_zip_archive *pZip, mz_uint file_index, mz_file_write_func pCallback,
+    void *pOpaque, mz_uint flags);
+MINIZ_EXPORT mz_bool mz_zip_reader_extract_file_to_callback(
+    mz_zip_archive *pZip, const char *pFilename, mz_file_write_func pCallback,
+    void *pOpaque, mz_uint flags);
 
 /* Extract a file iteratively */
-MINIZ_EXPORT mz_zip_reader_extract_iter_state *mz_zip_reader_extract_iter_new(
-    mz_zip_archive *pZip,
-    mz_uint file_index,
-    mz_uint flags);
 MINIZ_EXPORT mz_zip_reader_extract_iter_state *
-mz_zip_reader_extract_file_iter_new(mz_zip_archive *pZip,
-                                    const char *pFilename,
+mz_zip_reader_extract_iter_new(mz_zip_archive *pZip, mz_uint file_index,
+                               mz_uint flags);
+MINIZ_EXPORT mz_zip_reader_extract_iter_state *
+mz_zip_reader_extract_file_iter_new(mz_zip_archive *pZip, const char *pFilename,
                                     mz_uint flags);
-MINIZ_EXPORT size_t
-mz_zip_reader_extract_iter_read(mz_zip_reader_extract_iter_state *pState,
-                                void *pvBuf,
-                                size_t buf_size);
+MINIZ_EXPORT size_t mz_zip_reader_extract_iter_read(
+    mz_zip_reader_extract_iter_state *pState, void *pvBuf, size_t buf_size);
 MINIZ_EXPORT mz_bool
 mz_zip_reader_extract_iter_free(mz_zip_reader_extract_iter_state *pState);
 
@@ -1652,11 +1585,9 @@ MINIZ_EXPORT mz_bool mz_zip_reader_extract_to_file(mz_zip_archive *pZip,
                                                    mz_uint file_index,
                                                    const char *pDst_filename,
                                                    mz_uint flags);
-MINIZ_EXPORT mz_bool
-mz_zip_reader_extract_file_to_file(mz_zip_archive *pZip,
-                                   const char *pArchive_filename,
-                                   const char *pDst_filename,
-                                   mz_uint flags);
+MINIZ_EXPORT mz_bool mz_zip_reader_extract_file_to_file(
+    mz_zip_archive *pZip, const char *pArchive_filename,
+    const char *pDst_filename, mz_uint flags);
 
 /* Extracts a archive file starting at the current position in the destination
  * FILE stream. */
@@ -1664,11 +1595,9 @@ MINIZ_EXPORT mz_bool mz_zip_reader_extract_to_cfile(mz_zip_archive *pZip,
                                                     mz_uint file_index,
                                                     MZ_FILE *File,
                                                     mz_uint flags);
-MINIZ_EXPORT mz_bool
-mz_zip_reader_extract_file_to_cfile(mz_zip_archive *pZip,
-                                    const char *pArchive_filename,
-                                    MZ_FILE *pFile,
-                                    mz_uint flags);
+MINIZ_EXPORT mz_bool mz_zip_reader_extract_file_to_cfile(
+    mz_zip_archive *pZip, const char *pArchive_filename, MZ_FILE *pFile,
+    mz_uint flags);
 #endif
 
 #if 0
@@ -1688,8 +1617,7 @@ mz_zip_reader_extract_file_to_cfile(mz_zip_archive *pZip,
 /* It also validates that each file can be successfully uncompressed unless the
  * MZ_ZIP_FLAG_VALIDATE_HEADERS_ONLY is specified. */
 MINIZ_EXPORT mz_bool mz_zip_validate_file(mz_zip_archive *pZip,
-                                          mz_uint file_index,
-                                          mz_uint flags);
+                                          mz_uint file_index, mz_uint flags);
 
 /* Validates an entire archive by calling mz_zip_validate_file() on each file.
  */
@@ -1697,8 +1625,7 @@ MINIZ_EXPORT mz_bool mz_zip_validate_archive(mz_zip_archive *pZip,
                                              mz_uint flags);
 
 /* Misc utils/helpers, valid for ZIP reading or writing */
-MINIZ_EXPORT mz_bool mz_zip_validate_mem_archive(const void *pMem,
-                                                 size_t size,
+MINIZ_EXPORT mz_bool mz_zip_validate_mem_archive(const void *pMem, size_t size,
                                                  mz_uint flags,
                                                  mz_zip_error *pErr);
 #ifndef MINIZ_NO_STDIO
@@ -1726,29 +1653,22 @@ MINIZ_EXPORT mz_bool mz_zip_writer_init_v2(mz_zip_archive *pZip,
                                            mz_uint64 existing_size,
                                            mz_uint flags);
 
-MINIZ_EXPORT mz_bool
-mz_zip_writer_init_heap(mz_zip_archive *pZip,
-                        size_t size_to_reserve_at_beginning,
-                        size_t initial_allocation_size);
-MINIZ_EXPORT mz_bool
-mz_zip_writer_init_heap_v2(mz_zip_archive *pZip,
-                           size_t size_to_reserve_at_beginning,
-                           size_t initial_allocation_size,
-                           mz_uint flags);
+MINIZ_EXPORT mz_bool mz_zip_writer_init_heap(
+    mz_zip_archive *pZip, size_t size_to_reserve_at_beginning,
+    size_t initial_allocation_size);
+MINIZ_EXPORT mz_bool mz_zip_writer_init_heap_v2(
+    mz_zip_archive *pZip, size_t size_to_reserve_at_beginning,
+    size_t initial_allocation_size, mz_uint flags);
 
 #ifndef MINIZ_NO_STDIO
-MINIZ_EXPORT mz_bool
-mz_zip_writer_init_file(mz_zip_archive *pZip,
-                        const char *pFilename,
-                        mz_uint64 size_to_reserve_at_beginning);
-MINIZ_EXPORT mz_bool
-mz_zip_writer_init_file_v2(mz_zip_archive *pZip,
-                           const char *pFilename,
-                           mz_uint64 size_to_reserve_at_beginning,
-                           mz_uint flags);
+MINIZ_EXPORT
+    mz_bool mz_zip_writer_init_file(mz_zip_archive *pZip, const char *pFilename,
+                                    mz_uint64 size_to_reserve_at_beginning);
+MINIZ_EXPORT mz_bool mz_zip_writer_init_file_v2(
+    mz_zip_archive *pZip, const char *pFilename,
+    mz_uint64 size_to_reserve_at_beginning, mz_uint flags);
 MINIZ_EXPORT mz_bool mz_zip_writer_init_cfile(mz_zip_archive *pZip,
-                                              MZ_FILE *pFile,
-                                              mz_uint flags);
+                                              MZ_FILE *pFile, mz_uint flags);
 #endif
 
 /* Converts a ZIP archive reader object into a writer object, to allow efficient
@@ -1779,58 +1699,37 @@ MINIZ_EXPORT mz_bool mz_zip_writer_init_from_reader_v2(mz_zip_archive *pZip,
  * just set to MZ_DEFAULT_COMPRESSION. */
 MINIZ_EXPORT mz_bool mz_zip_writer_add_mem(mz_zip_archive *pZip,
                                            const char *pArchive_name,
-                                           const void *pBuf,
-                                           size_t buf_size,
+                                           const void *pBuf, size_t buf_size,
                                            mz_uint level_and_flags);
 
 /* Like mz_zip_writer_add_mem(), except you can specify a file comment field,
  * and optionally supply the function with already compressed data. */
 /* uncomp_size/uncomp_crc32 are only used if the MZ_ZIP_FLAG_COMPRESSED_DATA
  * flag is specified. */
-MINIZ_EXPORT mz_bool mz_zip_writer_add_mem_ex(mz_zip_archive *pZip,
-                                              const char *pArchive_name,
-                                              const void *pBuf,
-                                              size_t buf_size,
-                                              const void *pComment,
-                                              mz_uint16 comment_size,
-                                              mz_uint level_and_flags,
-                                              mz_uint64 uncomp_size,
-                                              mz_uint32 uncomp_crc32);
+MINIZ_EXPORT mz_bool mz_zip_writer_add_mem_ex(
+    mz_zip_archive *pZip, const char *pArchive_name, const void *pBuf,
+    size_t buf_size, const void *pComment, mz_uint16 comment_size,
+    mz_uint level_and_flags, mz_uint64 uncomp_size, mz_uint32 uncomp_crc32);
 
-MINIZ_EXPORT mz_bool
-mz_zip_writer_add_mem_ex_v2(mz_zip_archive *pZip,
-                            const char *pArchive_name,
-                            const void *pBuf,
-                            size_t buf_size,
-                            const void *pComment,
-                            mz_uint16 comment_size,
-                            mz_uint level_and_flags,
-                            mz_uint64 uncomp_size,
-                            mz_uint32 uncomp_crc32,
-                            MZ_TIME_T *last_modified,
-                            const char *user_extra_data_local,
-                            mz_uint user_extra_data_local_len,
-                            const char *user_extra_data_central,
-                            mz_uint user_extra_data_central_len);
+MINIZ_EXPORT mz_bool mz_zip_writer_add_mem_ex_v2(
+    mz_zip_archive *pZip, const char *pArchive_name, const void *pBuf,
+    size_t buf_size, const void *pComment, mz_uint16 comment_size,
+    mz_uint level_and_flags, mz_uint64 uncomp_size, mz_uint32 uncomp_crc32,
+    MZ_TIME_T *last_modified, const char *user_extra_data_local,
+    mz_uint user_extra_data_local_len, const char *user_extra_data_central,
+    mz_uint user_extra_data_central_len);
 
 /* Adds the contents of a file to an archive. This function also records the
  * disk file's modified time into the archive. */
 /* File data is supplied via a read callback function. User
  * mz_zip_writer_add_(c)file to add a file directly.*/
-MINIZ_EXPORT mz_bool
-mz_zip_writer_add_read_buf_callback(mz_zip_archive *pZip,
-                                    const char *pArchive_name,
-                                    mz_file_read_func read_callback,
-                                    void *callback_opaque,
-                                    mz_uint64 max_size,
-                                    const MZ_TIME_T *pFile_time,
-                                    const void *pComment,
-                                    mz_uint16 comment_size,
-                                    mz_uint level_and_flags,
-                                    const char *user_extra_data_local,
-                                    mz_uint user_extra_data_local_len,
-                                    const char *user_extra_data_central,
-                                    mz_uint user_extra_data_central_len);
+MINIZ_EXPORT mz_bool mz_zip_writer_add_read_buf_callback(
+    mz_zip_archive *pZip, const char *pArchive_name,
+    mz_file_read_func read_callback, void *callback_opaque, mz_uint64 max_size,
+    const MZ_TIME_T *pFile_time, const void *pComment, mz_uint16 comment_size,
+    mz_uint level_and_flags, const char *user_extra_data_local,
+    mz_uint user_extra_data_local_len, const char *user_extra_data_central,
+    mz_uint user_extra_data_central_len);
 
 #ifndef MINIZ_NO_STDIO
 /* Adds the contents of a disk file to an archive. This function also records
@@ -1838,28 +1737,18 @@ mz_zip_writer_add_read_buf_callback(mz_zip_archive *pZip,
 /* level_and_flags - compression level (0-10, see MZ_BEST_SPEED,
  * MZ_BEST_COMPRESSION, etc.) logically OR'd with zero or more mz_zip_flags, or
  * just set to MZ_DEFAULT_COMPRESSION. */
-MINIZ_EXPORT mz_bool mz_zip_writer_add_file(mz_zip_archive *pZip,
-                                            const char *pArchive_name,
-                                            const char *pSrc_filename,
-                                            const void *pComment,
-                                            mz_uint16 comment_size,
-                                            mz_uint level_and_flags);
+MINIZ_EXPORT mz_bool mz_zip_writer_add_file(
+    mz_zip_archive *pZip, const char *pArchive_name, const char *pSrc_filename,
+    const void *pComment, mz_uint16 comment_size, mz_uint level_and_flags);
 
 /* Like mz_zip_writer_add_file(), except the file data is read from the
  * specified FILE stream. */
-MINIZ_EXPORT mz_bool
-mz_zip_writer_add_cfile(mz_zip_archive *pZip,
-                        const char *pArchive_name,
-                        MZ_FILE *pSrc_file,
-                        mz_uint64 max_size,
-                        const MZ_TIME_T *pFile_time,
-                        const void *pComment,
-                        mz_uint16 comment_size,
-                        mz_uint level_and_flags,
-                        const char *user_extra_data_local,
-                        mz_uint user_extra_data_local_len,
-                        const char *user_extra_data_central,
-                        mz_uint user_extra_data_central_len);
+MINIZ_EXPORT mz_bool mz_zip_writer_add_cfile(
+    mz_zip_archive *pZip, const char *pArchive_name, MZ_FILE *pSrc_file,
+    mz_uint64 max_size, const MZ_TIME_T *pFile_time, const void *pComment,
+    mz_uint16 comment_size, mz_uint level_and_flags,
+    const char *user_extra_data_local, mz_uint user_extra_data_local_len,
+    const char *user_extra_data_central, mz_uint user_extra_data_central_len);
 #endif
 
 /* Adds a file to an archive by fully cloning the data from another archive. */
@@ -1867,10 +1756,8 @@ mz_zip_writer_add_cfile(mz_zip_archive *pZip,
  * recompression), along with its full filename, extra data (it may add or
  * modify the zip64 local header extra data field), and the optional descriptor
  * following the compressed data. */
-MINIZ_EXPORT mz_bool
-mz_zip_writer_add_from_zip_reader(mz_zip_archive *pZip,
-                                  mz_zip_archive *pSource_zip,
-                                  mz_uint src_file_index);
+MINIZ_EXPORT mz_bool mz_zip_writer_add_from_zip_reader(
+    mz_zip_archive *pZip, mz_zip_archive *pSource_zip, mz_uint src_file_index);
 
 /* Finalizes the archive by writing the central directory records followed by
  * the end of central directory record. */
@@ -1907,41 +1794,27 @@ MINIZ_EXPORT mz_bool mz_zip_writer_end(mz_zip_archive *pZip);
 /* TODO: Perhaps add an option to leave the existing central dir in place in
  * case the add dies? We could then truncate the file (so the old central dir
  * would be at the end) if something goes wrong. */
-MINIZ_EXPORT mz_bool
-mz_zip_add_mem_to_archive_file_in_place(const char *pZip_filename,
-                                        const char *pArchive_name,
-                                        const void *pBuf,
-                                        size_t buf_size,
-                                        const void *pComment,
-                                        mz_uint16 comment_size,
-                                        mz_uint level_and_flags);
-MINIZ_EXPORT mz_bool
-mz_zip_add_mem_to_archive_file_in_place_v2(const char *pZip_filename,
-                                           const char *pArchive_name,
-                                           const void *pBuf,
-                                           size_t buf_size,
-                                           const void *pComment,
-                                           mz_uint16 comment_size,
-                                           mz_uint level_and_flags,
-                                           mz_zip_error *pErr);
+MINIZ_EXPORT mz_bool mz_zip_add_mem_to_archive_file_in_place(
+    const char *pZip_filename, const char *pArchive_name, const void *pBuf,
+    size_t buf_size, const void *pComment, mz_uint16 comment_size,
+    mz_uint level_and_flags);
+MINIZ_EXPORT mz_bool mz_zip_add_mem_to_archive_file_in_place_v2(
+    const char *pZip_filename, const char *pArchive_name, const void *pBuf,
+    size_t buf_size, const void *pComment, mz_uint16 comment_size,
+    mz_uint level_and_flags, mz_zip_error *pErr);
 
 #ifndef MINIZ_NO_STDIO
 /* Reads a single file from an archive into a heap block. */
 /* If pComment is not NULL, only the file with the specified comment will be
  * extracted. */
 /* Returns NULL on failure. */
-MINIZ_EXPORT void *mz_zip_extract_archive_file_to_heap(
-    const char *pZip_filename,
-    const char *pArchive_name,
-    size_t *pSize,
-    mz_uint flags);
+MINIZ_EXPORT void *
+mz_zip_extract_archive_file_to_heap(const char *pZip_filename,
+                                    const char *pArchive_name, size_t *pSize,
+                                    mz_uint flags);
 MINIZ_EXPORT void *mz_zip_extract_archive_file_to_heap_v2(
-    const char *pZip_filename,
-    const char *pArchive_name,
-    const char *pComment,
-    size_t *pSize,
-    mz_uint flags,
-    mz_zip_error *pErr);
+    const char *pZip_filename, const char *pArchive_name, const char *pComment,
+    size_t *pSize, mz_uint flags, mz_zip_error *pErr);
 #endif
 
 #endif /* #ifndef MINIZ_NO_ARCHIVE_WRITING_APIS */

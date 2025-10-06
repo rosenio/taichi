@@ -4,4 +4,4 @@ namespace taichi {
 
 void print_traceback();
 
-}  // namespace taichi
+} // namespace taichi

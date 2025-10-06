@@ -3,8 +3,8 @@
 #include "taichi/ir/ir.h"
 #include "taichi/program/compile_config.h"
 
-#include <unordered_map>
 #include <typeindex>
+#include <unordered_map>
 #include <utility>
 
 namespace taichi::lang {
@@ -36,13 +36,12 @@ struct AnalysisResultConcept {
 
 template <typename ResultT>
 struct AnalysisResultModel : public AnalysisResultConcept {
-  explicit AnalysisResultModel(ResultT result) : result(std::move(result)) {
-  }
+  explicit AnalysisResultModel(ResultT result) : result(std::move(result)) {}
   ResultT result;
 };
 
 class Pass {
- public:
+public:
   static const PassID id;
 
   // The numbers for the cases are assigned to make sure that Failure & anything
@@ -63,9 +62,8 @@ class Pass {
 };
 
 class AnalysisManager {
- public:
-  template <typename PassT>
-  typename PassT::Result *get_pass_result() {
+public:
+  template <typename PassT> typename PassT::Result *get_pass_result() {
     auto result = result_.find(PassT::id);
     if (result == result_.end()) {
       return nullptr;
@@ -80,8 +78,8 @@ class AnalysisManager {
     result_[PassT::id] = std::make_unique<ResultModelT>(std::move(result));
   }
 
- private:
+private:
   std::unordered_map<PassID, std::unique_ptr<AnalysisResultConcept>> result_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

@@ -7,10 +7,10 @@
 
 #include "taichi/common/core.h"
 #include "taichi/common/filesystem.hpp"
-#include <string>
-#include <vector>
 #include <cstdio>
 #include <cstdlib>
+#include <string>
+#include <vector>
 
 namespace taichi {
 
@@ -38,7 +38,7 @@ inline bool remove(const std::string &path) {
   return std::remove(path.c_str()) == 0;
 }
 
-template <typename Visitor>  // void(const std::string &name, bool is_dir)
+template <typename Visitor> // void(const std::string &name, bool is_dir)
 inline bool traverse_directory(const std::string &dir, Visitor v) {
   namespace fs = std::filesystem;
   std::error_code ec{};
@@ -62,15 +62,13 @@ inline std::string filename_extension(const std::string &filename) {
   return postfix;
 }
 
-template <typename T>
-void write_to_disk(const T &dat, std::string fn) {
+template <typename T> void write_to_disk(const T &dat, std::string fn) {
   FILE *f = fopen(fn.c_str(), "wb");
   fwrite(&dat, sizeof(dat), 1, f);
   fclose(f);
 }
 
-template <typename T>
-bool read_from_disk(T &dat, std::string fn) {
+template <typename T> bool read_from_disk(T &dat, std::string fn) {
   FILE *f = fopen(fn.c_str(), "rb");
   if (f == nullptr) {
     return false;
@@ -114,4 +112,4 @@ bool read_vector_from_disk(std::vector<T> *p_vec, std::string fn) {
   return true;
 }
 
-}  // namespace taichi
+} // namespace taichi

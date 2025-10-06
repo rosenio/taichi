@@ -7,10 +7,10 @@
 #include <variant>
 #include <vector>
 
-#include "taichi/aot/module_data.h"
-#include "taichi/rhi/device.h"
-#include "taichi/ir/snode.h"
 #include "taichi/aot/graph_data.h"
+#include "taichi/aot/module_data.h"
+#include "taichi/ir/snode.h"
+#include "taichi/rhi/device.h"
 
 namespace taichi::lang {
 
@@ -19,7 +19,7 @@ class Graph;
 namespace aot {
 
 class TI_DLL_EXPORT Field {
- public:
+public:
   // Rule of 5 to make MSVC happy
   Field() = default;
   virtual ~Field() = default;
@@ -30,14 +30,13 @@ class TI_DLL_EXPORT Field {
 };
 
 class TI_DLL_EXPORT KernelTemplateArg {
- public:
+public:
   using ArgUnion = std::variant<bool, int64_t, uint64_t, const Field *>;
   template <typename T>
   KernelTemplateArg(const std::string &name, T &&arg)
-      : name_(name), targ_(std::forward<T>(arg)) {
-  }
+      : name_(name), targ_(std::forward<T>(arg)) {}
 
- private:
+private:
   std::string name_;
   /**
    * @brief Template arg
@@ -47,7 +46,7 @@ class TI_DLL_EXPORT KernelTemplateArg {
 };
 
 class TI_DLL_EXPORT KernelTemplate {
- public:
+public:
   // Rule of 5 to make MSVC happy
   KernelTemplate() = default;
   virtual ~KernelTemplate() = default;
@@ -58,16 +57,16 @@ class TI_DLL_EXPORT KernelTemplate {
 
   Kernel *get_kernel(const std::vector<KernelTemplateArg> &template_args);
 
- protected:
-  virtual std::unique_ptr<Kernel> make_new_kernel(
-      const std::vector<KernelTemplateArg> &template_args) = 0;
+protected:
+  virtual std::unique_ptr<Kernel>
+  make_new_kernel(const std::vector<KernelTemplateArg> &template_args) = 0;
 
- private:
+private:
   std::unordered_map<std::string, std::unique_ptr<Kernel>> loaded_kernels_;
 };
 
 class TI_DLL_EXPORT Module {
- public:
+public:
   // Rule of 5 to make MSVC happy
   Module() = default;
   virtual ~Module() = default;
@@ -89,8 +88,8 @@ class TI_DLL_EXPORT Module {
   KernelTemplate *get_kernel_template(const std::string &name);
   Field *get_snode_tree(const std::string &name);
 
-  virtual std::unique_ptr<aot::CompiledGraph> get_graph(
-      const std::string &name) {
+  virtual std::unique_ptr<aot::CompiledGraph>
+  get_graph(const std::string &name) {
     TI_NOT_IMPLEMENTED;
   }
 
@@ -99,21 +98,17 @@ class TI_DLL_EXPORT Module {
     return default_cfg;
   }
 
-  inline bool is_corrupted() const {
-    return is_corrupted_;
-  }
+  inline bool is_corrupted() const { return is_corrupted_; }
 
- protected:
+protected:
   virtual std::unique_ptr<Kernel> make_new_kernel(const std::string &name) = 0;
-  virtual std::unique_ptr<KernelTemplate> make_new_kernel_template(
-      const std::string &name) = 0;
+  virtual std::unique_ptr<KernelTemplate>
+  make_new_kernel_template(const std::string &name) = 0;
   virtual std::unique_ptr<Field> make_new_field(const std::string &name) = 0;
-  inline void mark_corrupted() {
-    is_corrupted_ = true;
-  }
+  inline void mark_corrupted() { is_corrupted_ = true; }
   std::unordered_map<std::string, CompiledGraph> graphs_;
 
- private:
+private:
   bool is_corrupted_{false};
   std::unordered_map<std::string, std::unique_ptr<Kernel>> loaded_kernels_;
   std::unordered_map<std::string, std::unique_ptr<KernelTemplate>>
@@ -121,5 +116,5 @@ class TI_DLL_EXPORT Module {
   std::unordered_map<std::string, std::unique_ptr<Field>> loaded_fields_;
 };
 
-}  // namespace aot
-}  // namespace taichi::lang
+} // namespace aot
+} // namespace taichi::lang

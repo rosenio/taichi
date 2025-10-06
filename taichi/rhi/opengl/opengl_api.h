@@ -1,8 +1,8 @@
 #pragma once
 
 #include "taichi/common/core.h"
-#include "taichi/rhi/impl_support.h"
 #include "taichi/rhi/device.h"
+#include "taichi/rhi/impl_support.h"
 
 namespace taichi::lang {
 namespace opengl {
@@ -20,5 +20,5 @@ std::shared_ptr<Device> make_opengl_device();
 #include "taichi/inc/opengl_extension.inc.h"
 #undef PER_OPENGL_EXTENSION
 
-}  // namespace opengl
-}  // namespace taichi::lang
+} // namespace opengl
+} // namespace taichi::lang

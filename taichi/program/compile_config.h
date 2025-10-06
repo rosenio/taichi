@@ -50,7 +50,7 @@ struct CompileConfig {
   bool cpu_block_dim_adaptive;
   int default_gpu_block_dim;
   int gpu_max_reg;
-  int ad_stack_size{0};  // 0 = adaptive
+  int ad_stack_size{0}; // 0 = adaptive
   // The default size when the Taichi compiler is unable to automatically
   // determine the autodiff stack size.
   int default_ad_stack_size{32};
@@ -92,10 +92,10 @@ struct CompileConfig {
   bool offline_cache{false};
   std::string offline_cache_file_path{get_repo_dir() + "ticache"};
   std::string offline_cache_cleaning_policy{
-      "lru"};  // "never"|"version"|"lru"|"fifo"
+      "lru"}; // "never"|"version"|"lru"|"fifo"
   int offline_cache_max_size_of_files{100 * 1024 *
-                                      1024};   // bytes, default: 100MB
-  double offline_cache_cleaning_factor{0.25};  // [0.f, 1.f]
+                                      1024};  // bytes, default: 100MB
+  double offline_cache_cleaning_factor{0.25}; // [0.f, 1.f]
 
   int num_compile_threads{4};
   std::string vk_api_version;
@@ -109,4 +109,4 @@ struct CompileConfig {
 
 extern TI_DLL_EXPORT CompileConfig default_compile_config;
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

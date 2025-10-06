@@ -8,11 +8,11 @@
 
 #ifndef TAICHI_H
 #include "taichi.h"
-#endif  // TAICHI_H
+#endif // TAICHI_H
 
 #ifdef __cplusplus
 extern "C" {
-#endif  // __cplusplus
+#endif // __cplusplus
 
 // Structure `TiVulkanRuntimeInteropInfo` (1.4.0)
 //
@@ -94,12 +94,10 @@ typedef struct TiVulkanImageInteropInfo {
 // Function `ti_create_vulkan_runtime_ext` (1.4.0)
 //
 // Creates a Vulkan Taichi runtime with user-controlled capability settings.
-TI_DLL_EXPORT TiRuntime TI_API_CALL
-ti_create_vulkan_runtime_ext(uint32_t api_version,
-                             uint32_t instance_extension_count,
-                             const char **instance_extensions,
-                             uint32_t device_extension_count,
-                             const char **device_extensions);
+TI_DLL_EXPORT TiRuntime TI_API_CALL ti_create_vulkan_runtime_ext(
+    uint32_t api_version, uint32_t instance_extension_count,
+    const char **instance_extensions, uint32_t device_extension_count,
+    const char **device_extensions);
 
 // Function `ti_import_vulkan_runtime` (1.4.0)
 //
@@ -110,42 +108,35 @@ ti_import_vulkan_runtime(const TiVulkanRuntimeInteropInfo *interop_info);
 // Function `ti_export_vulkan_runtime` (1.4.0)
 //
 // Exports a Vulkan runtime from external procedures to Taichi.
-TI_DLL_EXPORT void TI_API_CALL
-ti_export_vulkan_runtime(TiRuntime runtime,
-                         TiVulkanRuntimeInteropInfo *interop_info);
+TI_DLL_EXPORT void TI_API_CALL ti_export_vulkan_runtime(
+    TiRuntime runtime, TiVulkanRuntimeInteropInfo *interop_info);
 
 // Function `ti_import_vulkan_memory` (1.4.0)
 //
 // Imports the Vulkan buffer owned by Taichi to external procedures.
-TI_DLL_EXPORT TiMemory TI_API_CALL
-ti_import_vulkan_memory(TiRuntime runtime,
-                        const TiVulkanMemoryInteropInfo *interop_info);
+TI_DLL_EXPORT TiMemory TI_API_CALL ti_import_vulkan_memory(
+    TiRuntime runtime, const TiVulkanMemoryInteropInfo *interop_info);
 
 // Function `ti_export_vulkan_memory` (1.4.0)
 //
 // Exports a Vulkan buffer from external procedures to Taichi.
 TI_DLL_EXPORT void TI_API_CALL
-ti_export_vulkan_memory(TiRuntime runtime,
-                        TiMemory memory,
+ti_export_vulkan_memory(TiRuntime runtime, TiMemory memory,
                         TiVulkanMemoryInteropInfo *interop_info);
 
 // Function `ti_import_vulkan_image` (1.4.0)
 //
 // Imports the Vulkan image owned by Taichi to external procedures.
-TI_DLL_EXPORT TiImage TI_API_CALL
-ti_import_vulkan_image(TiRuntime runtime,
-                       const TiVulkanImageInteropInfo *interop_info,
-                       VkImageViewType view_type,
-                       VkImageLayout layout);
+TI_DLL_EXPORT TiImage TI_API_CALL ti_import_vulkan_image(
+    TiRuntime runtime, const TiVulkanImageInteropInfo *interop_info,
+    VkImageViewType view_type, VkImageLayout layout);
 
 // Function `ti_export_vulkan_image` (1.4.0)
 //
 // Exports a Vulkan image from external procedures to Taichi.
-TI_DLL_EXPORT void TI_API_CALL
-ti_export_vulkan_image(TiRuntime runtime,
-                       TiImage image,
-                       TiVulkanImageInteropInfo *interop_info);
+TI_DLL_EXPORT void TI_API_CALL ti_export_vulkan_image(
+    TiRuntime runtime, TiImage image, TiVulkanImageInteropInfo *interop_info);
 
 #ifdef __cplusplus
-}  // extern "C"
-#endif  // __cplusplus
+} // extern "C"
+#endif // __cplusplus

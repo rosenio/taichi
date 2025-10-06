@@ -1,35 +1,33 @@
 #pragma once
 
+#include "taichi/analysis/gather_uniquely_accessed_pointers.h"
+#include "taichi/analysis/mesh_bls_analyzer.h"
 #include "taichi/ir/ir.h"
 #include "taichi/ir/mesh.h"
 #include "taichi/ir/pass.h"
-#include "taichi/analysis/gather_uniquely_accessed_pointers.h"
-#include "taichi/analysis/mesh_bls_analyzer.h"
 #include <atomic>
 #include <optional>
-#include <unordered_set>
 #include <unordered_map>
+#include <unordered_set>
 
 namespace taichi::lang {
 
 class DiffRange {
- private:
+private:
   bool related_;
 
- public:
+public:
   int coeff;
   int low, high;
 
-  DiffRange() : DiffRange(false, 0) {
-  }
+  DiffRange() : DiffRange(false, 0) {}
 
   DiffRange(bool related, int coeff) : DiffRange(related, 0, 0) {
     TI_ASSERT(related == false);
   }
 
   DiffRange(bool related, int coeff, int low)
-      : DiffRange(related, coeff, low, low + 1) {
-  }
+      : DiffRange(related, coeff, low, low + 1) {}
 
   DiffRange(bool related, int coeff, int low, int high)
       : related_(related), coeff(coeff), low(low), high(high) {
@@ -38,13 +36,9 @@ class DiffRange {
     }
   }
 
-  bool related() const {
-    return related_;
-  }
+  bool related() const { return related_; }
 
-  bool linear_related() const {
-    return related_ && coeff == 1;
-  }
+  bool linear_related() const { return related_ && coeff == 1; }
 
   bool certain() {
     TI_ASSERT(related_);
@@ -106,15 +100,14 @@ std::vector<Stmt *> gather_statements(IRNode *root,
                                       const std::function<bool(Stmt *)> &test);
 void gather_uniquely_accessed_bit_structs(IRNode *root, AnalysisManager *amgr);
 std::tuple<std::unordered_map<const SNode *, GlobalPtrStmt *>,
-           std::unordered_map<std::vector<int>,
-                              ExternalPtrStmt *,
+           std::unordered_map<std::vector<int>, ExternalPtrStmt *,
                               hashing::Hasher<std::vector<int>>>,
            std::unordered_set<MatrixPtrStmt *>>
 gather_uniquely_accessed_pointers(IRNode *root);
 std::unordered_set<Stmt *> gather_dynamically_indexed_pointers(IRNode *root);
 
-std::unique_ptr<std::unordered_set<AtomicOpStmt *>> gather_used_atomics(
-    IRNode *root);
+std::unique_ptr<std::unordered_set<AtomicOpStmt *>>
+gather_used_atomics(IRNode *root);
 stmt_refs get_load_pointers(Stmt *load_stmt, bool get_aliased = false);
 stmt_refs include_aliased_stmts(stmt_refs dest);
 
@@ -156,8 +149,7 @@ bool maybe_same_address(Stmt *var1, Stmt *var2);
  *   ids in the id_map are reached.
  */
 bool same_statements(
-    IRNode *root1,
-    IRNode *root2,
+    IRNode *root1, IRNode *root2,
     const std::optional<std::unordered_map<int, int>> &id_map = std::nullopt);
 
 /**
@@ -168,8 +160,7 @@ bool same_statements(
  *   Same as in same_statements(root1, root2, id_map).
  */
 bool same_value(
-    Stmt *stmt1,
-    Stmt *stmt2,
+    Stmt *stmt1, Stmt *stmt2,
     const std::optional<std::unordered_map<int, int>> &id_map = std::nullopt);
 
 DiffRange value_diff_loop_index(Stmt *stmt, Stmt *loop, int index_id);
@@ -203,9 +194,8 @@ struct DiffPtrResult {
  */
 DiffPtrResult value_diff_ptr_index(Stmt *val1, Stmt *val2);
 
-std::unordered_set<Stmt *> constexpr_prop(
-    Block *block,
-    std::function<bool(Stmt *)> is_const_seed);
+std::unordered_set<Stmt *>
+constexpr_prop(Block *block, std::function<bool(Stmt *)> is_const_seed);
 
 void verify(IRNode *root);
 
@@ -214,11 +204,10 @@ void gather_meshfor_relation_types(IRNode *node);
 std::pair</* owned= */ std::unordered_set<mesh::MeshElementType>,
           /* total= */ std::unordered_set<mesh::MeshElementType>>
 gather_mesh_thread_local(OffloadedStmt *offload, const CompileConfig &config);
-std::unique_ptr<MeshBLSCaches> initialize_mesh_local_attribute(
-    OffloadedStmt *offload,
-    bool auto_mesh_local,
-    const CompileConfig &config);
+std::unique_ptr<MeshBLSCaches>
+initialize_mesh_local_attribute(OffloadedStmt *offload, bool auto_mesh_local,
+                                const CompileConfig &config);
 void gather_func_store_dests(IRNode *ir);
-}  // namespace analysis
-}  // namespace irpass
-}  // namespace taichi::lang
+} // namespace analysis
+} // namespace irpass
+} // namespace taichi::lang

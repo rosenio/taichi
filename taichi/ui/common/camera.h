@@ -21,9 +21,7 @@ struct Camera {
   float z_near{0.1};
   float z_far{1000};
 
-  glm::mat4 get_view_matrix() {
-    return glm::lookAt(position, lookat, up);
-  }
+  glm::mat4 get_view_matrix() { return glm::lookAt(position, lookat, up); }
   glm::mat4 get_projection_matrix(float aspect_ratio) {
     if (projection_mode == ProjectionMode::Perspective) {
       return glm::perspective(glm::radians(fov), aspect_ratio, z_far, z_near);
@@ -35,4 +33,4 @@ struct Camera {
   }
 };
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

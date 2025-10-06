@@ -1,27 +1,27 @@
 #pragma once
 
-#include <string>
-#include "taichi/ui/utils/utils.h"
 #include "input_handler.h"
+#include "taichi/ui/utils/utils.h"
+#include <string>
 
-#include <vector>
-#include <unordered_map>
-#include <queue>
 #include <list>
+#include <queue>
 #include <tuple>
+#include <unordered_map>
+#include <vector>
 
+#include "taichi/program/ndarray.h"
+#include "taichi/ui/common/app_config.h"
 #include "taichi/ui/common/canvas_base.h"
 #include "taichi/ui/common/event.h"
 #include "taichi/ui/common/gui_base.h"
-#include "taichi/ui/common/app_config.h"
-#include "taichi/program/ndarray.h"
 
 struct GLFWwindow;
 
 namespace taichi::ui {
 
 class WindowBase {
- public:
+public:
   bool is_pressed(std::string button);
 
   bool is_running();
@@ -56,7 +56,7 @@ class WindowBase {
 
   virtual ~WindowBase();
 
- protected:
+protected:
   AppConfig config_;
   GLFWwindow *glfw_window_{nullptr};
   InputHandler input_handler_;
@@ -68,25 +68,19 @@ class WindowBase {
   std::list<Event> events_;
   Event current_event_{EventType::Any, ""};
 
- protected:
+protected:
   explicit WindowBase(AppConfig config);
 
   void set_callbacks();
 
-  static void key_callback(GLFWwindow *glfw_window,
-                           int key,
-                           int scancode,
-                           int action,
-                           int mode);
+  static void key_callback(GLFWwindow *glfw_window, int key, int scancode,
+                           int action, int mode);
 
-  static void mouse_pos_callback(GLFWwindow *glfw_window,
-                                 double xpos,
+  static void mouse_pos_callback(GLFWwindow *glfw_window, double xpos,
                                  double ypos);
 
-  static void mouse_button_callback(GLFWwindow *glfw_window,
-                                    int button,
-                                    int action,
-                                    int modifier);
+  static void mouse_button_callback(GLFWwindow *glfw_window, int button,
+                                    int action, int modifier);
 };
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

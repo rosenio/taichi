@@ -1,15 +1,15 @@
 #pragma once
 
+#include "taichi/analysis/mesh_bls_analyzer.h"
 #include "taichi/ir/pass.h"
 #include "taichi/ir/statements.h"
-#include "taichi/analysis/mesh_bls_analyzer.h"
 
 #include <set>
 
 namespace taichi::lang {
 
 class MakeMeshBlockLocal : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Args {
@@ -18,11 +18,10 @@ class MakeMeshBlockLocal : public Pass {
 
   MakeMeshBlockLocal(OffloadedStmt *offload, const CompileConfig &config);
 
-  static void run(OffloadedStmt *offload,
-                  const CompileConfig &config,
+  static void run(OffloadedStmt *offload, const CompileConfig &config,
                   const std::string &kernel_name);
 
- private:
+private:
   void simplify_nested_conversion();
   void gather_candidate_mapping();
   void replace_conv_statements();
@@ -32,24 +31,21 @@ class MakeMeshBlockLocal : public Pass {
   void push_attr_to_global(Block *body, Stmt *idx_val, Stmt *mapping_val);
 
   Stmt *create_xlogue(
-      Stmt *start_val,
-      Stmt *end_val,
+      Stmt *start_val, Stmt *end_val,
       std::function<void(Block * /*block*/, Stmt * /*idx_val*/)> body);
   Stmt *create_cache_mapping(
-      Stmt *start_val,
-      Stmt *end_val,
+      Stmt *start_val, Stmt *end_val,
       std::function<Stmt *(Block * /*block*/, Stmt * /*idx_val*/)> global_val);
 
-  void fetch_mapping(
-      std::function<
-          Stmt *(Stmt * /*start_val*/,
-                 Stmt * /*end_val*/,
-                 std::function<Stmt *(Block * /*block*/,
-                                      Stmt * /*idx_val*/)>)/*global_val*/>
-          mapping_callback_handler,
-      std::function<void(Block * /*body*/,
-                         Stmt * /*idx_val*/,
-                         Stmt * /*mapping_val*/)> attr_callback_handler);
+  void
+  fetch_mapping(std::function<Stmt *(
+                    Stmt * /*start_val*/, Stmt * /*end_val*/,
+                    std::function<Stmt *(Block * /*block*/,
+                                         Stmt * /*idx_val*/)>)/*global_val*/>
+                    mapping_callback_handler,
+                std::function<void(Block * /*body*/, Stmt * /*idx_val*/,
+                                   Stmt * /*mapping_val*/)>
+                    attr_callback_handler);
 
   const CompileConfig &config_;
   OffloadedStmt *offload_{nullptr};
@@ -69,4 +65,4 @@ class MakeMeshBlockLocal : public Pass {
   int mapping_dtype_size_{0};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

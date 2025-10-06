@@ -3,9 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "taichi/rhi/device.h"
 #include "taichi/common/core.h"
 #include "taichi/common/serialization.h"
+#include "taichi/rhi/device.h"
 
 namespace taichi::lang {
 namespace aot {
@@ -19,20 +19,15 @@ struct CompiledFieldData {
   bool is_scalar{false};
   std::vector<int> element_shape;
 
-  TI_IO_DEF(field_name,
-            dtype,
-            dtype_name,
-            mem_offset_in_parent,
-            shape,
-            is_scalar,
-            element_shape);
+  TI_IO_DEF(field_name, dtype, dtype_name, mem_offset_in_parent, shape,
+            is_scalar, element_shape);
 };
 
 enum class BufferType { Root, GlobalTmps, Args, Rets };
 
 struct BufferInfo {
   BufferType type;
-  int id{-1};  // only used if type==Root
+  int id{-1}; // only used if type==Root
 
   TI_IO_DEF(type, id);
 };
@@ -63,12 +58,7 @@ struct CompiledOffloadedTask {
   std::vector<BufferBind> buffer_binds;
   std::vector<TextureBind> texture_binds;
 
-  TI_IO_DEF(type,
-            range_hint,
-            name,
-            source_path,
-            gpu_block_size,
-            buffer_binds,
+  TI_IO_DEF(type, range_hint, name, source_path, gpu_block_size, buffer_binds,
             texture_binds);
 };
 
@@ -91,12 +81,8 @@ struct ArrayArg {
   int bind_index{0};
   BufferFormat format{BufferFormat::unknown};
 
-  TI_IO_DEF(dtype_name,
-            field_dim,
-            element_shape,
-            shape_offset_in_args_buf,
-            bind_index,
-            format);
+  TI_IO_DEF(dtype_name, field_dim, element_shape, shape_offset_in_args_buf,
+            bind_index, format);
 };
 
 struct CompiledTaichiKernel {
@@ -109,13 +95,8 @@ struct CompiledTaichiKernel {
   std::unordered_map<int, ScalarArg> scalar_args;
   std::unordered_map<int, ArrayArg> arr_args;
 
-  TI_IO_DEF(tasks,
-            args_count,
-            rets_count,
-            args_buffer_size,
-            rets_buffer_size,
-            scalar_args,
-            arr_args);
+  TI_IO_DEF(tasks, args_count, rets_count, args_buffer_size, rets_buffer_size,
+            scalar_args, arr_args);
 };
 
 struct ModuleData {
@@ -135,5 +116,5 @@ struct ModuleData {
   TI_IO_DEF(kernels, kernel_tmpls, fields, required_caps, root_buffer_size);
 };
 
-}  // namespace aot
-}  // namespace taichi::lang
+} // namespace aot
+} // namespace taichi::lang

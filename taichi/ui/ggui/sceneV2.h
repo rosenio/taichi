@@ -7,8 +7,8 @@ namespace taichi::ui {
 namespace vulkan {
 
 class TI_DLL_EXPORT SceneV2 final : public SceneBase {
- public:
-  friend class Renderer;  // later, Renderer wont need to be friend
+public:
+  friend class Renderer; // later, Renderer wont need to be friend
   friend class Particles;
   friend class Mesh;
   friend class SceneLines;
@@ -22,10 +22,10 @@ class TI_DLL_EXPORT SceneV2 final : public SceneBase {
   void point_light(glm::vec3 pos, glm::vec3 color) override;
   void ambient_light(glm::vec3 color) override;
 
- private:
+private:
   Renderer *renderer_;
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

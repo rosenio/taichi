@@ -1,39 +1,31 @@
 #pragma once
 
+#include "taichi/analysis/offline_cache_util.h"
 #include "taichi/ir/expr.h"
 #include "taichi/ir/expression.h"
 #include "taichi/ir/frontend_ir.h"
 #include "taichi/program/program.h"
-#include "taichi/analysis/offline_cache_util.h"
 
 namespace taichi::lang {
 
 class ExpressionPrinter : public ExpressionVisitor {
- public:
-  explicit ExpressionPrinter(std::ostream *os = nullptr) : os_(os) {
-  }
+public:
+  explicit ExpressionPrinter(std::ostream *os = nullptr) : os_(os) {}
 
-  void set_ostream(std::ostream *os) {
-    os_ = os;
-  }
+  void set_ostream(std::ostream *os) { os_ = os; }
 
-  std::ostream *get_ostream() {
-    return os_;
-  }
+  std::ostream *get_ostream() { return os_; }
 
- private:
+private:
   std::ostream *os_{nullptr};
 };
 
 class ExpressionHumanFriendlyPrinter : public ExpressionPrinter {
- public:
+public:
   explicit ExpressionHumanFriendlyPrinter(std::ostream *os = nullptr)
-      : ExpressionPrinter(os) {
-  }
+      : ExpressionPrinter(os) {}
 
-  void visit(ExprGroup &expr_group) override {
-    emit_vector(expr_group.exprs);
-  }
+  void visit(ExprGroup &expr_group) override { emit_vector(expr_group.exprs); }
 
   void visit(ArgLoadExpression *expr) override {
     emit(fmt::format("arg{}[{}] (dt={})", expr->create_load ? "load" : "addr",
@@ -197,9 +189,7 @@ class ExpressionHumanFriendlyPrinter : public ExpressionPrinter {
     emit(')');
   }
 
-  void visit(ConstExpression *expr) override {
-    emit(expr->val.stringify());
-  }
+  void visit(ConstExpression *expr) override { emit(expr->val.stringify()); }
 
   void visit(ExternalTensorShapeAlongAxisExpression *expr) override {
     emit("external_tensor_shape_along_axis(");
@@ -263,15 +253,13 @@ class ExpressionHumanFriendlyPrinter : public ExpressionPrinter {
     return oss.str();
   }
 
- protected:
-  template <typename... Args>
-  void emit(Args &&...args) {
+protected:
+  template <typename... Args> void emit(Args &&...args) {
     TI_ASSERT(this->get_ostream());
     (*this->get_ostream() << ... << std::forward<Args>(args));
   }
 
-  template <typename T>
-  void emit_vector(std::vector<T> &v) {
+  template <typename T> void emit_vector(std::vector<T> &v) {
     if (!v.empty()) {
       emit_element(v[0]);
       const auto size = v.size();
@@ -282,8 +270,7 @@ class ExpressionHumanFriendlyPrinter : public ExpressionPrinter {
     }
   }
 
-  template <typename D>
-  void emit_element(D &&e) {
+  template <typename D> void emit_element(D &&e) {
     using T =
         typename std::remove_cv<typename std::remove_reference<D>::type>::type;
     if constexpr (std::is_same_v<T, Expr>) {
@@ -296,4 +283,4 @@ class ExpressionHumanFriendlyPrinter : public ExpressionPrinter {
   }
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

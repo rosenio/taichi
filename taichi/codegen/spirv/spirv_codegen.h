@@ -2,8 +2,8 @@
 
 #include "taichi/util/lang_util.h"
 
-#include "taichi/codegen/spirv/snode_struct_compiler.h"
 #include "taichi/codegen/spirv/kernel_utils.h"
+#include "taichi/codegen/spirv/snode_struct_compiler.h"
 
 #include <spirv-tools/libspirv.hpp>
 #include <spirv-tools/optimizer.hpp>
@@ -15,7 +15,7 @@ class Kernel;
 namespace spirv {
 
 class KernelCodegen {
- public:
+public:
   struct Params {
     std::string ti_kernel_name;
     const Kernel *kernel{nullptr};
@@ -31,7 +31,7 @@ class KernelCodegen {
   void run(TaichiKernelAttributes &kernel_attribs,
            std::vector<std::vector<uint32_t>> &generated_spirv);
 
- private:
+private:
   Params params_;
   KernelContextAttributes ctx_attribs_;
 
@@ -40,5 +40,5 @@ class KernelCodegen {
   spvtools::OptimizerOptions spirv_opt_options_;
 };
 
-}  // namespace spirv
-}  // namespace taichi::lang
+} // namespace spirv
+} // namespace taichi::lang

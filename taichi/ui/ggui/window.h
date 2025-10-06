@@ -1,40 +1,40 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
+#include "taichi/ui/utils/utils.h"
 #include <algorithm>
-#include <chrono>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <cstdint>
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
+#include <memory>
 #include <optional>
 #include <set>
-#include "taichi/ui/utils/utils.h"
-#include <memory>
+#include <stdexcept>
+#include <vector>
 
-#include "taichi/ui/ggui/swap_chain.h"
+#include "taichi/program/ndarray.h"
+#include "taichi/ui/common/window_base.h"
 #include "taichi/ui/ggui/app_context.h"
 #include "taichi/ui/ggui/canvas.h"
-#include "taichi/ui/ggui/sceneV2.h"
-#include "taichi/ui/ggui/renderer.h"
-#include "taichi/ui/common/window_base.h"
 #include "taichi/ui/ggui/gui.h"
 #include "taichi/ui/ggui/gui_metal.h"
-#include "taichi/program/ndarray.h"
+#include "taichi/ui/ggui/renderer.h"
+#include "taichi/ui/ggui/sceneV2.h"
+#include "taichi/ui/ggui/swap_chain.h"
 
 namespace taichi::lang {
 class Program;
-}  // namespace taichi::lang
+} // namespace taichi::lang
 
 namespace taichi::ui {
 
 namespace vulkan {
 
 class Window final : public WindowBase {
- public:
+public:
   Window(lang::Program *prog, const AppConfig &config);
 
   void show() override;
@@ -46,14 +46,14 @@ class Window final : public WindowBase {
 
   void write_image(const std::string &filename) override;
 
-  void copy_depth_buffer_to_ndarray(
-      const taichi::lang::Ndarray &depth_arr) override;
+  void
+  copy_depth_buffer_to_ndarray(const taichi::lang::Ndarray &depth_arr) override;
 
   std::vector<uint32_t> &get_image_buffer(uint32_t &w, uint32_t &h) override;
 
   ~Window() override;
 
- private:
+private:
   std::chrono::time_point<std::chrono::high_resolution_clock> last_frame_time_;
 
   std::unique_ptr<Canvas> canvas_;
@@ -64,7 +64,7 @@ class Window final : public WindowBase {
   double fps_limit_{1000.0};
   double limiter_overshoot_{0.0};
 
- private:
+private:
   void init(lang::Program *prog, const AppConfig &config);
 
   void prepare_for_next_frame();
@@ -75,11 +75,10 @@ class Window final : public WindowBase {
 
   void resize();
 
-  static void framebuffer_resize_callback(GLFWwindow *glfw_window_,
-                                          int width,
+  static void framebuffer_resize_callback(GLFWwindow *glfw_window_, int width,
                                           int height);
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

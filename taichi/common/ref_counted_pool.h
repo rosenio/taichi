@@ -9,24 +9,17 @@
 namespace taichi {
 
 class RefCount {
- public:
-  void inc() {
-    ref_count_++;
-  }
-  int dec() {
-    return --ref_count_;
-  }
-  int count() {
-    return ref_count_;
-  }
+public:
+  void inc() { ref_count_++; }
+  int dec() { return --ref_count_; }
+  int count() { return ref_count_; }
 
- private:
+private:
   int ref_count_{1};
 };
 
-template <class T, bool sync>
-class RefCountedPool {
- public:
+template <class T, bool sync> class RefCountedPool {
+public:
   void inc(T obj) {
     if constexpr (sync) {
       gc_pool_lock_.lock();
@@ -95,10 +88,10 @@ class RefCountedPool {
     gc_pool_.clear();
   }
 
- private:
+private:
   std::unordered_map<T, RefCount> counts_;
   std::vector<T> gc_pool_;
   std::mutex gc_pool_lock_;
 };
 
-}  // namespace taichi
+} // namespace taichi

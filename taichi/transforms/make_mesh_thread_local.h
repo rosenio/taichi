@@ -5,7 +5,7 @@
 namespace taichi::lang {
 
 class MakeMeshThreadLocal : public Pass {
- public:
+public:
   static const PassID id;
 
   struct Args {
@@ -13,4 +13,4 @@ class MakeMeshThreadLocal : public Pass {
   };
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

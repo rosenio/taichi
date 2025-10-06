@@ -1,31 +1,30 @@
 #include <memory>
 
 #include "llvm/ADT/StringRef.h"
-#include "llvm/Support/DynamicLibrary.h"
-#include "llvm/Support/raw_ostream.h"
-#include "llvm/Target/TargetMachine.h"
-#include "llvm/IR/Module.h"
+#include "llvm/Analysis/TargetTransformInfo.h"
+#include "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h"
 #include "llvm/IR/DataLayout.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/LegacyPassManager.h"
+#include "llvm/IR/Module.h"
 #include "llvm/IR/Verifier.h"
+#include "llvm/MC/TargetRegistry.h"
+#include "llvm/Support/DynamicLibrary.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Target/TargetMachine.h"
+#include "llvm/Transforms/IPO.h"
+#include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/Transforms/InstCombine/InstCombine.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Scalar/GVN.h"
-#include "llvm/Transforms/IPO.h"
-#include "llvm/Transforms/IPO/PassManagerBuilder.h"
-#include "llvm/Analysis/TargetTransformInfo.h"
-#include "llvm/MC/TargetRegistry.h"
-#include "llvm/Target/TargetMachine.h"
-#include "llvm/ExecutionEngine/Orc/JITTargetMachineBuilder.h"
 
+#include "taichi/jit/jit_session.h"
+#include "taichi/program/program.h"
 #include "taichi/rhi/cuda/cuda_context.h"
 #include "taichi/rhi/cuda/cuda_driver.h"
-#include "taichi/jit/jit_session.h"
-#include "taichi/util/lang_util.h"
-#include "taichi/program/program.h"
 #include "taichi/system/timer.h"
 #include "taichi/util/file_sequence_writer.h"
+#include "taichi/util/lang_util.h"
 
 #define TI_RUNTIME_HOST
 #include "taichi/program/context.h"
@@ -35,12 +34,11 @@ namespace taichi::lang {
 
 #if defined(TI_WITH_CUDA)
 class JITModuleCUDA : public JITModule {
- private:
+private:
   void *module_;
 
- public:
-  explicit JITModuleCUDA(void *module) : module_(module) {
-  }
+public:
+  explicit JITModuleCUDA(void *module) : module_(module) {}
 
   void *lookup_function(const std::string &name) override {
     // TODO: figure out why using the guard leads to wrong tests results
@@ -59,16 +57,13 @@ class JITModuleCUDA : public JITModule {
     return func;
   }
 
-  void call(const std::string &name,
-            const std::vector<void *> &arg_pointers,
+  void call(const std::string &name, const std::vector<void *> &arg_pointers,
             const std::vector<int> &arg_sizes) override {
     launch(name, 1, 1, 0, arg_pointers, arg_sizes);
   }
 
-  void launch(const std::string &name,
-              std::size_t grid_dim,
-              std::size_t block_dim,
-              std::size_t dynamic_shared_mem_bytes,
+  void launch(const std::string &name, std::size_t grid_dim,
+              std::size_t block_dim, std::size_t dynamic_shared_mem_bytes,
               const std::vector<void *> &arg_pointers,
               const std::vector<int> &arg_sizes) override {
     auto func = lookup_function(name);
@@ -77,36 +72,29 @@ class JITModuleCUDA : public JITModule {
                                        dynamic_shared_mem_bytes);
   }
 
-  bool direct_dispatch() const override {
-    return false;
-  }
+  bool direct_dispatch() const override { return false; }
 };
 
 class JITSessionCUDA : public JITSession {
- public:
+public:
   llvm::DataLayout data_layout;
 
-  JITSessionCUDA(TaichiLLVMContext *tlctx,
-                 const CompileConfig &config,
+  JITSessionCUDA(TaichiLLVMContext *tlctx, const CompileConfig &config,
                  llvm::DataLayout data_layout)
-      : JITSession(tlctx, config), data_layout(data_layout) {
-  }
+      : JITSession(tlctx, config), data_layout(data_layout) {}
 
   JITModule *add_module(std::unique_ptr<llvm::Module> M, int max_reg) override;
 
-  llvm::DataLayout get_data_layout() override {
-    return data_layout;
-  }
+  llvm::DataLayout get_data_layout() override { return data_layout; }
 
- private:
+private:
   std::string compile_module_to_ptx(std::unique_ptr<llvm::Module> &module);
 };
 
 #endif
 
-std::unique_ptr<JITSession> create_llvm_jit_session_cuda(
-    TaichiLLVMContext *tlctx,
-    const CompileConfig &config,
-    Arch arch);
+std::unique_ptr<JITSession>
+create_llvm_jit_session_cuda(TaichiLLVMContext *tlctx,
+                             const CompileConfig &config, Arch arch);
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

@@ -1,33 +1,33 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
+#include "taichi/ui/ggui/vertex.h"
+#include "taichi/ui/utils/utils.h"
 #include <algorithm>
-#include <chrono>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <cstdint>
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
 #include <optional>
 #include <set>
-#include "taichi/ui/utils/utils.h"
-#include "taichi/ui/ggui/vertex.h"
+#include <stdexcept>
+#include <vector>
 
-#include "taichi/ui/ggui/app_context.h"
-#include "taichi/ui/ggui/swap_chain.h"
-#include "taichi/ui/ggui/renderable.h"
 #include "taichi/program/field_info.h"
-#include "taichi/ui/common/canvas_base.h"
 #include "taichi/rhi/device.h"
+#include "taichi/ui/common/canvas_base.h"
+#include "taichi/ui/ggui/app_context.h"
+#include "taichi/ui/ggui/renderable.h"
+#include "taichi/ui/ggui/swap_chain.h"
 
 namespace taichi::ui {
 
 namespace vulkan {
 
 class SetImage final : public Renderable {
- public:
+public:
   struct UniformBufferObject {
     glm::vec2 lower_bound;
     glm::vec2 upper_bound;
@@ -40,14 +40,14 @@ class SetImage final : public Renderable {
 
   SetImage(AppContext *app_context, VertexAttributes vbo_attrs);
 
-  void record_this_frame_commands(
-      taichi::lang::CommandList *command_list) final;
+  void
+  record_this_frame_commands(taichi::lang::CommandList *command_list) final;
 
   void update_data(const SetImageInfo &info);
 
   void update_data(taichi::lang::Texture *tex);
 
- private:
+private:
   int width_{0};
   int height_{0};
 
@@ -55,12 +55,12 @@ class SetImage final : public Renderable {
 
   taichi::lang::BufferFormat format_;
 
- private:
+private:
   void resize_texture(int width, int height, taichi::lang::BufferFormat format);
 
   void update_ubo(float x_factor, float y_factor, bool transpose);
 };
 
-}  // namespace vulkan
+} // namespace vulkan
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

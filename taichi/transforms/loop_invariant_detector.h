@@ -9,7 +9,7 @@
 namespace taichi::lang {
 
 class LoopInvariantDetector : public BasicStmtVisitor {
- public:
+public:
   using BasicStmtVisitor::visit;
 
   std::vector<Block *> loop_blocks;
@@ -20,8 +20,7 @@ class LoopInvariantDetector : public BasicStmtVisitor {
     allow_undefined_visitor = true;
   }
 
-  bool is_operand_loop_invariant_impl(Stmt *operand,
-                                      Block *current_scope,
+  bool is_operand_loop_invariant_impl(Stmt *operand, Block *current_scope,
                                       Block *loop_block = nullptr) {
     if (!loop_block) {
       loop_block = loop_blocks.back();
@@ -56,8 +55,7 @@ class LoopInvariantDetector : public BasicStmtVisitor {
     return true;
   }
 
-  bool is_operand_loop_invariant(Stmt *operand,
-                                 Block *current_scope,
+  bool is_operand_loop_invariant(Stmt *operand, Block *current_scope,
                                  int depth = -1) {
     if (depth == -1) {
       depth = loop_blocks.size() - 1;
@@ -84,13 +82,9 @@ class LoopInvariantDetector : public BasicStmtVisitor {
     return is_invariant;
   }
 
-  Stmt *get_loop_stmt(int depth) {
-    return loop_blocks[depth]->parent_stmt();
-  }
+  Stmt *get_loop_stmt(int depth) { return loop_blocks[depth]->parent_stmt(); }
 
-  Stmt *current_loop_stmt() {
-    return get_loop_stmt(loop_blocks.size() - 1);
-  }
+  Stmt *current_loop_stmt() { return get_loop_stmt(loop_blocks.size() - 1); }
   void visit(Block *stmt_list) override {
     for (auto &stmt : stmt_list->statements)
       stmt->accept(this);
@@ -104,21 +98,13 @@ class LoopInvariantDetector : public BasicStmtVisitor {
     loop_blocks.pop_back();
   }
 
-  void visit(RangeForStmt *stmt) override {
-    visit_loop(stmt->body.get());
-  }
+  void visit(RangeForStmt *stmt) override { visit_loop(stmt->body.get()); }
 
-  void visit(StructForStmt *stmt) override {
-    visit_loop(stmt->body.get());
-  }
+  void visit(StructForStmt *stmt) override { visit_loop(stmt->body.get()); }
 
-  void visit(MeshForStmt *stmt) override {
-    visit_loop(stmt->body.get());
-  }
+  void visit(MeshForStmt *stmt) override { visit_loop(stmt->body.get()); }
 
-  void visit(WhileStmt *stmt) override {
-    visit_loop(stmt->body.get());
-  }
+  void visit(WhileStmt *stmt) override { visit_loop(stmt->body.get()); }
 
   void visit(OffloadedStmt *stmt) override {
     if (stmt->tls_prologue)
@@ -147,4 +133,4 @@ class LoopInvariantDetector : public BasicStmtVisitor {
   }
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

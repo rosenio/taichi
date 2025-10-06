@@ -2,9 +2,9 @@
 
 #include <atomic>
 
-#include "taichi/ir/type.h"
-#include "taichi/ir/snode.h"
 #include "taichi/ir/scratch_pad.h"
+#include "taichi/ir/snode.h"
+#include "taichi/ir/type.h"
 
 #include <unordered_set>
 
@@ -57,9 +57,7 @@ struct MeshLocalRelation {
     fixed = false;
   }
 
-  explicit MeshLocalRelation(SNode *value_) : value(value_) {
-    fixed = true;
-  }
+  explicit MeshLocalRelation(SNode *value_) : value(value_) { fixed = true; }
 
   bool fixed;
   SNode *value{nullptr};
@@ -68,7 +66,7 @@ struct MeshLocalRelation {
 };
 
 class Mesh {
- public:
+public:
   Mesh() = default;
 
   template <typename T>
@@ -77,19 +75,19 @@ class Mesh {
   int num_patches{0};
   MeshMapping<int> num_elements{};
   MeshMapping<int>
-      patch_max_element_num{};  // the max number of mesh element in each patch
+      patch_max_element_num{}; // the max number of mesh element in each patch
 
-  MeshMapping<SNode *> owned_offset{};  // prefix of owned element
-  MeshMapping<SNode *> total_offset{};  // prefix of total element
+  MeshMapping<SNode *> owned_offset{}; // prefix of owned element
+  MeshMapping<SNode *> total_offset{}; // prefix of total element
   std::map<std::pair<MeshElementType, ConvType>, SNode *>
-      index_mapping{};  // mapping from one index space to another index space
+      index_mapping{}; // mapping from one index space to another index space
 
   std::map<MeshRelationType, MeshLocalRelation> relations;
 };
 
-struct MeshPtr {  // Mesh wrapper in python
+struct MeshPtr { // Mesh wrapper in python
   std::shared_ptr<Mesh> ptr;
 };
 
-}  // namespace mesh
-}  // namespace taichi::lang
+} // namespace mesh
+} // namespace taichi::lang

@@ -1,6 +1,6 @@
-#include <cmath>
-#include <algorithm>
 #include "taichi/common/core.h"
+#include <algorithm>
+#include <cmath>
 
 namespace SifakisSVD {
 
@@ -38,47 +38,22 @@ A. McAdams, A. Selle, R. Tamstorf, J. Teran and E. Sifakis
 //  POSSIBILITY OF SUCH DAMAGE.
 // #####################################################################
 
-TI_FORCE_INLINE float rsqrt(const float f) {
-  return 1.0f / std::sqrt(f);
-}
+TI_FORCE_INLINE float rsqrt(const float f) { return 1.0f / std::sqrt(f); }
 
-constexpr float Four_Gamma_Squared = 5.82842712474619f;  // sqrt(8.) + 3.;
+constexpr float Four_Gamma_Squared = 5.82842712474619f; // sqrt(8.) + 3.;
 constexpr float Sine_Pi_Over_Eight =
-    0.3826834323650897f;  // .5 * sqrt(2. - sqrt(2.));
+    0.3826834323650897f; // .5 * sqrt(2. - sqrt(2.));
 constexpr float Cosine_Pi_Over_Eight =
-    0.9238795325112867f;  //.5 * sqrt(2. + sqrt(2.));
+    0.9238795325112867f; //.5 * sqrt(2. + sqrt(2.));
 
 template <int sweeps = 4>
-TI_FORCE_INLINE void svd(const float a11,
-                         const float a12,
-                         const float a13,
-                         const float a21,
-                         const float a22,
-                         const float a23,
-                         const float a31,
-                         const float a32,
-                         const float a33,
-                         float &u11,
-                         float &u12,
-                         float &u13,
-                         float &u21,
-                         float &u22,
-                         float &u23,
-                         float &u31,
-                         float &u32,
-                         float &u33,
-                         float &v11,
-                         float &v12,
-                         float &v13,
-                         float &v21,
-                         float &v22,
-                         float &v23,
-                         float &v31,
-                         float &v32,
-                         float &v33,
-                         float &sigma1,
-                         float &sigma2,
-                         float &sigma3) {
+TI_FORCE_INLINE void
+svd(const float a11, const float a12, const float a13, const float a21,
+    const float a22, const float a23, const float a31, const float a32,
+    const float a33, float &u11, float &u12, float &u13, float &u21, float &u22,
+    float &u23, float &u31, float &u32, float &u33, float &v11, float &v12,
+    float &v13, float &v21, float &v22, float &v23, float &v31, float &v32,
+    float &v33, float &sigma1, float &sigma2, float &sigma3) {
   // var
   union {
     float f;
@@ -1181,4 +1156,4 @@ TI_FORCE_INLINE void svd(const float a11,
   // output
 }
 
-}  // namespace SifakisSVD
+} // namespace SifakisSVD

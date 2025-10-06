@@ -18,24 +18,18 @@ BufferFormat type_channels2buffer_format(const DataType &type,
                                          uint32_t num_channels);
 
 class TI_DLL_EXPORT Texture {
- public:
+public:
   /* Constructs a Texture managed by Program.
    * Texture object allocation and deallocation is handled by Program.
    */
-  explicit Texture(Program *prog,
-                   BufferFormat format,
-                   int width,
-                   int height,
+  explicit Texture(Program *prog, BufferFormat format, int width, int height,
                    int depth = 1);
 
   /* Constructs a Texture from an existing DeviceAllocation
    * It doesn't handle the allocation and deallocation.
    */
-  explicit Texture(DeviceAllocation &devalloc,
-                   BufferFormat format,
-                   int width,
-                   int height,
-                   int depth = 1);
+  explicit Texture(DeviceAllocation &devalloc, BufferFormat format, int width,
+                   int height, int depth = 1);
 
   intptr_t get_device_allocation_ptr_as_int() const;
 
@@ -43,21 +37,15 @@ class TI_DLL_EXPORT Texture {
 
   void from_snode(SNode *snode);
 
-  DeviceAllocation get_device_allocation() const {
-    return texture_alloc_;
-  }
+  DeviceAllocation get_device_allocation() const { return texture_alloc_; }
 
   ~Texture();
 
-  BufferFormat get_buffer_format() const {
-    return format_;
-  }
+  BufferFormat get_buffer_format() const { return format_; }
 
-  std::array<int, 3> get_size() const {
-    return {width_, height_, depth_};
-  }
+  std::array<int, 3> get_size() const { return {width_, height_, depth_}; }
 
- private:
+private:
   DeviceAllocation texture_alloc_{kDeviceNullAllocation};
   DataType dtype_;
   BufferFormat format_;
@@ -69,4 +57,4 @@ class TI_DLL_EXPORT Texture {
   Program *prog_{nullptr};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

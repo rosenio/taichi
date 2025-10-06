@@ -16,16 +16,13 @@ TI_DLL_EXPORT int data_type_size_gfx(DataType t);
 
 TI_DLL_EXPORT std::string data_type_format(DataType dt, Arch arch = Arch::x64);
 
-inline int data_type_bits(DataType t) {
-  return data_type_size(t) * 8;
-}
+inline int data_type_bits(DataType t) { return data_type_size(t) * 8; }
 
 inline size_t align_up(size_t x, size_t alignment) {
   return (x + alignment - 1) / alignment * alignment;
 }
 
-template <typename T>
-inline DataType get_data_type() {
+template <typename T> inline DataType get_data_type() {
   if (std::is_same<T, float32>()) {
     return PrimitiveType::f32;
   } else if (std::is_same<T, float64>()) {
@@ -55,8 +52,7 @@ inline DataType get_data_type() {
   }
 }
 
-template <typename T>
-inline PrimitiveTypeID get_primitive_data_type() {
+template <typename T> inline PrimitiveTypeID get_primitive_data_type() {
   if (std::is_same<T, float32>()) {
     return PrimitiveTypeID::f32;
   } else if (std::is_same<T, float64>()) {
@@ -84,9 +80,7 @@ inline PrimitiveTypeID get_primitive_data_type() {
   }
 }
 
-inline bool is_tensor(DataType dt) {
-  return dt->is<TensorType>();
-}
+inline bool is_tensor(DataType dt) { return dt->is<TensorType>(); }
 
 inline bool is_quant(DataType dt) {
   return dt->is<QuantIntType>() || dt->is<QuantFixedType>() ||
@@ -199,7 +193,7 @@ inline TypedConstant get_min_value(DataType dt) {
 }
 
 class BitStructTypeBuilder {
- public:
+public:
   explicit BitStructTypeBuilder(int max_num_bits) {
     physical_type_ =
         TypeFactory::get_instance().get_primitive_int_type(max_num_bits);
@@ -248,7 +242,7 @@ class BitStructTypeBuilder {
         member_exponent_users_);
   }
 
- private:
+private:
   int add_member_impl(Type *member_type) {
     int old_num_members = member_types_.size();
     member_types_.push_back(member_type);
@@ -283,4 +277,4 @@ class BitStructTypeBuilder {
   int current_shared_exponent_{-1};
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

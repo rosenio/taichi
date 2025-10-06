@@ -1,17 +1,14 @@
 #pragma once
-#include <memory>
-#include <functional>
-#include <vector>
 #include "taichi/ui/utils/utils.h"
+#include <functional>
+#include <memory>
+#include <vector>
 
 namespace taichi::ui {
 
 class InputHandler {
- public:
-  void key_callback(GLFWwindow *window,
-                    int key,
-                    int scancode,
-                    int action,
+public:
+  void key_callback(GLFWwindow *window, int key, int scancode, int action,
                     int mode) {
     if (action == GLFW_PRESS) {
       keys_[key] = true;
@@ -41,9 +38,7 @@ class InputHandler {
     }
   }
 
-  void mouse_button_callback(GLFWwindow *window,
-                             int button,
-                             int action,
+  void mouse_button_callback(GLFWwindow *window, int button, int action,
                              int modifier) {
     if (button == GLFW_MOUSE_BUTTON_LEFT) {
       if (action == GLFW_PRESS) {
@@ -65,17 +60,11 @@ class InputHandler {
     }
   }
 
-  bool is_pressed(int key) {
-    return keys_[key];
-  }
+  bool is_pressed(int key) { return keys_[key]; }
 
-  float last_x() {
-    return last_x_;
-  }
+  float last_x() { return last_x_; }
 
-  float last_y() {
-    return last_y_;
-  }
+  float last_y() { return last_y_; }
 
   void add_key_callback(std::function<void(int, int)> f) {
     user_key_callbacks_.push_back(f);
@@ -87,10 +76,9 @@ class InputHandler {
     user_mouse_button_callbacks_.push_back(f);
   }
 
-  InputHandler() : keys_(1024, false) {
-  }
+  InputHandler() : keys_(1024, false) {}
 
- private:
+private:
   bool first_mouse_ = true;
 
   bool left_mouse_down_ = false;
@@ -104,4 +92,4 @@ class InputHandler {
   std::vector<std::function<void(int, int)>> user_mouse_button_callbacks_;
 };
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

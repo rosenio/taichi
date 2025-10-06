@@ -2,8 +2,8 @@
 
 #include <mutex>
 
-#include "taichi/common/dynamic_loader.h"
 #include "taichi/common/core.h"
+#include "taichi/common/dynamic_loader.h"
 #include "taichi/rhi/cuda/cuda_types.h"
 
 #if (0)
@@ -18,7 +18,7 @@ static_assert(sizeof(CUmodule) == sizeof(void *));
 static_assert(sizeof(CUstream) == sizeof(void *));
 static_assert(sizeof(CUevent) == sizeof(void *));
 static_assert(sizeof(CUjit_option) == sizeof(uint32));
-}  // namespace taichi
+} // namespace taichi
 #endif
 
 namespace taichi::lang {
@@ -48,16 +48,11 @@ constexpr uint32 CU_LIMIT_STACK_SIZE = 0;
 
 std::string get_cuda_error_message(uint32 err);
 
-template <typename... Args>
-class CUDADriverFunction {
- public:
-  CUDADriverFunction() {
-    function_ = nullptr;
-  }
+template <typename... Args> class CUDADriverFunction {
+public:
+  CUDADriverFunction() { function_ = nullptr; }
 
-  void set(void *func_ptr) {
-    function_ = (func_type *)func_ptr;
-  }
+  void set(void *func_ptr) { function_ = (func_type *)func_ptr; }
 
   uint32 call(Args... args) {
     TI_ASSERT(function_ != nullptr);
@@ -71,9 +66,7 @@ class CUDADriverFunction {
     symbol_name_ = symbol_name;
   }
 
-  void set_lock(std::mutex *lock) {
-    driver_lock_ = lock;
-  }
+  void set_lock(std::mutex *lock) { driver_lock_ = lock; }
 
   std::string get_error_message(uint32 err) {
     return get_cuda_error_message(err) +
@@ -92,7 +85,7 @@ class CUDADriverFunction {
     TI_ERROR_IF(err, get_error_message(err));
   }
 
- private:
+private:
   using func_type = uint32_t(Args...);
 
   func_type *function_{nullptr};
@@ -101,10 +94,10 @@ class CUDADriverFunction {
 };
 
 class CUDADriverBase {
- public:
+public:
   ~CUDADriverBase() = default;
 
- protected:
+protected:
   std::unique_ptr<DynamicLoader> loader_;
   CUDADriverBase();
 
@@ -120,8 +113,8 @@ class CUDADriverBase {
 };
 
 class CUDADriver : protected CUDADriverBase {
- public:
-#define PER_CUDA_FUNCTION(name, symbol_name, ...) \
+public:
+#define PER_CUDA_FUNCTION(name, symbol_name, ...)                              \
   CUDADriverFunction<__VA_ARGS__> name;
 #include "taichi/rhi/cuda/cuda_driver_functions.inc.h"
 #undef PER_CUDA_FUNCTION
@@ -142,15 +135,11 @@ class CUDADriver : protected CUDADriverBase {
 
   static CUDADriver &get_instance_without_context();
 
-  int get_version_major() {
-    return version_major_;
-  }
+  int get_version_major() { return version_major_; }
 
-  int get_version_minor() {
-    return version_minor_;
-  }
+  int get_version_minor() { return version_minor_; }
 
- private:
+private:
   CUDADriver();
 
   std::mutex lock_;
@@ -162,66 +151,60 @@ class CUDADriver : protected CUDADriverBase {
 };
 
 class CUSPARSEDriver : protected CUDADriverBase {
- public:
+public:
   static CUSPARSEDriver &get_instance();
 
-#define PER_CUSPARSE_FUNCTION(name, symbol_name, ...) \
+#define PER_CUSPARSE_FUNCTION(name, symbol_name, ...)                          \
   CUDADriverFunction<__VA_ARGS__> name;
 #include "taichi/rhi/cuda/cusparse_functions.inc.h"
 #undef PER_CUSPARSE_FUNCTION
 
   bool load_cusparse();
 
-  inline bool is_loaded() {
-    return cusparse_loaded_;
-  }
+  inline bool is_loaded() { return cusparse_loaded_; }
 
- private:
+private:
   CUSPARSEDriver();
   std::mutex lock_;
   bool cusparse_loaded_{false};
 };
 
 class CUSOLVERDriver : protected CUDADriverBase {
- public:
+public:
   // TODO: Add cusolver function APIs
   static CUSOLVERDriver &get_instance();
 
-#define PER_CUSOLVER_FUNCTION(name, symbol_name, ...) \
+#define PER_CUSOLVER_FUNCTION(name, symbol_name, ...)                          \
   CUDADriverFunction<__VA_ARGS__> name;
 #include "taichi/rhi/cuda/cusolver_functions.inc.h"
 #undef PER_CUSOLVER_FUNCTION
 
   bool load_cusolver();
 
-  inline bool is_loaded() {
-    return cusolver_loaded_;
-  }
+  inline bool is_loaded() { return cusolver_loaded_; }
 
- private:
+private:
   CUSOLVERDriver();
   std::mutex lock_;
   bool cusolver_loaded_{false};
 };
 
 class CUBLASDriver : protected CUDADriverBase {
- public:
+public:
   static CUBLASDriver &get_instance();
 
-#define PER_CUBLAS_FUNCTION(name, symbol_name, ...) \
+#define PER_CUBLAS_FUNCTION(name, symbol_name, ...)                            \
   CUDADriverFunction<__VA_ARGS__> name;
 #include "taichi/rhi/cuda/cublas_functions.inc.h"
 #undef PER_CUBLAS_FUNCTION
 
   bool load_cublas();
 
-  inline bool is_loaded() {
-    return cublas_loaded_;
-  }
+  inline bool is_loaded() { return cublas_loaded_; }
 
- private:
+private:
   CUBLASDriver();
   std::mutex lock_;
   bool cublas_loaded_{false};
 };
-}  // namespace taichi::lang
+} // namespace taichi::lang

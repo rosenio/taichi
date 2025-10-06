@@ -2,8 +2,8 @@
 
 #include <unordered_map>
 
-#include "taichi/program/kernel.h"
 #include "taichi/ir/snode.h"
+#include "taichi/program/kernel.h"
 
 namespace taichi::lang {
 
@@ -16,17 +16,16 @@ class Program;
  * plain data.
  */
 class SNodeRwAccessorsBank {
- private:
+private:
   struct RwKernels {
     Kernel *reader{nullptr};
     Kernel *writer{nullptr};
   };
 
- public:
+public:
   class Accessors {
-   public:
-    explicit Accessors(const SNode *snode,
-                       const RwKernels &kernels,
+  public:
+    explicit Accessors(const SNode *snode, const RwKernels &kernels,
                        Program *prog);
 
     // for float and double
@@ -39,15 +38,14 @@ class SNodeRwAccessorsBank {
     int64 read_int(const std::vector<int> &I);
     uint64 read_uint(const std::vector<int> &I);
 
-   private:
+  private:
     const SNode *snode_;
     Program *prog_;
     Kernel *reader_;
     Kernel *writer_;
   };
 
-  explicit SNodeRwAccessorsBank(Program *program) : program_(program) {
-  }
+  explicit SNodeRwAccessorsBank(Program *program) : program_(program) {}
 
   Accessors get(SNode *snode);
 
@@ -56,9 +54,9 @@ class SNodeRwAccessorsBank {
       snode_to_kernels_.erase(snode);
   }
 
- private:
+private:
   Program *const program_;
   std::unordered_map<const SNode *, RwKernels> snode_to_kernels_;
 };
 
-}  // namespace taichi::lang
+} // namespace taichi::lang

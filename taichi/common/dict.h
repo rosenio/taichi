@@ -5,14 +5,14 @@
 
 #pragma once
 
-#include <map>
-#include <string>
 #include <cstdio>
-#include <iostream>
 #include <fstream>
-#include <vector>
+#include <iostream>
+#include <map>
 #include <sstream>
+#include <string>
 #include <typeinfo>
+#include <vector>
 
 #include "taichi/common/core.h"
 #include "taichi/math/math.h"
@@ -21,20 +21,19 @@ namespace taichi {
 
 // Declare and then load
 // Load to `this`
-#define TI_LOAD_CONFIG(name, default_val) \
+#define TI_LOAD_CONFIG(name, default_val)                                      \
   this->name = config.get(#name, default_val)
 
 class Dict {
- private:
+private:
   std::map<std::string, std::string> data_;
 
- public:
+public:
   TI_IO_DEF(data_);
 
   Dict() = default;
 
-  template <typename T>
-  Dict(const std::string &key, const T &value) {
+  template <typename T> Dict(const std::string &key, const T &value) {
     this->set(key, value);
   }
 
@@ -46,9 +45,7 @@ class Dict {
     return keys;
   }
 
-  void clear() {
-    data_.clear();
-  }
+  void clear() { data_.clear(); }
 
   template <typename V>
   typename std::enable_if_t<(!type::is_VectorND<V>() &&
@@ -73,10 +70,9 @@ class Dict {
 
   void check_string_integral(const std::string &str) const {
     if (!is_string_integral(str)) {
-      TI_ERROR(
-          "Getting integral value out of non-integral string '{}' is not "
-          "allowed.",
-          str);
+      TI_ERROR("Getting integral value out of non-integral string '{}' is not "
+               "allowed.",
+               str);
     }
   }
 
@@ -85,9 +81,8 @@ class Dict {
     check_string_integral(str);
   }
 
-  template <
-      typename V,
-      typename std::enable_if<(type::is_VectorND<V>()), V>::type * = nullptr>
+  template <typename V, typename std::enable_if<(type::is_VectorND<V>()),
+                                                V>::type * = nullptr>
   V get(std::string key) const {
     constexpr int N = V::dim;
     using T = typename V::ScalarType;
@@ -152,12 +147,9 @@ class Dict {
 
   std::string get(std::string key, const char *default_val) const;
 
-  template <typename T>
-  T get(std::string key, const T &default_val) const;
+  template <typename T> T get(std::string key, const T &default_val) const;
 
-  bool has_key(std::string key) const {
-    return data_.find(key) != data_.end();
-  }
+  bool has_key(std::string key) const { return data_.find(key) != data_.end(); }
 
   std::vector<std::string> get_string_arr(std::string key) const {
     std::string str = get_string(key);
@@ -168,8 +160,7 @@ class Dict {
     return strs;
   }
 
-  template <typename T>
-  T *get_ptr(std::string key) const {
+  template <typename T> T *get_ptr(std::string key) const {
     std::string val = get_string(key);
     std::stringstream ss(val);
     std::string t;
@@ -182,8 +173,8 @@ class Dict {
   }
 
   template <typename T>
-  std::enable_if_t<std::is_pointer<T>::value, std::remove_pointer_t<T>> get(
-      std::string key) const {
+  std::enable_if_t<std::is_pointer<T>::value, std::remove_pointer_t<T>>
+  get(std::string key) const {
     return get_ptr<std::remove_pointer_t<T>>(key);
   }
 
@@ -193,8 +184,7 @@ class Dict {
     return *get_ptr<std::remove_reference_t<T>>(key);
   }
 
-  template <typename T>
-  T *get_ptr(std::string key, T *default_value) const {
+  template <typename T> T *get_ptr(std::string key, T *default_value) const {
     if (has_key(key)) {
       return get_ptr<T>(key);
     } else {
@@ -202,8 +192,7 @@ class Dict {
     }
   }
 
-  template <typename T>
-  Dict &set(std::string name, T val) {
+  template <typename T> Dict &set(std::string name, T val) {
     std::stringstream ss;
     ss << val;
     data_[name] = ss.str();
@@ -259,15 +248,13 @@ class Dict {
     return *this;
   }
 
-  template <typename T>
-  static std::string get_ptr_string(T *ptr) {
+  template <typename T> static std::string get_ptr_string(T *ptr) {
     std::stringstream ss;
     ss << typeid(T).name() << "\t" << reinterpret_cast<uint64>(ptr);
     return ss.str();
   }
 
-  template <typename T>
-  Dict &set(std::string name, T *const ptr) {
+  template <typename T> Dict &set(std::string name, T *const ptr) {
     data_[name] = get_ptr_string(ptr);
     return *this;
   }
@@ -286,8 +273,7 @@ class Dict {
   }
 };
 
-template <>
-inline std::string Dict::get<std::string>(std::string key) const {
+template <> inline std::string Dict::get<std::string>(std::string key) const {
   return get_string(key);
 }
 
@@ -306,42 +292,35 @@ inline std::string Dict::get(std::string key, const char *default_val) const {
     return get<std::string>(key);
 }
 
-template <>
-inline float32 Dict::get<float32>(std::string key) const {
+template <> inline float32 Dict::get<float32>(std::string key) const {
   return (float32)std::atof(get_string(key).c_str());
 }
 
-template <>
-inline float64 Dict::get<float64>(std::string key) const {
+template <> inline float64 Dict::get<float64>(std::string key) const {
   return (float64)std::atof(get_string(key).c_str());
 }
 
-template <>
-inline int32 Dict::get<int32>(std::string key) const {
+template <> inline int32 Dict::get<int32>(std::string key) const {
   check_value_integral(key);
   return std::atoi(get_string(key).c_str());
 }
 
-template <>
-inline uint32 Dict::get<uint32>(std::string key) const {
+template <> inline uint32 Dict::get<uint32>(std::string key) const {
   check_value_integral(key);
   return uint32(std::atoll(get_string(key).c_str()));
 }
 
-template <>
-inline int64 Dict::get<int64>(std::string key) const {
+template <> inline int64 Dict::get<int64>(std::string key) const {
   check_value_integral(key);
   return std::atoll(get_string(key).c_str());
 }
 
-template <>
-inline uint64 Dict::get<uint64>(std::string key) const {
+template <> inline uint64 Dict::get<uint64>(std::string key) const {
   check_value_integral(key);
   return std::stoull(get_string(key));
 }
 
-template <>
-inline bool Dict::get<bool>(std::string key) const {
+template <> inline bool Dict::get<bool>(std::string key) const {
   std::string s = get_string(key);
   static std::map<std::string, bool> dict{
       {"true", true},   {"True", true},   {"t", true},  {"1", true},
@@ -354,4 +333,4 @@ inline bool Dict::get<bool>(std::string key) const {
 
 using Config = Dict;
 
-}  // namespace taichi
+} // namespace taichi

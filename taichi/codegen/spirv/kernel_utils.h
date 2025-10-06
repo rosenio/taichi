@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "taichi/ir/offloaded_task_type.h"
-#include "taichi/ir/type.h"
 #include "taichi/ir/transforms.h"
+#include "taichi/ir/type.h"
 #include "taichi/rhi/device.h"
 
 namespace taichi::lang {
@@ -32,21 +32,18 @@ struct TaskAttributes {
 
   struct BufferInfo {
     BufferType type;
-    std::vector<int> root_id{-1};  // only used if type==Root or type==ExtArr
+    std::vector<int> root_id{-1}; // only used if type==Root or type==ExtArr
 
     BufferInfo() = default;
 
     // NOLINTNEXTLINE(google-explicit-constructor)
-    BufferInfo(BufferType buffer_type) : type(buffer_type) {
-    }
+    BufferInfo(BufferType buffer_type) : type(buffer_type) {}
 
     BufferInfo(BufferType buffer_type, int root_buffer_id)
-        : type(buffer_type), root_id({root_buffer_id}) {
-    }
+        : type(buffer_type), root_id({root_buffer_id}) {}
 
     BufferInfo(BufferType buffer_type, const std::vector<int> &root_buffer_id)
-        : type(buffer_type), root_id(root_buffer_id) {
-    }
+        : type(buffer_type), root_id(root_buffer_id) {}
 
     bool operator==(const BufferInfo &other) const {
       if (type != other.type) {
@@ -112,9 +109,7 @@ struct TaskAttributes {
     bool const_begin{true};
     bool const_end{true};
 
-    inline bool const_range() const {
-      return (const_begin && const_end);
-    }
+    inline bool const_range() const { return (const_begin && const_end); }
 
     TI_IO_DEF(begin, end, const_begin, const_end);
   };
@@ -127,13 +122,8 @@ struct TaskAttributes {
 
   std::string debug_string() const;
 
-  TI_IO_DEF(name,
-            advisory_total_num_threads,
-            advisory_num_threads_per_group,
-            task_type,
-            buffer_binds,
-            texture_binds,
-            range_for_attribs);
+  TI_IO_DEF(name, advisory_total_num_threads, advisory_num_threads_per_group,
+            task_type, buffer_binds, texture_binds, range_for_attribs);
 };
 
 /**
@@ -153,7 +143,7 @@ struct TaskAttributes {
  * +----------+---------+----------+---------+-----------------+
  */
 class KernelContextAttributes {
- private:
+private:
   /**
    * Attributes that are shared by the input arg and the return value.
    */
@@ -174,18 +164,11 @@ class KernelContextAttributes {
     BufferFormat format{BufferFormat::unknown};
     ParameterType ptype{ParameterType::kUnknown};
 
-    TI_IO_DEF(name,
-              stride,
-              offset_in_mem,
-              dtype,
-              is_array,
-              element_shape,
-              field_dim,
-              format,
-              ptype);
+    TI_IO_DEF(name, stride, offset_in_mem, dtype, is_array, element_shape,
+              field_dim, format, ptype);
   };
 
- public:
+public:
   /**
    * This is mostly the same as Kernel::Arg, with device specific attributes.
    */
@@ -194,17 +177,8 @@ class KernelContextAttributes {
     std::vector<int> indices;
     bool is_argpack{false};
 
-    TI_IO_DEF(name,
-              stride,
-              offset_in_mem,
-              indices,
-              dtype,
-              is_array,
-              is_argpack,
-              element_shape,
-              field_dim,
-              format,
-              ptype);
+    TI_IO_DEF(name, stride, offset_in_mem, indices, dtype, is_array, is_argpack,
+              element_shape, field_dim, format, ptype);
   };
 
   /**
@@ -214,16 +188,8 @@ class KernelContextAttributes {
     // Index of the return value in the host `Context`.
     int index{-1};
 
-    TI_IO_DEF(name,
-              stride,
-              offset_in_mem,
-              index,
-              dtype,
-              is_array,
-              element_shape,
-              field_dim,
-              format,
-              ptype);
+    TI_IO_DEF(name, stride, offset_in_mem, index, dtype, is_array,
+              element_shape, field_dim, format, ptype);
   };
 
   KernelContextAttributes() = default;
@@ -233,12 +199,10 @@ class KernelContextAttributes {
   /**
    * Whether this kernel has any argument
    */
-  inline bool has_args() const {
-    return !arg_attribs_vec_.empty();
-  }
+  inline bool has_args() const { return !arg_attribs_vec_.empty(); }
 
-  inline const std::vector<std::pair<std::vector<int>, ArgAttributes>> &args()
-      const {
+  inline const std::vector<std::pair<std::vector<int>, ArgAttributes>> &
+  args() const {
     return arg_attribs_vec_;
   }
 
@@ -257,9 +221,7 @@ class KernelContextAttributes {
   /**
    * Whether this kernel has any return value
    */
-  inline bool has_rets() const {
-    return !ret_attribs_vec_.empty();
-  }
+  inline bool has_rets() const { return !ret_attribs_vec_.empty(); }
 
   inline const std::vector<RetAttributes> &rets() const {
     return ret_attribs_vec_;
@@ -268,37 +230,27 @@ class KernelContextAttributes {
   /**
    * Whether this kernel has either arguments or return values.
    */
-  inline bool empty() const {
-    return !(has_args() || has_rets());
-  }
+  inline bool empty() const { return !(has_args() || has_rets()); }
 
   /**
    * Number of bytes needed by all the arguments.
    */
-  inline size_t args_bytes() const {
-    return args_bytes_;
-  }
+  inline size_t args_bytes() const { return args_bytes_; }
 
   /**
    * Number of bytes needed by all the return values.
    */
-  inline size_t rets_bytes() const {
-    return rets_bytes_;
-  }
+  inline size_t rets_bytes() const { return rets_bytes_; }
 
   /**
    * The type of the struct that contains all the arguments.
    */
-  inline const lang::StructType *args_type() const {
-    return args_type_;
-  }
+  inline const lang::StructType *args_type() const { return args_type_; }
 
   /**
    * The type of the struct that contains all the return values.
    */
-  inline const lang::StructType *rets_type() const {
-    return rets_type_;
-  }
+  inline const lang::StructType *rets_type() const { return rets_type_; }
 
   /**
    * Get the type of argpack by arg_id.
@@ -323,16 +275,10 @@ class KernelContextAttributes {
   std::vector<std::pair<std::vector<int>, irpass::ExternalPtrAccess>>
       arr_access;
 
-  TI_IO_DEF(arg_attribs_vec_,
-            ret_attribs_vec_,
-            args_bytes_,
-            rets_bytes_,
-            arr_access,
-            args_type_,
-            rets_type_,
-            argpack_types_);
+  TI_IO_DEF(arg_attribs_vec_, ret_attribs_vec_, args_bytes_, rets_bytes_,
+            arr_access, args_type_, rets_type_, argpack_types_);
 
- private:
+private:
   std::vector<std::pair<std::vector<int>, ArgAttributes>> arg_attribs_vec_;
   std::vector<RetAttributes> ret_attribs_vec_;
 
@@ -361,5 +307,5 @@ struct TaichiKernelAttributes {
   TI_IO_DEF(name, is_jit_evaluator, tasks_attribs, ctx_attribs);
 };
 
-}  // namespace spirv
-}  // namespace taichi::lang
+} // namespace spirv
+} // namespace taichi::lang

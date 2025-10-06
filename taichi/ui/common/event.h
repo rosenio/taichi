@@ -11,4 +11,4 @@ struct Event {
   DEFINE_PROPERTY(std::string, key);
 };
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

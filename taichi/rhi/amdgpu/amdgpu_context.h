@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mutex>
-#include <unordered_map>
 #include <thread>
+#include <unordered_map>
 
 #include "taichi/program/kernel_profiler.h"
 #include "taichi/rhi/amdgpu/amdgpu_driver.h"
@@ -13,7 +13,7 @@ namespace lang {
 class AMDGPUDriver;
 
 class AMDGPUContext {
- private:
+private:
   void *device_{nullptr};
   void *context_{nullptr};
   int dev_count_{0};
@@ -25,16 +25,14 @@ class AMDGPUContext {
   bool debug_{false};
   std::vector<void *> kernel_arg_pointer_;
 
- public:
+public:
   AMDGPUContext();
 
   std::size_t get_total_memory();
   std::size_t get_free_memory();
   std::string get_device_name();
 
-  bool detected() const {
-    return dev_count_ != 0;
-  }
+  bool detected() const { return dev_count_ != 0; }
 
   void push_back_kernel_arg_pointer(void *ptr) {
     kernel_arg_pointer_.push_back(ptr);
@@ -48,52 +46,36 @@ class AMDGPUContext {
                               kernel_arg_pointer_.end());
   }
 
-  void pack_args(std::vector<void *> arg_pointers,
-                 std::vector<int> arg_sizes,
+  void pack_args(std::vector<void *> arg_pointers, std::vector<int> arg_sizes,
                  char *arg_packed);
 
   int get_args_byte(std::vector<int> arg_sizes);
 
-  void set_profiler(KernelProfilerBase *profiler) {
-    profiler_ = profiler;
-  }
+  void set_profiler(KernelProfilerBase *profiler) { profiler_ = profiler; }
 
-  void launch(void *func,
-              const std::string &task_name,
+  void launch(void *func, const std::string &task_name,
               const std::vector<void *> &arg_pointers,
-              const std::vector<int> &arg_sizes,
-              unsigned grid_dim,
-              unsigned block_dim,
-              std::size_t dynamic_shared_mem_bytes);
+              const std::vector<int> &arg_sizes, unsigned grid_dim,
+              unsigned block_dim, std::size_t dynamic_shared_mem_bytes);
 
-  void set_debug(bool debug) {
-    debug_ = debug;
-  }
+  void set_debug(bool debug) { debug_ = debug; }
 
-  std::string get_mcpu() const {
-    return mcpu_;
-  }
+  std::string get_mcpu() const { return mcpu_; }
 
-  void *get_context() {
-    return context_;
-  }
+  void *get_context() { return context_; }
 
-  void make_current() {
-    driver_.context_set_current(context_);
-  }
+  void make_current() { driver_.context_set_current(context_); }
 
-  int get_compute_capability() const {
-    return compute_capability_;
-  }
+  int get_compute_capability() const { return compute_capability_; }
 
   ~AMDGPUContext();
 
   class ContextGuard {
-   private:
+  private:
     void *old_ctx_;
     void *new_ctx_;
 
-   public:
+  public:
     explicit ContextGuard(AMDGPUContext *new_ctx)
         : old_ctx_(nullptr), new_ctx_(new_ctx) {
       AMDGPUDriver::get_instance().context_get_current(&old_ctx_);
@@ -108,9 +90,7 @@ class AMDGPUContext {
     }
   };
 
-  ContextGuard get_guard() {
-    return ContextGuard(this);
-  }
+  ContextGuard get_guard() { return ContextGuard(this); }
 
   std::unique_lock<std::mutex> get_lock_guard() {
     return std::unique_lock<std::mutex>(lock_);
@@ -119,5 +99,5 @@ class AMDGPUContext {
   static AMDGPUContext &get_instance();
 };
 
-}  // namespace lang
-}  // namespace taichi
+} // namespace lang
+} // namespace taichi

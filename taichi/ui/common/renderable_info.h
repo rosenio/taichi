@@ -1,7 +1,7 @@
 #pragma once
 
-#include "taichi/ui/ggui/vertex.h"
 #include "taichi/program/field_info.h"
+#include "taichi/ui/ggui/vertex.h"
 #include "taichi/ui/utils/utils.h"
 
 namespace taichi::ui {
@@ -20,4 +20,4 @@ struct RenderableInfo {
   taichi::lang::PolygonMode display_mode{taichi::lang::PolygonMode::Fill};
 };
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

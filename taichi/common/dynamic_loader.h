@@ -10,21 +10,20 @@
 namespace taichi {
 
 class DynamicLoader {
- public:
+public:
   static bool check_lib_loaded(const std::string &lib_path);
 
- private:
+private:
   void load_dll(const std::string &dll_path);
 
   void close_dll();
 
- public:
+public:
   explicit DynamicLoader(const std::string &dll_path);
 
   void *load_function(const std::string &func_name);
 
-  template <typename T>
-  void load_function(const std::string &func_name, T &f) {
+  template <typename T> void load_function(const std::string &func_name, T &f) {
     f = (T)load_function(func_name);
   }
 
@@ -32,8 +31,8 @@ class DynamicLoader {
 
   ~DynamicLoader();
 
- private:
+private:
   void *dll_ = nullptr;
 };
 
-}  // namespace taichi
+} // namespace taichi

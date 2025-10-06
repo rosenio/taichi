@@ -2,29 +2,27 @@
 
 #pragma once
 
-#include <string>
-#include <iostream>
-#include <stdexcept>
-#include <stdio.h>
-#include <iostream>
-#include <fstream>
-#include <stdexcept>
 #include <algorithm>
-#include <chrono>
-#include <vector>
-#include <cstring>
-#include <cstdlib>
-#include <cstdint>
 #include <array>
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+#include <iostream>
 #include <optional>
 #include <set>
+#include <stdexcept>
+#include <stdio.h>
+#include <string>
 #include <unordered_map>
+#include <vector>
 
 #ifdef _WIN64
+#include <VersionHelpers.h>
 #include <aclapi.h>
 #include <dxgi1_2.h>
 #include <windows.h>
-#include <VersionHelpers.h>
 #define _USE_MATH_DEFINES
 #endif
 
@@ -32,9 +30,9 @@
 #define VK_USE_PLATFORM_WIN32_KHR 1
 #endif
 
-#include "taichi/rhi/vulkan/vulkan_common.h"
-#include "taichi/rhi/common/window_system.h"
 #include "taichi/common/filesystem.hpp"
+#include "taichi/rhi/common/window_system.h"
+#include "taichi/rhi/vulkan/vulkan_common.h"
 
 #include <stdarg.h>
 
@@ -45,20 +43,17 @@
 
 namespace taichi::ui {
 
-#define RHI_VERIFY(rhi_call)                                    \
-  {                                                             \
-    taichi::lang::RhiResult r = rhi_call;                       \
-    TI_ASSERT_INFO(r == taichi::lang::RhiResult::success,       \
-                   "`{}` failed, error {}", #rhi_call, int(r)); \
+#define RHI_VERIFY(rhi_call)                                                   \
+  {                                                                            \
+    taichi::lang::RhiResult r = rhi_call;                                      \
+    TI_ASSERT_INFO(r == taichi::lang::RhiResult::success,                      \
+                   "`{}` failed, error {}", #rhi_call, int(r));                \
   }
 
 #ifdef TI_WITH_GLFW
-inline GLFWwindow *create_glfw_window_(const std::string &name,
-                                       int screenWidth,
-                                       int screenHeight,
-                                       int window_pos_x,
-                                       int window_pos_y,
-                                       bool vsync) {
+inline GLFWwindow *create_glfw_window_(const std::string &name, int screenWidth,
+                                       int screenHeight, int window_pos_x,
+                                       int window_pos_y, bool vsync) {
   if (!taichi::lang::window_system::glfw_context_acquire()) {
     printf("cannot initialize GLFW\n");
     exit(EXIT_FAILURE);
@@ -203,4 +198,4 @@ inline std::vector<char> read_file(const std::string &filename) {
   return buffer;
 }
 
-}  // namespace taichi::ui
+} // namespace taichi::ui

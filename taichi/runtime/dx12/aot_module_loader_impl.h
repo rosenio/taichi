@@ -15,10 +15,9 @@ struct TI_DLL_EXPORT AotModuleParams {
   std::string module_path;
 };
 
-TI_DLL_EXPORT std::unique_ptr<aot::Module> make_aot_module(
-    std::any mod_params,
-    Arch device_api_backend);
+TI_DLL_EXPORT std::unique_ptr<aot::Module>
+make_aot_module(std::any mod_params, Arch device_api_backend);
 
-}  // namespace directx12
-}  // namespace lang
-}  // namespace taichi
+} // namespace directx12
+} // namespace lang
+} // namespace taichi

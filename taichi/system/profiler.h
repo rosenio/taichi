@@ -5,11 +5,11 @@
 
 #pragma once
 
-#include <vector>
 #include <map>
 #include <memory>
 #include <mutex>
 #include <thread>
+#include <vector>
 
 #include "taichi/common/core.h"
 #include "taichi/system/timer.h"
@@ -21,7 +21,7 @@ class ProfilerRecords;
 // Captures running time between the construction and destruction of the
 // profiler instance
 class ScopedProfiler {
- public:
+public:
   explicit ScopedProfiler(std::string name, uint64 elements = -1);
 
   void stop();
@@ -32,7 +32,7 @@ class ScopedProfiler {
 
   ~ScopedProfiler();
 
- private:
+private:
   std::string name_;
   float64 start_time_;
   uint64 elements_;
@@ -41,13 +41,13 @@ class ScopedProfiler {
 
 // A profiling system for multithreaded applications
 class Profiling {
- public:
+public:
   void print_profile_info();
   void clear_profile_info();
   ProfilerRecords *get_this_thread_profiler();
   static Profiling &get_instance();
 
- private:
+private:
   std::mutex mut_;
   std::unordered_map<std::thread::id, ProfilerRecords *> profilers_;
 };
@@ -56,4 +56,4 @@ class Profiling {
 
 #define TI_AUTO_PROF TI_PROFILER(__FUNCTION__)
 
-}  // namespace taichi
+} // namespace taichi
